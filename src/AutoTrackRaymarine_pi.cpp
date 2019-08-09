@@ -29,7 +29,6 @@
 #include <wx/aui/aui.h>
 //#include "apdc.h"
 #include "jsoncpp/json/json.h"
-//#include "json/json.h"
 #include "AutoTrackRaymarine_pi.h"
 #include "concanv.h"
 #include "PreferencesDialog.h"
@@ -496,8 +495,8 @@ static bool ParseMessage(wxString &message_body, Json::Value &root)
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
-  //// construct the JSON root object
-  //Json::Value  root;
+  // construct the JSON root object
+  Json::Value  root;
   //// construct a JSON parser
   //wxString    out;
 

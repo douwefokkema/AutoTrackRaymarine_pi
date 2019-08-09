@@ -59,7 +59,7 @@
 #include "ocpn_plugin.h"
 
 #ifdef __MSVC__
-//#include "msvcdefs.h"
+#include "msvcdefs.h"
 #endif
 
 //----------------------------------
