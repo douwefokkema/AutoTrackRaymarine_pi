@@ -171,7 +171,7 @@ void ConsoleCanvas::SetColorScheme( PI_ColorScheme cs )
 
 void ConsoleCanvas::OnPaint( wxPaintEvent& event )
 {
-    wxPaintDC dc( this );
+    /*wxPaintDC dc( this );
 
 #if 0    
     if( g_pRouteMan->GetpActiveRoute() ) {
@@ -182,12 +182,12 @@ void ConsoleCanvas::OnPaint( wxPaintEvent& event )
 
         UpdateRouteData();
     }
-#endif    
+#endif */   
 }
 
 void ConsoleCanvas::OnShow( wxShowEvent& event )
 {
-    pXTE->Show( m_pi.prefs.ActiveRouteLabel(page, "XTE") );
+    /*pXTE->Show( m_pi.prefs.ActiveRouteLabel(page, "XTE") );
     pBRG->Show( m_pi.prefs.ActiveRouteLabel(page, "BRG") );
     pRNG->Show( m_pi.prefs.ActiveRouteLabel(page, "RNG") );
     pTTG->Show( m_pi.prefs.ActiveRouteLabel(page, "TTG") );
@@ -198,7 +198,7 @@ void ConsoleCanvas::OnShow( wxShowEvent& event )
     pCDI->Show( m_pi.prefs.ActiveRouteLabel(page, "Highway") );
     pDeactivate->Show( m_pi.prefs.ActiveRouteLabel(page, "Deactivate") );
 
-    m_pitemBoxSizerLeg->SetSizeHints( this );
+    m_pitemBoxSizerLeg->SetSizeHints( this );*/
 }
 
 void ConsoleCanvas::OnContextMenu( wxContextMenuEvent& event ) {

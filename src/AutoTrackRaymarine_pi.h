@@ -106,15 +106,13 @@ public:
   static wxString StandardPath();
 
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
-  double Declination();
 
   NMEA0183 m_NMEA0183;
 
   double m_XTE, m_BTW;
   bool m_heading_set;
   double m_var;
-  HANDLE m_hSerialin; //COM port handler
-  NGT1Input *m_NGT1_read;
+  
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
   uint16_t m_pilot_state; // 0 standby, 1 auto, 2 tracking
@@ -132,13 +130,6 @@ public:
     struct preferences {
         double max_angle;
         wxString com_port;
-        // Active Route Window
-        std::map<wxString, bool> active_route_labels[2];
-        bool ActiveRouteLabel(int i, wxString label) {
-            if(active_route_labels[i].find(label) != active_route_labels[i].end())
-                return active_route_labels[i][label];
-            return false;
-        }
 
         // Waypoint Arrival
         bool confirm_bearing_change;
@@ -148,15 +139,6 @@ public:
         wxString boundary_guid;
         int boundary_width;
 
-        // NMEA output
-        int rate;
-        bool magnetic;
-        std::map<wxString, bool> nmea_sentences;
-        bool NmeaSentences(wxString sentence) {
-            if(nmea_sentences.find(sentence) != nmea_sentences.end())
-                return nmea_sentences[sentence];
-            return false;
-        }
     } prefs;
 
     // for console canvas
@@ -182,10 +164,7 @@ private:
     int m_leftclick_tool_id;
     wxTimer m_Timer;
 
-    double m_declination;
-    wxDateTime m_declinationTime;
     
-
     ConsoleCanvas *m_ConsoleCanvas;
     
 
@@ -204,10 +183,6 @@ private:
     double m_avg_sog;
 
     // for handling NGT-1
-    
-    bool OpenSerialPort(wchar_t* pcCommPort, HANDLE* handle);
-    void writeMessage(HANDLE handle, unsigned char command, const unsigned char * cmd, const size_t len);
-    void parseAndWriteIn(HANDLE handle, const unsigned char * cmd);
     void AutoTrackRaymarine_pi::SetAutopilotHeading(double heading);
 };
 

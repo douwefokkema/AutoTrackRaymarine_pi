@@ -32,8 +32,9 @@ class PreferencesDialog : public PreferencesDialogBase
 public:
     PreferencesDialog(wxWindow *parent, AutoTrackRaymarine_pi &pi )
         : PreferencesDialogBase(parent), m_pi(pi) {
-      FindSerialPorts();
+      
     }
+    ~PreferencesDialog();
 
     bool Show( bool show = true );
     void FindSerialPorts();

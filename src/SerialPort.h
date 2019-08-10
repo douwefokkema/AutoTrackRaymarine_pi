@@ -45,7 +45,12 @@ class SerialPort {
 
 public:
   SerialPort(AutoTrackRaymarine_pi *pi);
-  
+  ~SerialPort();
   AutoTrackRaymarine_pi* m_pi;
+  HANDLE m_hSerialin; //COM port handler
+  NGT1Input *m_NGT1_read;
+  bool OpenSerialPort(wchar_t* pcCommPort, HANDLE* handle);
+  void writeMessage(HANDLE handle, unsigned char command, const unsigned char * cmd, const size_t len);
+  void parseAndWriteIn(HANDLE handle, const unsigned char * cmd);
 
 };

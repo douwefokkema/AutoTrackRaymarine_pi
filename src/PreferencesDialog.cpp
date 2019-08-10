@@ -35,6 +35,7 @@ bool PreferencesDialog::Show( bool show )
 
         // load preferences
         AutoTrackRaymarine_pi::preferences &p = m_pi.prefs;
+        FindSerialPorts();
 
         m_sMaxAngle1->SetValue(p.max_angle);
         m_comboBox1->SetValue(p.com_port);
@@ -63,8 +64,13 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.intercept_route = m_cbInterceptRoute->GetValue();
     p.com_port = m_comboBox1->GetValue();
     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$x comport value =%s"), p.com_port);
+    // make com port now
+
     Hide();
 }
+
+PreferencesDialog::~PreferencesDialog() {
+};
 
 void PreferencesDialog::FindSerialPorts() {
   // find and locate serial ports

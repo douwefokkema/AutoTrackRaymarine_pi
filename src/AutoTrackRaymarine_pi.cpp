@@ -34,17 +34,15 @@
 #include "PreferencesDialog.h"
 #include "icons.h"
 #include "GL/gl.h"
-#include "conio.h"
 #include "actisense.h"
 #include "NGT1Read.h"
 #include "actisense.h"
-#include "serial/serial.h"
-#include "SerialPort.h"
+
 
 using namespace std;
 #define TURNRATE 10.   // turnrate per second
 
-#define NGT1_port 6  // later in preferences, todo
+
 
 // commands for NGT-1 in Canboat format
 // string msg0 = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standbye
@@ -90,7 +88,6 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
   m_ConsoleCanvas = NULL;
   m_PreferencesDialog = NULL;
   m_avg_sog = 0;
-  m_declination = NAN;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -131,91 +128,18 @@ int AutoTrackRaymarine_pi::Init(void)
   p.boundary_guid = pConf->Read("Boundary", "");
   p.boundary_width = pConf->Read("BoundaryWidth", 30);
 
-  // NMEA output
-  p.rate = pConf->Read("NMEARate", 1L);
-  p.magnetic = (bool)pConf->Read("NMEAMagnetic", 0L);
-  wxString sentences = pConf->Read("NMEASentences", "APB;");
-  while (sentences.size()) {
-    p.nmea_sentences[sentences.BeforeFirst(';')] = true;
-    sentences = sentences.AfterFirst(';');
-  }
+  //// NMEA output
+  //p.rate = pConf->Read("NMEARate", 1L);
+  //p.magnetic = (bool)pConf->Read("NMEAMagnetic", 0L);
+  //wxString sentences = pConf->Read("NMEASentences", "APB;");
+  //while (sentences.size()) {
+  //  p.nmea_sentences[sentences.BeforeFirst(';')] = true;
+  //  sentences = sentences.AfterFirst(';');
+  //}
 
  
   m_Timer.Connect(wxEVT_TIMER, wxTimerEventHandler
   (AutoTrackRaymarine_pi::OnTimer), NULL, this);
-
-
-  // initialise NGT-1 com port
-  char s[20];
-  wchar_t pcCommPort[20];
-  char Port[10];
-
-  /* The following startup command reverse engineered from Actisense NMEAreader.
-  * It instructs the NGT1 to clear its PGN message TX list, thus it starts
-  * sending all PGNs.
-  */
-  static unsigned char NGT_STARTUP_SEQ[] =
-  { 0x11   /* msg byte 1, meaning ? */
-    , 0x02   /* msg byte 2, meaning ? */
-    , 0x00   /* msg byte 3, meaning ? */
-  };
-
-  sprintf_s(s, "\\\\.\\COM%d", NGT1_port);
-  mbstowcs(pcCommPort, s, strlen(s) + 1); //Plus null
-  sprintf_s(Port, "COM%d", NGT1_port);
-  // Open the port tentatively
-  HANDLE hComm = ::CreateFile(pcCommPort, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, 0, 0);
-
-  //  Check for the error returns that indicate a port is there, but not currently useable
-  if (hComm == INVALID_HANDLE_VALUE)
-  {
-    DWORD dwError = GetLastError();
-
-    if (dwError == ERROR_ACCESS_DENIED ||
-      dwError == ERROR_GEN_FAILURE ||
-      dwError == ERROR_SHARING_VIOLATION ||
-      dwError == ERROR_SEM_TIMEOUT)
-      wxLogMessage(wxT("AutoTrackRaymarine_pi: serial port COM%d not found, can not open NGT-1."), NGT1_port);
-  }
-  else
-  {
-    CloseHandle(hComm);
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: Found serial port COM%d and it's ready to use"), NGT1_port);
-  }
-  // now really open com port
-  if (!OpenSerialPort(pcCommPort, &m_hSerialin)) {            // open serial port for NGT-1
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error making serial port for NGT-1"));
-  }
-  else {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi serial port for NGT-1 opened"));
-  }
-
-  COMMTIMEOUTS timeouts;
-  if ((GetCommTimeouts(m_hSerialin, &timeouts) == 0))
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: error getting timeouts"));
-  }
-  timeouts.ReadIntervalTimeout = 1;
-  timeouts.ReadTotalTimeoutMultiplier = 1;
-  timeouts.ReadTotalTimeoutConstant = 1;
-  timeouts.WriteTotalTimeoutMultiplier = 1;
-  timeouts.WriteTotalTimeoutConstant = 1;
-  if (SetCommTimeouts(m_hSerialin, &timeouts) == 0)
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi error setting timeouts"));
-  }
-
-  wxLogMessage(wxT("AutoTrackRaymarine_pi Device is a serial port, send the startup sequence."));
-
-  writeMessage(m_hSerialin, NGT_MSG_SEND, NGT_STARTUP_SEQ, sizeof(NGT_STARTUP_SEQ));
-  Sleep(100);  // $$$ this was 2000 earlier, why so long? for startup only.
-
-  m_serial_comms = new SerialPort(this);
-  m_NGT1_read = new NGT1Input(this);
-  if (m_NGT1_read->Run() != wxTHREAD_NO_ERROR) {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: unable to start NGT1Input thread"));
-    return 0;
-  }  
 
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |
@@ -417,15 +341,6 @@ wxString AutoTrackRaymarine_pi::StandardPath()
   return stdPath;
 }
 
-double AutoTrackRaymarine_pi::Declination()
-{
-  if (prefs.magnetic &&
-    (!m_declinationTime.IsValid() || (wxDateTime::Now() - m_declinationTime).GetSeconds() > 1200)) {
-    m_declination = NAN;
-    SendPluginMessage("WMM_VARIATION_BOAT_REQUEST", "");
-  }
-  return m_declination;
-}
 
 bool AutoTrackRaymarine_pi::GetConsoleInfo(
   double &bearing, double &xte)
@@ -479,14 +394,13 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
     m_avg_sog = m_avg_sog * .9 + pfix.Sog*.1;
   }
   m_var = pfix.Var;
-  //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ variation read %f"), m_var);
 }
 
 static bool ParseMessage(wxString &message_body, Json::Value &root)
 {
   Json::Reader reader;
   if (reader.parse(std::string(message_body), root))
-    return true;   //$$$
+    return true;
 
   wxLogMessage(wxString("AutoTrackRaymarine_pi: Error parsing JSON message: ") + reader.getFormattedErrorMessages());
   return false;
@@ -497,48 +411,42 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
 {
   // construct the JSON root object
   Json::Value  root;
-  //// construct a JSON parser
-  //wxString    out;
+  // construct a JSON parser
+  wxString    out;
 
-  //if (message_id == wxS("AutoTrackRaymarine_pi")) {
-  //  return; // nothing yet
-  //}
-  //else if (message_id == wxS("AIS")) {
-  //}
-  //else if (message_id == _T("WMM_VARIATION_BOAT")) {
-  //  if (ParseMessage(message_body, root)) {
-  //    wxString(root["Decl"].asString()).ToDouble(&m_declination);
-  //    m_declinationTime = wxDateTime::Now();
-  //  }
-  //}
-  //else if (message_id == "OCPN_RTE_ACTIVATED") {
-  //  if (ParseMessage(message_body, root)) {
-  //    ResetXTE();
-  //    ShowConsoleCanvas();
-  //    m_pilot_state = 0;    // standby
-  //    if (m_ConsoleCanvas) {
-  //      m_ConsoleCanvas->pDeactivate->SetLabel(_("Standby"));
-  //    }
-  //  }
-  //  m_Timer.Start(1000);
-  //}
-  //else if (message_id == "OCPN_WPT_ACTIVATED") {
-  //  wxString guid = root["GUID"].asString();
-  //  m_last_wpt_activated_guid = guid;
-  //  //ShowConsoleCanvas();
-  //}
-  //else if (message_id == "OCPN_WPT_ARRIVED") {
-  //}
-  //else if (message_id == "OCPN_RTE_DEACTIVATED" || message_id == "OCPN_RTE_ENDED") {
-  //  m_Timer.Stop();
-  //  m_active_guid = "";
-  //  m_active_request_guid = "";
-  //  if (m_ConsoleCanvas) {
-  //    GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Float();
-  //    GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Show(false);
-  //    GetFrameAuiManager()->Update();
-  //  }
-  //}
+  if (message_id == wxS("AutoTrackRaymarine_pi")) {
+    return; // nothing yet
+  }
+  else if (message_id == wxS("AIS")) {
+  }
+  else if (message_id == "OCPN_RTE_ACTIVATED") {
+    if (ParseMessage(message_body, root)) {
+      ResetXTE();
+      ShowConsoleCanvas();
+      m_pilot_state = 0;    // standby
+      if (m_ConsoleCanvas) {
+        m_ConsoleCanvas->pDeactivate->SetLabel(_("Standby"));
+      }
+    }
+    m_Timer.Start(1000);
+  }
+  else if (message_id == "OCPN_WPT_ACTIVATED") {
+    wxString guid = root["GUID"].asString();
+    m_last_wpt_activated_guid = guid;
+    //ShowConsoleCanvas();
+  }
+  else if (message_id == "OCPN_WPT_ARRIVED") {
+  }
+  else if (message_id == "OCPN_RTE_DEACTIVATED" || message_id == "OCPN_RTE_ENDED") {
+    m_Timer.Stop();
+    m_active_guid = "";
+    m_active_request_guid = "";
+    if (m_ConsoleCanvas) {
+      GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Float();
+      GetFrameAuiManager()->GetPane(m_ConsoleCanvas).Show(false);
+      GetFrameAuiManager()->Update();
+    }
+  }
 }
 
 
@@ -721,61 +629,7 @@ void AutoTrackRaymarine_pi::SendHSC(double course) {
   PushNMEABuffer(nmea);
 }
 
-bool AutoTrackRaymarine_pi::OpenSerialPort(wchar_t* pcCommPort, HANDLE* handle) {
-  // Open serial port number
-  DCB dcbSerialParams = { 0 };
-  COMMTIMEOUTS timeouts = { 0 };
 
-  *handle = CreateFile(
-    pcCommPort, GENERIC_READ | GENERIC_WRITE, 0, NULL,
-    OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-
-  if (*handle == INVALID_HANDLE_VALUE)
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error com port"));
-    int Dummy = toupper(_getch());
-    return false;
-  }
-  else wxLogMessage(wxT("AutoTrackRaymarine_pi  OK"));
-
-  // Set device parameters (115200 baud, 1 start bit,
-  // 1 stop bit, no parity)
-  dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-  if (GetCommState(*handle, &dcbSerialParams) == 0)
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error getting device state. Press a key to exit"));
-    CloseHandle(*handle);
-    int Dummy = toupper(_getch());
-    return false;
-  }
-
-  dcbSerialParams.BaudRate = CBR_115200;
-  dcbSerialParams.ByteSize = 8;
-  dcbSerialParams.StopBits = ONESTOPBIT;
-  dcbSerialParams.Parity = NOPARITY;
-  if (SetCommState(*handle, &dcbSerialParams) == 0)
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error setting device parameters"));
-    CloseHandle(*handle);
-    int Dummy = toupper(_getch());
-    return false;
-  }
-
-  // Set COM port timeout settings
-  timeouts.ReadIntervalTimeout = 50;
-  timeouts.ReadTotalTimeoutConstant = 50;
-  timeouts.ReadTotalTimeoutMultiplier = 10;
-  timeouts.WriteTotalTimeoutConstant = 50;
-  timeouts.WriteTotalTimeoutMultiplier = 10;
-  if (SetCommTimeouts(*handle, &timeouts) == 0)
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error setting timeouts"));
-    CloseHandle(*handle);
-    int Dummy = toupper(_getch());
-    return false;
-  }
-  return true;
-}
 
 void AutoTrackRaymarine_pi::writeMessage(HANDLE handle, unsigned char command, const unsigned char * cmd, const size_t len)
 {
