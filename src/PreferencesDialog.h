@@ -24,6 +24,9 @@
 ***************************************************************************
 */
 
+#ifndef INC_PREFERENCESDIALOG_H
+#define INC_PREFERENCESDIALOG_H
+
 #include "AutoTrackRaymarine_pi.h"
 #include "AutoTrackRaymarineUI.h"
 
@@ -40,9 +43,13 @@ public:
     void FindSerialPorts();
     wxArrayString *m_pSerialArray;
     wxArrayString *EnumerateSerialPorts(void);
+
 private:
     void OnCancel( wxCommandEvent& event );
     void OnOk( wxCommandEvent& event );
 
+
     AutoTrackRaymarine_pi &m_pi;
 };
+
+#endif // !INC_PREFERENCESDIALOG_H

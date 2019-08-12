@@ -26,6 +26,7 @@
  */
 
 #include "PreferencesDialog.h"
+#include "SerialPort.h"
 
 int                       g_nCOMPortCheck = 32;
 
@@ -36,7 +37,10 @@ bool PreferencesDialog::Show( bool show )
         // load preferences
         AutoTrackRaymarine_pi::preferences &p = m_pi.prefs;
         FindSerialPorts();
-
+        if (m_pi.m_serial_comms) {
+          delete m_pi.m_serial_comms;
+          wxLogMessage(wxT("AutoTrackRaymarine_pi: serial port deleted"));
+        }
         m_sMaxAngle1->SetValue(p.max_angle);
         m_comboBox1->SetValue(p.com_port);
 
@@ -63,9 +67,8 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
     p.intercept_route = m_cbInterceptRoute->GetValue();
     p.com_port = m_comboBox1->GetValue();
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$x comport value =%s"), p.com_port);
     // make com port now
-
+    m_pi.m_serial_comms = new SerialPort(&m_pi);
     Hide();
 }
 

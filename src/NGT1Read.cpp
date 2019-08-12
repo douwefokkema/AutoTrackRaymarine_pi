@@ -27,11 +27,11 @@
 
 
 
-
-
 #include "NGT1Read.h"
-#include "actisense.h"
+//#include "actisense.h"
 #include "AutoTrackRaymarine_pi.h"
+#include "SerialPort.h"
+#include "actisense.h"
 
 
 enum MSG_State
@@ -61,17 +61,11 @@ NGT1Input::NGT1Input(AutoTrackRaymarine_pi *pi) : wxThread(wxTHREAD_JOINABLE) {
 
 
 void *NGT1Input::Entry(void) {
-  
   int wake_timeout = 0;
-
-
   wxLogMessage(wxT("AutoTrackRaymarine_pi: NGTInput1 thread starting"));
-
   m_is_shutdown = false;
-
   while (!m_shutdown) {
-
-    if (!ReadNGT1(m_pi->m_hSerialin)) {
+    if (!ReadNGT1(m_pi->m_serial_comms->m_hSerialin)) {
       break;
     }
   }
@@ -169,7 +163,6 @@ void NGT1Input::messageReceived(const unsigned char * msg, size_t msgLen)
 {
   unsigned char command;
   unsigned char checksum = 0;
-  unsigned char * payload;
   unsigned char payloadLen;
   size_t i;
   //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ messageReceived len = %i"), msgLen);
@@ -210,15 +203,9 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
 {
   unsigned int prio, src, dst;
   unsigned int pgn;
-  size_t i;
   unsigned int id;
   unsigned int len;
-  unsigned int data[8];
-  char line[800];
-  char * p;
   int pilot_heading = -1;  // unknown
-  //int heading = -1;        // unknown
-  double p_h;
   double new_heading;
   static int test = 3;
 
@@ -334,7 +321,6 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     new_heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
     if ((int)new_heading != heading) {
       heading = (int)new_heading;
-      fprintf(stderr, " new heading= %i \n", heading);
     }
 
     break;

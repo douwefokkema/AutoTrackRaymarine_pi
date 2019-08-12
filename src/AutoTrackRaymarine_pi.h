@@ -69,7 +69,7 @@
 class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
-class NGT1Input;
+//class NGT1Input;
 class SerialPort;
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_110
@@ -152,7 +152,6 @@ protected:
     PlugIn_Position_Fix_Ex m_lastfix;
 
 private:
-    void SetCursorLatLon(double lat, double lon);
     void SetNMEASentence(wxString &sentence);
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
@@ -179,11 +178,6 @@ private:
 
     double m_current_bearing, m_current_xte;
 
-    // optimum route mode variables
-    double m_avg_sog;
-
-    // for handling NGT-1
-    void AutoTrackRaymarine_pi::SetAutopilotHeading(double heading);
 };
 
 #endif

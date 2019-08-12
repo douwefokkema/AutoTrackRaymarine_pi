@@ -28,14 +28,11 @@
 
 #pragma once
 
-#include "wx/wx.h"
-
-#include <wx/fileconf.h>
-
-#include "version.h"
+#include "AutoTrackRaymarine_pi.h"
 #include "wxWTranslateCatalog.h"
-
 #include "SerialPort.h"
+#include "NGT1Read.h"
+
 
 class AutoTrackRaymarine_pi;
 
@@ -52,5 +49,6 @@ public:
   bool OpenSerialPort(wchar_t* pcCommPort, HANDLE* handle);
   void writeMessage(HANDLE handle, unsigned char command, const unsigned char * cmd, const size_t len);
   void parseAndWriteIn(HANDLE handle, const unsigned char * cmd);
+  void SetAutopilotHeading(double heading);
 
 };

@@ -24,8 +24,9 @@
 ***************************************************************************
 */
 
+#ifndef INC_NGT1Read_h
+#define INC_NGT1Read_h
 #include "AutoTrackRaymarine_pi.h"
-
 
 //
 // Will start a thread to read te incoming messages on the NGT-1
@@ -72,3 +73,5 @@ private:
 
   wxCriticalSection m_exclusive;
 };
+
+#endif // INC_NGT1Read_h

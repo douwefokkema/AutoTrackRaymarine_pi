@@ -69,7 +69,6 @@ bool XTE::Parse( const SENTENCE& sentence )
 //   ASSERT_VALID( this );
 
    wxString field_data;
-   wxLogMessage(wxT("AutoTrackRaymarine: $$$ parse enter"));
    /*
    ** XTE - Autopilot Sentence
    **                      
@@ -99,7 +98,7 @@ bool XTE::Parse( const SENTENCE& sentence )
    if ( check == NTrue )
    {
       SetErrorMessage( _T("Invalid Checksum") );
-      wxLogMessage(wxT("AutoTrackRaymarine: $$$ error checksum"));
+      wxLogMessage(wxT("AutoTrackRaymarine: error checksum"));
       //return( FALSE );
    } 
 

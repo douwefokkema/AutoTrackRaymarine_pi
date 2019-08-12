@@ -35,21 +35,14 @@
 #include "icons.h"
 #include "GL/gl.h"
 #include "actisense.h"
-#include "NGT1Read.h"
+//#include "NGT1Read.h"
 #include "actisense.h"
+#include "SerialPort.h"
 
 
-using namespace std;
+//using namespace std;
 #define TURNRATE 10.   // turnrate per second
 
-
-
-// commands for NGT-1 in Canboat format
-// string msg0 = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standbye
-// string msg1 = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff"; // set auto
-string msg2    = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,00,00";  //set 0 magnetic
-// string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";  //set 92 magnetic
-// string msg4 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,4e,3f";  //set 93 example only, magnetic
 
 double heading_resolve(double degrees, double offset = 0)
 {
@@ -87,7 +80,6 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
   initialize_images();
   m_ConsoleCanvas = NULL;
   m_PreferencesDialog = NULL;
-  m_avg_sog = 0;
 }
 
 //---------------------------------------------------------------------------------------------------------
@@ -137,7 +129,8 @@ int AutoTrackRaymarine_pi::Init(void)
   //  sentences = sentences.AfterFirst(';');
   //}
 
- 
+  m_serial_comms = new SerialPort(this);
+
   m_Timer.Connect(wxEVT_TIMER, wxTimerEventHandler
   (AutoTrackRaymarine_pi::OnTimer), NULL, this);
 
@@ -181,13 +174,8 @@ bool AutoTrackRaymarine_pi::DeInit(void)
   pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
   pConf->Write("InterceptRoute", p.intercept_route);
 
-  //  Stop read thread NGT-1
-  m_NGT1_read->Shutdown();
-  delete m_NGT1_read;
-  // Close NGT-1 serial port
-  if (CloseHandle(m_hSerialin) == 0) {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error closing serial port NGT-1"));
-  }
+  //  Close serial port and stop reader thread NGT-1
+  delete (m_serial_comms);
   return true;
 }
 
@@ -378,21 +366,8 @@ void AutoTrackRaymarine_pi::OnTimer(wxTimerEvent &)
 }
 
 
-void AutoTrackRaymarine_pi::SetCursorLatLon(double lat, double lon)
-{
-  wxPoint pos = wxGetMouseState().GetPosition();
-  if (pos == m_cursor_position)
-    return;
-  m_cursor_position = pos;
-}
-
-
 void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 {
-  m_lastfix = pfix;
-  if (pfix.nSats > 3) {
-    m_avg_sog = m_avg_sog * .9 + pfix.Sog*.1;
-  }
   m_var = pfix.Var;
 }
 
@@ -491,9 +466,7 @@ void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
 
 }
 
-
-void AutoTrackRaymarine_pi::Compute()
-{
+void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
 
@@ -580,7 +553,7 @@ void AutoTrackRaymarine_pi::Compute()
   while (m_current_bearing < 0.) m_current_bearing += 360.;
   if (m_pilot_state == 2) {   // tracking
     wxLogMessage(wxT("AutoTrackRaymarine $$$ tracking send to raymarine"));
-    SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
+    m_serial_comms->SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
     SendHSC(m_current_bearing);  
   }
   m_current_xte = m_XTE;
@@ -589,7 +562,6 @@ void AutoTrackRaymarine_pi::Compute()
 
 
 NMEA0183    NMEA0183;
-
 
 
 
@@ -627,158 +599,4 @@ void AutoTrackRaymarine_pi::SendHSC(double course) {
   nmea.Printf(wxT("$%s*%02X\r\n"), sentence, (unsigned)checksum);
   wxLogMessage(wxT("AutoTrackRaymarine: $$$sending HSC %s"), nmea);
   PushNMEABuffer(nmea);
-}
-
-
-
-void AutoTrackRaymarine_pi::writeMessage(HANDLE handle, unsigned char command, const unsigned char * cmd, const size_t len)
-{
-  unsigned char bst[255];
-  unsigned char *b = bst;
-  unsigned char *lenPtr;
-  unsigned char crc;
-  DWORD bytes_written;
-  int length = len;
-
-  *b++ = DLE;
-  *b++ = STX;
-  *b++ = command;
-  crc = command;
-  lenPtr = b++;
-
-  for (size_t i = 0; i < len; i++)
-  {
-    if (cmd[i] == DLE)
-    {
-      *b++ = DLE;
-    }
-    *b++ = cmd[i];
-    crc += (unsigned char)cmd[i];
-  }
-  
-  *lenPtr = length;
-  crc += length;
-
-  *b++ = (unsigned char)(256 - (int)crc);
-  *b++ = DLE;
-  *b++ = ETX;
-  if (!WriteFile(handle, bst, b - bst, &bytes_written, NULL)) {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error. Writing to serial port"));
-    CloseHandle(m_hSerialin);
-    int Dummy = toupper(_getch());
-  }
- // wxLogMessage(wxT("AutoTrackRaymarine_pi $$$length=%i, written %i "), length, bytes_written);
-  //  if (write(handle, bst, b - bst) != b - bst)
-}
-
-void AutoTrackRaymarine_pi::SetAutopilotHeading(double heading) {
- // wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
-  double heading_normal = heading;
-  while (heading_normal < 0) heading_normal += 360;
-  while (heading_normal >= 360) heading_normal -= 360;
-  uint16_t heading_radials1000 = (uint16_t)(heading_normal * 174.53); // heading to be set in thousands of radials
-  //wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading2 radials = %i %000x"), heading_radials1000, heading_radials1000);
-  uint8_t byte0, byte1;
-  byte0 = heading_radials1000 & 0xff;
-  byte1 = heading_radials1000 >> 8;
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading byte0 = %0x, byte1 = %0x"), byte0, byte1);
-  char s[4];
-  sprintf_s(s, "%0x", byte0);
-  if (byte0 > 15) {
-    msg2[56] = s[0];
-    msg2[57] = s[1];
-  }
-  else {
-    msg2[56] = '0';
-    msg2[57] = s[0];
-  }
-  sprintf_s(s, "%0x", byte1);
-  if (byte1 > 15) {
-    msg2[59] = s[0];
-    msg2[60] = s[1];
-  }
-  else {
-    msg2[59] = '0';
-    msg2[60] = s[0];
-  }
-  unsigned char msg[500];
-  for (unsigned int i = 0; i <= msg2.length(); i++) {
-    msg[i] = msg2[i];
-  }
-  parseAndWriteIn(m_hSerialin, msg);
-}
-
-void AutoTrackRaymarine_pi::parseAndWriteIn(HANDLE handle, const unsigned char * cmd)
-{
-  unsigned char msg[500];
-  unsigned char * m;
-
-  unsigned int prio;
-  unsigned int pgn;
-  unsigned int src;
-  unsigned int dst;
-  unsigned int bytes;
-
-  char * p;
-  int i;
-  int b;
-  unsigned int byt;
-  int r;
-
-  if (!cmd || !*cmd || *cmd == '\n')
-  {
-    return;
-  }
-
-  p = strchr((char *)cmd, ',');
-  if (!p)
-  {
-    return;
-  }
-
-  r = sscanf(p, ",%u,%u,%u,%u,%u,%n", &prio, &pgn, &src, &dst, &bytes, &i);
-  if (r == 5)
-  {
-    p += i - 1;
-    m = msg;
-    *m++ = (unsigned char)prio;
-    *m++ = (unsigned char)pgn;
-    *m++ = (unsigned char)(pgn >> 8);
-    *m++ = (unsigned char)(pgn >> 16);
-    *m++ = (unsigned char)dst;
-    //*m++ = (unsigned char) 0;
-    *m++ = (unsigned char)bytes;
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi $$$write message prio %i, pgn %i, src %i, dst %i, bytes %i, i %i "), prio, pgn, src, dst, bytes, i);
-
-    for (b = 0; m < msg + sizeof(msg) && b < bytes; b++)
-    {
-      if ((sscanf(p, ",%x%n", &byt, &i) == 1) && (byt < 256))
-      {
-        *m++ = byt;
-        //wxLogMessage(wxT("AutoTrackRaymarine_pi byt=%0x "), byt);   // $$$
-      }
-      else
-      {
-        wxLogMessage(wxT("AutoTrackRaymarine_pi: Unable to parse incoming message '%s' at offset %u %i"), cmd, b, byt);
-        Sleep(1000);
-        return;
-      }
-      p += i;
-    }
-  }
-  else
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: Unable to parse incoming message '%s', r = %d"), cmd, r);
-    return;
-  }
-  /*wxLogMessage(wxT("AutoTrackRaymarine_pi                  write message called len= %i "), m - msg)*/;
-
- /* wxLogMessage(wxT("              $$$  write message called len= %i \n"), m - msg);
-  wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x \n"),
-    msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
-    msg[16], msg[17], msg[18], msg[19], msg[20]);*/
-
-
-  writeMessage(handle, N2K_MSG_SEND, msg, m - msg);
-  /*wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$message written to Actisense"));*/
 }

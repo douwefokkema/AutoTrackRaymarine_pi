@@ -244,7 +244,6 @@ void ConsoleCanvas::UpdateRouteData()
       pDeactivate->SetLabel(_("Auto"));
     if (m_pi.m_pilot_state == STANDBY)
       pDeactivate->SetLabel(_("Standby"));
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$2 pilot_state=%i"), m_pi.m_pilot_state);
 
     wxString cogstr;
 //            if( g_bShowTrue )
