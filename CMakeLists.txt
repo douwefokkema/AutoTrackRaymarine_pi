@@ -31,8 +31,10 @@ SET(SRC_AUTOTRACKRAYMARINE
 			src/AutoTrackRaymarine_pi.h
             src/PreferencesDialog.cpp
 			src/PreferencesDialog.h
-            src/AutoTrackRaymarineUI.cpp
-			src/AutoTrackRaymarineUI.h
+            src/AutoTrackInfoUI.cpp
+			src/AutoTrackInfoUI.h
+			src/AutoTrackPrefsUI.cpp
+			src/AutoTrackPrefsUI.h
             src/concanv.cpp
 			src/concanv.h
             src/icons.cpp
