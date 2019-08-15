@@ -28,7 +28,7 @@
 #define INC_PREFERENCESDIALOG_H
 
 #include "AutoTrackRaymarine_pi.h"
-#include "AutoTrackRaymarineUI.h"
+#include "AutoTrackPrefsUI.h"
 
 class PreferencesDialog : public PreferencesDialogBase
 {
