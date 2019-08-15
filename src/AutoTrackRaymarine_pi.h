@@ -71,6 +71,7 @@ class ConsoleCanvas;
 class PreferencesDialog;
 //class NGT1Input;
 class SerialPort;
+class m_dialog;
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_110
 {
@@ -92,7 +93,7 @@ public:
   wxString GetShortDescription();
   wxString GetLongDescription();
 
-  void SetColorScheme(PI_ColorScheme cs);
+ // void SetColorScheme(PI_ColorScheme cs);  $$$
   void ShowPreferencesDialog(wxWindow* parent);
 
  // bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
@@ -164,10 +165,10 @@ private:
     wxTimer m_Timer;
 
     
-    ConsoleCanvas *m_ConsoleCanvas;
+    m_dialog *m_ConsoleCanvas;
     
 
-    PI_ColorScheme m_colorscheme;
+   // PI_ColorScheme m_colorscheme; $$$
 
     wxString m_active_guid, m_active_request_guid;
     wxDateTime m_active_request_time;

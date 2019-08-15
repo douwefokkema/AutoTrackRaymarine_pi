@@ -28,11 +28,8 @@
 
 #include "SerialPort.h"
 #include "AutoTrackRaymarine_pi.h"
-#include "AutoTrackRaymarineUI.h"
-#include "PreferencesDialog.h"
 #include "conio.h"
 #include "serial/serial.h"
-//#include "NGT1Read.h"
 #include "actisense.h"
 
 
@@ -46,7 +43,7 @@ class PreferencesDialogBase;
 
 SerialPort::SerialPort(AutoTrackRaymarine_pi *pi) {
   m_pi = pi;
-  wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ enterinfg SerialPort"));
+  wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ entering SerialPort"));
   // initialise NGT-1 com port
   //char s[20];
   wchar_t pcCommPort[20];

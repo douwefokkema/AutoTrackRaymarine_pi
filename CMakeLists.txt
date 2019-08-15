@@ -35,8 +35,8 @@ SET(SRC_AUTOTRACKRAYMARINE
 			src/AutoTrackInfoUI.h
 			src/AutoTrackPrefsUI.cpp
 			src/AutoTrackPrefsUI.h
-            src/concanv.cpp
-			src/concanv.h
+          ##src/concanv.cpp
+	      ##src/concanv.h
             src/icons.cpp
             src/ODAPI.h
           ##  src/apdc.cpp
