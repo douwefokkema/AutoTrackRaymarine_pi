@@ -28,7 +28,6 @@
 
 
 #include "NGT1Read.h"
-//#include "actisense.h"
 #include "AutoTrackRaymarine_pi.h"
 #include "SerialPort.h"
 #include "actisense.h"
@@ -204,8 +203,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   unsigned int prio, src, dst;
   unsigned int pgn;
   unsigned int len;
-  int pilot_heading = -1;  // unknown
-  double new_heading;
+  double new_heading, p_h;
   static int test = 3;
 
   //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ n2kMessage reseived  msgLen=%i"), msgLen);
@@ -230,20 +228,20 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   double heading = -1000.;
 
   switch (pgn) {
-  //case 65360:  // autopilot heading only when pilot is auto. From pilot
-  //  wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###receiving 65360"));
-  //  if (m_pi->m_pilot_state == 0) {   // standby
-  //    printf("new state = AUTO");
-  //    m_pi->m_pilot_state = 1;  // auto
-  //  }
-  //  p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
-  //  if (pilot_heading != (int)p_h) {
-  //    pilot_heading = (int)p_h;
-  //    printf("auto = %i \n", pilot_heading);
-  //  }
-  //  break;
+  case 65360:  // autopilot heading only when pilot is auto. From pilot
+    wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###receiving 65360"));
+    if (m_pi->m_pilot_state == 0) {   // standby
+      printf("new state = AUTO");
+      m_pi->m_pilot_state = 1;  // auto
+    }
+    p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
+    if (m_pi->m_pilot_heading != (int)p_h) {
+      m_pi->m_pilot_heading = (int)p_h;
+      printf("auto = %i \n", m_pi->m_pilot_heading);  // only print when heading is changed, take out later $$$
+    }
+    break;
 
-    case 126208:
+    case 126208:  // set to standby or auto if length is 28
     	//heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
     	if (msgLen != 28) { // we only want the messages that originate from a keystroke auto / standly
         break;
@@ -260,6 +258,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {   
         m_pi->m_pilot_state = STANDBY;  // standly
         wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
+        m_pi->m_pilot_heading = -1; // undefined
       }
       if (msg[23] == 0x40) {  // AUTO
         if (m_pi->m_pilot_state == STANDBY) {
