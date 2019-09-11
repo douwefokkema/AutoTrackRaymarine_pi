@@ -203,7 +203,6 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
 {
   unsigned int prio, src, dst;
   unsigned int pgn;
-  unsigned int id;
   unsigned int len;
   int pilot_heading = -1;  // unknown
   double new_heading;
@@ -228,7 +227,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     return;
   }
   //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ message received %i"), pgn);
-  double heading;
+  double heading = -1000.;
 
   switch (pgn) {
   //case 65360:  // autopilot heading only when pilot is auto. From pilot

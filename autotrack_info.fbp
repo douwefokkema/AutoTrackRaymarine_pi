@@ -48,7 +48,7 @@
             <property name="name">m_dialog</property>
             <property name="pos"></property>
             <property name="size">400,350</property>
-            <property name="style">wxCAPTION|wxMINIMIZE_BOX</property>
+            <property name="style">wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER</property>
             <property name="subclass"></property>
             <property name="title">Autopilot and Track Control</property>
             <property name="tooltip"></property>

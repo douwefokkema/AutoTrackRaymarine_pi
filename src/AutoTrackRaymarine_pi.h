@@ -77,10 +77,7 @@ class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_110
 {
   friend ConsoleCanvas;
 public:
-
   AutoTrackRaymarine_pi(void *ppimgr);
-
-
   int Init(void);
   bool DeInit(void);
 
@@ -96,8 +93,8 @@ public:
  // void SetColorScheme(PI_ColorScheme cs);  $$$
   void ShowPreferencesDialog(wxWindow* parent);
 
- // bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
- // bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
+  bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
+  bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
   void ShowConsoleCanvas();
   void ShowPreferences();
@@ -111,8 +108,11 @@ public:
   NMEA0183 m_NMEA0183;
 
   double m_XTE, m_BTW;
+  bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var;
+  bool m_initialized;
+  bool m_route_active;
   
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
@@ -141,14 +141,10 @@ public:
         int boundary_width;
 
     } prefs;
-
-    // for console canvas
-    bool GetConsoleInfo(double &bearing, double &xte);
-    void DeactivateRoute();
+    
     PreferencesDialog *m_PreferencesDialog;
 
 protected:   
-    void OnTimer( wxTimerEvent & );
     wxPoint m_cursor_position;
     PlugIn_Position_Fix_Ex m_lastfix;
 
@@ -162,9 +158,7 @@ private:
     void SendHSC(double course);
 
     int m_leftclick_tool_id;
-    wxTimer m_Timer;
 
-    
     m_dialog *m_ConsoleCanvas;
     
 
