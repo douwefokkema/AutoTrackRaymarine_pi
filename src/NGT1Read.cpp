@@ -291,6 +291,10 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
 
 
   case 65359:
+    //  heading all the time
+     p_h = (((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000);
+     m_pi->m_heading = (int)p_h;
+     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %i "), m_pi->m_heading);
     break;
 
     //case 65379:
