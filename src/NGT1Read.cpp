@@ -156,8 +156,6 @@ void NGT1Input::readNGT1Byte(unsigned char c)
   }
 }
 
-
-
 void NGT1Input::messageReceived(const unsigned char * msg, size_t msgLen)
 {
   unsigned char command;
@@ -228,11 +226,11 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   double heading = -1000.;
 
   switch (pgn) {
-  case 65360:  // autopilot heading only when pilot is auto. From pilot
+  case 65360:  // Autopilot heading. From pilot. Transmitted only when pilot is auto.
     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###receiving 65360"));
-    if (m_pi->m_pilot_state == 0) {   // standby
+    if (m_pi->m_pilot_state == STANDBY) {
       printf("new state = AUTO");
-      m_pi->m_pilot_state = 1;  // auto
+      m_pi->m_pilot_state = AUTO;
     }
     p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
     if (m_pi->m_pilot_heading != (int)p_h) {
@@ -241,7 +239,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     }
     break;
 
-    case 126208:  // set to standby or auto if length is 28
+    case 126208:  // if length is 28: command to set to standby or auto 
     	//heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
     	if (msgLen != 28) { // we only want the messages that originate from a keystroke auto / standly
         break;
@@ -266,8 +264,11 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
           wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###New pilot state = AUTO"));
         }
         else {
-          m_pi->ResetXTE();
-          m_pi->m_pilot_state = TRACKING;
+          if (m_pi->m_route_active) {
+            m_pi->ResetXTE();
+            ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
+            m_pi->m_pilot_state = TRACKING;
+          }
         }
       }
       break;
@@ -293,8 +294,8 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   case 65359:
     //  heading all the time
      p_h = (((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000);
-     m_pi->m_heading = (int)p_h;
-     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %i "), m_pi->m_heading);
+     m_pi->m_vessel_heading = (int)p_h;
+     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %i "), m_pi->m_vessel_heading);
     break;
 
     //case 65379:
@@ -311,7 +312,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     //	}
     //	break;
 
-  case 127250:
+  case 127250:   // vessel heading, standard nmea2000
     if (len != 8) {
       break;
     }
@@ -324,7 +325,6 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     if ((int)new_heading != heading) {
       heading = (int)new_heading;
     }
-
     break;
   default:
     break;

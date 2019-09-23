@@ -120,7 +120,8 @@ int AutoTrackRaymarine_pi::Init(void)
   m_initialized = true;
   m_route_active = false;
   m_pilot_heading = -1;     // undefined
-  m_heading = -1;       // current heading of vessel according to pilot, undefined
+  m_vessel_heading = -1;       // current heading of vessel according to pilot, undefined
+  m_XTE = 100000.;      // undefined
 
 
   return (WANTS_OVERLAY_CALLBACK |
@@ -257,16 +258,28 @@ void AutoTrackRaymarine_pi::UpdateConsole() {
       m_ConsoleCanvas->TextStatus11->SetLabel(_("Auto"));
     if (m_pilot_state == STANDBY)
       m_ConsoleCanvas->TextStatus11->SetLabel(_("Standby"));
-    wxString pilot_heading;     
-    pilot_heading << wxString::Format(wxString("%i", wxConvUTF8), m_pilot_heading);
+    wxString pilot_heading;
+    if (m_pilot_heading == -1) {
+      pilot_heading = _("----");
+    } else {
+      pilot_heading << wxString::Format(wxString("%i", wxConvUTF8), m_pilot_heading);
+    }
     m_ConsoleCanvas->TextStatus14->SetLabel(pilot_heading);
     wxString heading;
-    m_heading = 280;
-    heading << wxString::Format(wxString("%i", wxConvUTF8), m_heading);
+    if (m_vessel_heading == -1) {
+      heading = _("----");
+    }
+    else {
+      heading << wxString::Format(wxString("%i", wxConvUTF8), m_vessel_heading);
+    }
     m_ConsoleCanvas->TextStatus12->SetLabel(heading);
     wxString xte;
-    m_XTE = 280.55;
-    xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_XTE);
+    if (m_XTE == 100000.) {
+      xte = _("----");
+    }
+    else {
+      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_XTE);
+    }
     m_ConsoleCanvas->TextStatus121->SetLabel(xte);
   }
 }
@@ -297,7 +310,6 @@ void AutoTrackRaymarine_pi::ShowPreferences()
     icon.CopyFromBitmap(*_img_AutoTrackRaymarine);
     m_PreferencesDialog->SetIcon(icon);
   }
-
   m_PreferencesDialog->Show();
 }
 
@@ -384,6 +396,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
   else if (message_id == "OCPN_RTE_DEACTIVATED" || message_id == "OCPN_RTE_ENDED") {
     m_active_guid = "";
     m_route_active = false;
+    m_XTE = 100000.;  // undefined
   }
 }
 

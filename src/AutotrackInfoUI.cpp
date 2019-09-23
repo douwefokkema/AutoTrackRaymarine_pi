@@ -22,14 +22,14 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	bSizer10->Add( StaticLine1, 0, wxEXPAND | wxALL, 5 );
 
 	wxGridSizer* gSizer7;
-	gSizer7 = new wxGridSizer( 0, 2, 0, 0 );
+	gSizer7 = new wxGridSizer( 0, 3, 0, 0 );
 
 	buttonAuto = new wxButton( this, wxID_ANY, wxT("Auto"), wxDefaultPosition, wxSize( 90,40 ), 0|wxBORDER_DEFAULT );
 	buttonAuto->SetFont( wxFont( 10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Arial") ) );
 	buttonAuto->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
 	buttonAuto->SetBackgroundColour( wxColour( 255, 0, 0 ) );
 
-	gSizer7->Add( buttonAuto, 0, wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
+	gSizer7->Add( buttonAuto, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
 
 	buttonStandby = new wxButton( this, wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize( 90,40 ), 0 );
 	buttonStandby->SetFont( wxFont( 10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Arial") ) );
@@ -37,6 +37,13 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	buttonStandby->SetBackgroundColour( wxColour( 0, 255, 0 ) );
 
 	gSizer7->Add( buttonStandby, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
+
+	buttonTrack = new wxButton( this, wxID_ANY, wxT("Tracking"), wxDefaultPosition, wxSize( 90,40 ), 0|wxBORDER_DEFAULT );
+	buttonTrack->SetFont( wxFont( 10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Arial") ) );
+	buttonTrack->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
+	buttonTrack->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_HIGHLIGHT ) );
+
+	gSizer7->Add( buttonTrack, 0, wxALL, 5 );
 
 
 	bSizer10->Add( gSizer7, 0, wxALIGN_CENTER|wxRIGHT|wxLEFT, 4 );
@@ -62,7 +69,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( pilot_state, 0, wxALL, 5 );
 
-	TextStatus11 = new wxTextCtrl( this, wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize( 200,35 ), wxTE_READONLY|wxTE_CENTER );
+	TextStatus11 = new wxTextCtrl( this, wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize( 200,35 ), wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !TextStatus11->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -92,7 +99,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( heading, 0, wxALL, 5 );
 
-	TextStatus12 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_READONLY|wxTE_CENTER );
+	TextStatus12 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !TextStatus12->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -122,7 +129,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( track, 0, wxALL, 5 );
 
-	TextStatus14 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_READONLY|wxTE_CENTER );
+	TextStatus14 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !TextStatus14->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -152,7 +159,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( XTE, 0, wxALL, 5 );
 
-	TextStatus121 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_READONLY|wxTE_CENTER );
+	TextStatus121 = new wxTextCtrl( this, wxID_ANY, wxT("-----"), wxDefaultPosition, wxSize( 200,35 ), wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !TextStatus121->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -214,10 +221,11 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	this->Connect( wxEVT_ACTIVATE_APP, wxActivateEventHandler( m_dialog::OnActiveApp ) );
 	buttonAuto->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnAuto ), NULL, this );
 	buttonStandby->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnStandby ), NULL, this );
-	buttonDecOne->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnDecrementOne ), NULL, this );
-	buttonDecTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnDecrementTen ), NULL, this );
-	buttonIncTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnIncrementTen ), NULL, this );
-	buttonIncOne->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnIncrementOne ), NULL, this );
+	buttonTrack->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnTracking ), NULL, this );
+	buttonDecOne->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnMinusOne ), NULL, this );
+	buttonDecTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnMinusTen ), NULL, this );
+	buttonIncTen->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnPlusTen ), NULL, this );
+	buttonIncOne->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnPlusOne ), NULL, this );
 }
 
 m_dialog::~m_dialog()
@@ -226,9 +234,10 @@ m_dialog::~m_dialog()
 	this->Disconnect( wxEVT_ACTIVATE_APP, wxActivateEventHandler( m_dialog::OnActiveApp ) );
 	buttonAuto->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnAuto ), NULL, this );
 	buttonStandby->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnStandby ), NULL, this );
-	buttonDecOne->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnDecrementOne ), NULL, this );
-	buttonDecTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnDecrementTen ), NULL, this );
-	buttonIncTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnIncrementTen ), NULL, this );
-	buttonIncOne->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnIncrementOne ), NULL, this );
+	buttonTrack->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnTracking ), NULL, this );
+	buttonDecOne->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnMinusOne ), NULL, this );
+	buttonDecTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnMinusTen ), NULL, this );
+	buttonIncTen->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnPlusTen ), NULL, this );
+	buttonIncOne->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( m_dialog::OnPlusOne ), NULL, this );
 
 }

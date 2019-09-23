@@ -27,12 +27,14 @@
 #define _PLUGIN_H_
 
 #ifndef DECL_EXP
-#ifdef __WXMSW__
+#if defined(__WXMSW__) || defined(__CYGWIN__)
 #  define DECL_EXP     __declspec(dllexport)
+#elif defined __GNUC__ && __GNUC__ >= 4
+#  define DECL_EXP     __attribute__((visibility("default")))
+#elif defined __WXOSX__
+#  define DECL_EXP     __attribute__((visibility("default")))
 #else
-# ifdef __GNUC__
-# define DECL_EXP       __attribute__((visibility("default")))
-# endif
+#  define DECL_EXP
 #endif
 #endif
 
@@ -43,9 +45,15 @@
 #endif    
 
 #include <wx/xml/xml.h>
+#include <wx/dcmemory.h>
+#include <wx/dialog.h>
+#include <wx/event.h>
+#include <wx/menuitem.h>
+#include <wx/gdicmn.h>
+
 
 #ifdef ocpnUSE_SVG
-#include "wxSVG/svg.h"
+#include <wx/bitmap.h>
 #endif // ocpnUSE_SVG
 
 #include <memory>
@@ -676,6 +684,8 @@ extern "C"  DECL_EXP bool AddLocaleCatalog( wxString catalog );
 
 extern "C"  DECL_EXP void PushNMEABuffer( wxString str );
 
+extern "C"  DECL_EXP void ZeroXTE();
+
 extern  DECL_EXP wxXmlDocument GetChartDatabaseEntryXML(int dbIndex, bool b_getGeom);
 
 extern  DECL_EXP bool UpdateChartDBInplace(wxArrayString dir_array,
@@ -1172,7 +1182,7 @@ enum OCPN_DLDialogStyle
 
 /*   Synchronous (Blocking) download of a single file  */
 
-extern DECL_EXP _OCPN_DLStatus OCPN_downloadFile( const wxString& url, const wxString &outputFile, 
+extern DECL_EXP _OCPN_DLStatus OCPN_downloadFile( const wxString& url, const wxString &outputFile,
                                        const wxString &title, const wxString &message, 
                                        const wxBitmap& bitmap,
                                        wxWindow *parent, long style, int timeout_secs);
@@ -1260,7 +1270,7 @@ extern DECL_EXP bool PlugInSetFontColor(const wxString TextElement, const wxColo
 extern DECL_EXP double PlugInGetDisplaySizeMM();
 
 // 
-extern DECL_EXP wxFont* FindOrCreateFont_PlugIn( int point_size, wxFontFamily family, 
+extern DECL_EXP wxFont* FindOrCreateFont_PlugIn( int point_size, wxFontFamily family,
                     wxFontStyle style, wxFontWeight weight, bool underline = false,
                     const wxString &facename = wxEmptyString,
                     wxFontEncoding encoding = wxFONTENCODING_DEFAULT );
@@ -1268,7 +1278,7 @@ extern DECL_EXP wxFont* FindOrCreateFont_PlugIn( int point_size, wxFontFamily fa
 extern DECL_EXP int PlugInGetMinAvailableGshhgQuality();
 extern DECL_EXP int PlugInGetMaxAvailableGshhgQuality();
 
-//extern DECL_EXP void PlugInHandleAutoTrackRaymarine(bool enable);
+extern DECL_EXP void PlugInHandleAutopilotRoute(bool enable);
 
 // API 1.16
 //

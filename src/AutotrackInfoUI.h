@@ -37,6 +37,7 @@ class m_dialog : public wxDialog
 		wxStaticLine* StaticLine1;
 		wxButton* buttonAuto;
 		wxButton* buttonStandby;
+		wxButton* buttonTrack;
 		wxTextCtrl* pilot_state;
 		wxTextCtrl* TextStatus11;
 		wxTextCtrl* heading;
@@ -55,10 +56,11 @@ class m_dialog : public wxDialog
 		virtual void OnActiveApp( wxActivateEvent& event ) { event.Skip(); }
 		virtual void OnAuto( wxCommandEvent& event ) { event.Skip(); }
 		virtual void OnStandby( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDecrementOne( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnDecrementTen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnIncrementTen( wxCommandEvent& event ) { event.Skip(); }
-		virtual void OnIncrementOne( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnTracking( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMinusOne( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnMinusTen( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPlusTen( wxCommandEvent& event ) { event.Skip(); }
+		virtual void OnPlusOne( wxCommandEvent& event ) { event.Skip(); }
 
 
 	public:
