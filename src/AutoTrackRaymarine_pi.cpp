@@ -27,10 +27,8 @@
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
-//#include "apdc.h"
 #include "jsoncpp/json/json.h"
 #include "AutoTrackRaymarine_pi.h"
-#include "concanv.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
 #include "GL/gl.h"
@@ -38,6 +36,7 @@
 #include "actisense.h"
 #include "SerialPort.h"
 #include "AutotrackInfoUI.h"
+#include "Info.h"
 
 
 //using namespace std;
@@ -77,7 +76,7 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
 {
   // Create the PlugIn icons
   initialize_images();
-  m_ConsoleCanvas = NULL;
+  m_InfoDialog = NULL;
   m_PreferencesDialog = NULL;
   m_initialized = false;
 }
@@ -146,12 +145,12 @@ bool AutoTrackRaymarine_pi::DeInit(void)
   wxFileConfig *pConf = GetOCPNConfigObject();
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
-  if (m_ConsoleCanvas) {
-    wxPoint p = GetFrameAuiManager()->GetPane(m_ConsoleCanvas).floating_pos;
+  if (m_InfoDialog) {
+    wxPoint p = GetFrameAuiManager()->GetPane(m_InfoDialog).floating_pos;
     pConf->Write("PosX", p.x);
     pConf->Write("PosY", p.y);
   }
-  delete m_ConsoleCanvas;
+  delete m_InfoDialog;
 
   preferences &p = prefs;
   
@@ -211,8 +210,8 @@ Route tracking and remote control for Raymarine Evolution pilots");
 //void AutoTrackRaymarine_pi::SetColorScheme(PI_ColorScheme cs) // $$$
 //{
 //  m_colorscheme = cs;
-//  if (m_ConsoleCanvas)
-//    m_ConsoleCanvas->SetColorScheme(cs);
+//  if (m_InfoDialog)
+//    m_InfoDialog->SetColorScheme(cs);
 //}
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
@@ -230,7 +229,9 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
   if (!m_initialized) {
     return true;
   }
-  UpdateConsole();
+  if (m_InfoDialog) {
+    m_InfoDialog->UpdateInfo();
+  }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
     Compute();
@@ -242,7 +243,9 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
   if (!m_initialized) {
     return true;
   }
-  UpdateConsole();
+  if (m_InfoDialog) {
+    m_InfoDialog->UpdateInfo();
+  }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
     Compute();
@@ -250,53 +253,20 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
   return true;
 }
 
-void AutoTrackRaymarine_pi::UpdateConsole() {
-  if (m_ConsoleCanvas) {
-    if (m_pilot_state == TRACKING)
-      m_ConsoleCanvas->TextStatus11->SetLabel(_("Tracking"));
-    if (m_pilot_state == AUTO)
-      m_ConsoleCanvas->TextStatus11->SetLabel(_("Auto"));
-    if (m_pilot_state == STANDBY)
-      m_ConsoleCanvas->TextStatus11->SetLabel(_("Standby"));
-    wxString pilot_heading;
-    if (m_pilot_heading == -1) {
-      pilot_heading = _("----");
-    } else {
-      pilot_heading << wxString::Format(wxString("%i", wxConvUTF8), m_pilot_heading);
-    }
-    m_ConsoleCanvas->TextStatus14->SetLabel(pilot_heading);
-    wxString heading;
-    if (m_vessel_heading == -1) {
-      heading = _("----");
-    }
-    else {
-      heading << wxString::Format(wxString("%i", wxConvUTF8), m_vessel_heading);
-    }
-    m_ConsoleCanvas->TextStatus12->SetLabel(heading);
-    wxString xte;
-    if (m_XTE == 100000.) {
-      xte = _("----");
-    }
-    else {
-      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_XTE);
-    }
-    m_ConsoleCanvas->TextStatus121->SetLabel(xte);
-  }
-}
 
 void AutoTrackRaymarine_pi::ShowConsoleCanvas()
 {
   wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show1"));
-  if (!m_ConsoleCanvas) {
+  if (!m_InfoDialog) {
     wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show2"));
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
 
-    m_ConsoleCanvas = new m_dialog(GetOCPNCanvasWindow());
+    m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), *this);
     //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
-    wxSize sz = m_ConsoleCanvas->GetSize();
-    m_ConsoleCanvas->Show();
+    wxSize sz = m_InfoDialog->GetSize();
+    m_InfoDialog->Show();
     
   }
   wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));

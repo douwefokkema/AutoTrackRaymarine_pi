@@ -71,11 +71,12 @@ class ConsoleCanvas;
 class PreferencesDialog;
 //class NGT1Input;
 class SerialPort;
-class m_dialog;
+//class m_dialog;
+class InfoDialog;
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_110
 {
-  friend ConsoleCanvas;
+  //friend InfoDialog;
 public:
   AutoTrackRaymarine_pi(void *ppimgr);
   int Init(void);
@@ -157,12 +158,11 @@ private:
 
     
     void Compute();
-    void UpdateConsole();
     void SendHSC(double course);
 
     int m_leftclick_tool_id;
 
-    m_dialog *m_ConsoleCanvas;
+    InfoDialog *m_InfoDialog;
     
 
    // PI_ColorScheme m_colorscheme; $$$

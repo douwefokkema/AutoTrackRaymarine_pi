@@ -35,13 +35,11 @@ SET(SRC_AUTOTRACKRAYMARINE
 			src/AutoTrackInfoUI.h
 			src/AutoTrackPrefsUI.cpp
 			src/AutoTrackPrefsUI.h
-          ##src/concanv.cpp
-	      ##src/concanv.h
+            src/Info.h
+			src/Info.cpp
             src/icons.cpp
             src/ODAPI.h
-          ##  src/apdc.cpp
-		##	src/apdc.h
-            src/TexFont.cpp
+			src/TexFont.cpp
             src/NGT1Read.h
             src/NGT1Read.cpp
             src/actisense.h

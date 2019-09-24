@@ -33,7 +33,7 @@ class m_dialog : public wxDialog
 {
 	private:
 
-	public:
+	protected:
 		wxStaticLine* StaticLine1;
 		wxButton* buttonAuto;
 		wxButton* buttonStandby;
