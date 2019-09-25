@@ -35,17 +35,24 @@
 class InfoDialog : public m_dialog
 {
 public:
-  InfoDialog(wxWindow *parent, AutoTrackRaymarine_pi &pi)
+  InfoDialog(wxWindow *parent, AutoTrackRaymarine_pi *pi)
     : m_dialog(parent), m_pi(pi) {
   }
   ~InfoDialog() {};
   void UpdateInfo();
+  void OnAuto(wxCommandEvent & event);
+  void OnStandBy(wxCommandEvent & event);
+  void OnTracking(wxCommandEvent & event);
+  void OnMinus10(wxCommandEvent & event);
+  void OnPlus10(wxCommandEvent & event);
+  void OnMinus1(wxCommandEvent & event);
+  void OnPlus1(wxCommandEvent & event);
 
 private:
   /*void OnCancel(wxCommandEvent& event);
   void OnOk(wxCommandEvent& event);*/
 
-  AutoTrackRaymarine_pi &m_pi;
+  AutoTrackRaymarine_pi *m_pi;
 
 };
 

@@ -118,8 +118,8 @@ int AutoTrackRaymarine_pi::Init(void)
   m_XTE_refreshed = false;
   m_initialized = true;
   m_route_active = false;
-  m_pilot_heading = -1;     // undefined
-  m_vessel_heading = -1;       // current heading of vessel according to pilot, undefined
+  m_pilot_heading = -1.;     // undefined
+  m_vessel_heading = -1.;       // current heading of vessel according to pilot, undefined
   m_XTE = 100000.;      // undefined
 
 
@@ -263,7 +263,7 @@ void AutoTrackRaymarine_pi::ShowConsoleCanvas()
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
 
-    m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), *this);
+    m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), this);
     //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
     wxSize sz = m_InfoDialog->GetSize();
     m_InfoDialog->Show();
@@ -506,6 +506,20 @@ void AutoTrackRaymarine_pi::Compute(){
   }
   m_current_xte = m_XTE;
   wxLogMessage(wxT("AutoTrackRaymarine $$$1 m_XTE=%f"), m_XTE);
+}
+
+void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
+  if (m_pilot_state == STANDBY) {
+    return;
+  }
+  if (m_pilot_state == TRACKING) {
+    m_pilot_state = AUTO;
+  }
+  double new_pilot_heading = m_pilot_heading + (double) degrees;
+  if (new_pilot_heading >= 360.) m_pilot_heading -= 360.;
+  if (new_pilot_heading < 0.) m_pilot_heading += 360.;
+  m_serial_comms->SetAutopilotHeading(new_pilot_heading - m_var); //$$$  and display one decimal
+  
 }
 
 

@@ -241,8 +241,8 @@ void SerialPort::SetAutopilotHeading(double heading) {
   // wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
   
   // commands for NGT-1 in Canboat format
-  // string msg0 = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standbye
-  // string msg1 = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff"; // set auto
+  string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
+  // string auto_command    = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
   string msg2 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,00,00";  //set 0 magnetic
   // string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";  //set 92 magnetic
   // string msg4 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,4e,3f";  //set 93 example only, magnetic
@@ -278,6 +278,24 @@ void SerialPort::SetAutopilotHeading(double heading) {
   unsigned char msg[500];
   for (unsigned int i = 0; i <= msg2.length(); i++) {
     msg[i] = msg2[i];
+  }
+  parseAndWriteIn(m_hSerialin, msg);
+}
+
+void SerialPort::SetAuto() {
+  string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+  unsigned char msg[500];
+  for (unsigned int i = 0; i <= auto_command.length(); i++) {
+    msg[i] = auto_command[i];
+  }
+  parseAndWriteIn(m_hSerialin, msg);
+}
+
+void SerialPort::SetStandby() {
+  string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
+  unsigned char msg[500];
+  for (unsigned int i = 0; i <= standby_command.length(); i++) {
+    msg[i] = standby_command[i];
   }
   parseAndWriteIn(m_hSerialin, msg);
 }

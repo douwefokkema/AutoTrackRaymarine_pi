@@ -233,9 +233,9 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       m_pi->m_pilot_state = AUTO;
     }
     p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
-    if (m_pi->m_pilot_heading != (int)p_h) {
-      m_pi->m_pilot_heading = (int)p_h;
-      printf("auto = %i \n", m_pi->m_pilot_heading);  // only print when heading is changed, take out later $$$
+    if (m_pi->m_pilot_heading != p_h) {
+      m_pi->m_pilot_heading = p_h;
+      printf("auto = %f \n", m_pi->m_pilot_heading);  // only print when heading is changed, take out later $$$
     }
     break;
 
@@ -256,7 +256,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {   
         m_pi->m_pilot_state = STANDBY;  // standly
         wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
-        m_pi->m_pilot_heading = -1; // undefined
+        m_pi->m_pilot_heading = -1.; // undefined
       }
       if (msg[23] == 0x40) {  // AUTO
         if (m_pi->m_pilot_state == STANDBY) {
@@ -294,8 +294,8 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   case 65359:
     //  heading all the time
      p_h = (((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000);
-     m_pi->m_vessel_heading = (int)p_h;
-     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %i "), m_pi->m_vessel_heading);
+     m_pi->m_vessel_heading = p_h;
+     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %f "), m_pi->m_vessel_heading);
     break;
 
     //case 65379:

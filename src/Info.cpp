@@ -27,38 +27,75 @@
 */
 
 #include "Info.h"
+#include "AutotrackInfoUI.h"
+#include "SerialPort.h"
 
 
 void InfoDialog::UpdateInfo() {
-    if (m_pi.m_pilot_state == TRACKING)
+    if (m_pi->m_pilot_state == TRACKING)
       TextStatus11->SetLabel(_("Tracking"));
-    if (m_pi.m_pilot_state == AUTO)
+    if (m_pi->m_pilot_state == AUTO)
       TextStatus11->SetLabel(_("Auto"));
-    if (m_pi.m_pilot_state == STANDBY)
+    if (m_pi->m_pilot_state == STANDBY)
       TextStatus11->SetLabel(_("Standby"));
     wxString pilot_heading;
-    if (m_pi.m_pilot_heading == -1) {
+    if (m_pi->m_pilot_heading == -1.) {
       pilot_heading = _("----");
     }
     else {
-      pilot_heading << wxString::Format(wxString("%i", wxConvUTF8), m_pi.m_pilot_heading);
+      pilot_heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_pilot_heading);
     }
     TextStatus14->SetLabel(pilot_heading);
     wxString heading;
-    if (m_pi.m_vessel_heading == -1) {
+    if (m_pi->m_vessel_heading == -1.) {
       heading = _("----");
     }
     else {
-      heading << wxString::Format(wxString("%i", wxConvUTF8), m_pi.m_vessel_heading);
+      heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_vessel_heading);
     }
     TextStatus12->SetLabel(heading);
     wxString xte;
-    if (m_pi.m_XTE == 100000.) {
+    if (m_pi->m_XTE == 100000.) {
       xte = _("----");
     }
     else {
-      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi.m_XTE);
+      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE);
     }
     TextStatus121->SetLabel(xte);
-  
+}
+
+void InfoDialog::OnAuto(wxCommandEvent& event) {
+  m_pi->m_serial_comms->SetAuto();
+  m_pi->m_pilot_state = AUTO;
+}
+
+void InfoDialog::OnStandBy(wxCommandEvent& event) {
+  m_pi->m_serial_comms->SetStandby();
+}
+
+void InfoDialog::OnTracking(wxCommandEvent& event) {
+  if (m_pi->m_route_active) {
+    if (m_pi->m_pilot_state = STANDBY) {
+      m_pi->m_serial_comms->SetAuto();
+    }
+    m_pi->ResetXTE();
+    ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
+    m_pi->m_pilot_state = TRACKING;
+  }
+}
+
+void InfoDialog::OnMinus10(wxCommandEvent& event) {
+m_pi->ChangePilotHeading(-10);
+}
+
+void InfoDialog::OnPlus10(wxCommandEvent& event) {
+  m_pi->ChangePilotHeading(10);
+}
+
+void InfoDialog::OnMinus1(wxCommandEvent& event) {
+  m_pi->ChangePilotHeading(-1);
+}
+
+void InfoDialog::OnPlus1(wxCommandEvent& event) {
+  m_pi->ChangePilotHeading(10);
 }
