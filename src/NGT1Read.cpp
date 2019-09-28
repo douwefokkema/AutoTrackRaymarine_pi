@@ -32,6 +32,7 @@
 #include "SerialPort.h"
 #include "actisense.h"
 
+#define NGT1ADDRESS 7  // enter NGT-1 device address here
 
 enum MSG_State
 {
@@ -240,37 +241,45 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     break;
 
     case 126208:  // if length is 28: command to set to standby or auto 
+                  // if length is 25: command to set to heading
     	//heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
-    	if (msgLen != 28) { // we only want the messages that originate from a keystroke auto / standly
-        break;
-    	}
-
-    /*  wxLogMessage(wxT("              $$$  #received message  len= %i \n"), msgLen);
-      wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
-        msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
-        msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);
-*/
-
-
-      //wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$ lengt 23, fiels22=%0x, f19=%0x, f20=%0x, len=%i"), msg[22], msg[23], msg[24], msgLen);
-      if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {   
-        m_pi->m_pilot_state = STANDBY;  // standly
-        wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
-        m_pi->m_pilot_heading = -1.; // undefined
-      }
-      if (msg[23] == 0x40) {  // AUTO
-        if (m_pi->m_pilot_state == STANDBY) {
-          m_pi->m_pilot_state = AUTO;
-          wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###New pilot state = AUTO"));
-        }
-        else {
-          if (m_pi->m_route_active) {
-            m_pi->ResetXTE();
-            ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
-            m_pi->m_pilot_state = TRACKING;
+      
+        if (msgLen == 25) {  // should be the heading command
+           // field 8 should be the address of origin
+          wxLogMessage(wxT(" $$$ source address = %i"), msg[8]);
+          if (msg[8] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
+            m_pi->m_pilot_state == AUTO;
+            wxLogMessage(wxT("$$$ set to auto by incoming message"));
           }
         }
-      }
+
+        wxLogMessage(wxT("              $$$  #received message 126208  len= %i \n"), msgLen);
+        wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
+          msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
+          msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);
+        
+
+        if (msgLen == 28) {//    messages that originate from a keystroke auto / standly
+          //wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$ lengt 23, fiels22=%0x, f19=%0x, f20=%0x, len=%i"), msg[22], msg[23], msg[24], msgLen);
+          if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {
+            m_pi->m_pilot_state = STANDBY;  // standly
+            wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
+            m_pi->m_pilot_heading = -1.; // undefined
+          }
+          if (msg[23] == 0x40) {  // AUTO
+            if (m_pi->m_pilot_state == STANDBY) {
+              m_pi->m_pilot_state = AUTO;
+              wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###New pilot state = AUTO"));
+            }
+            else {
+              if (m_pi->m_route_active) {
+                m_pi->ResetXTE();
+                ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
+                m_pi->m_pilot_state = TRACKING;
+              }
+            }
+          }
+        }
       break;
 
   case 126720:
