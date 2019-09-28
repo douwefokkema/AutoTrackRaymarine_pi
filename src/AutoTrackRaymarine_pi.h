@@ -151,6 +151,8 @@ public:
 protected:   
     wxPoint m_cursor_position;
     PlugIn_Position_Fix_Ex m_lastfix;
+    void OnTimer(wxTimerEvent &);
+    wxTimer m_Timer;
 
 private:
     void SetNMEASentence(wxString &sentence);

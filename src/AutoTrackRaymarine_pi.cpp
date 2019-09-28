@@ -122,6 +122,8 @@ int AutoTrackRaymarine_pi::Init(void)
   m_vessel_heading = -1.;       // current heading of vessel according to pilot, undefined
   m_XTE = 100000.;      // undefined
 
+  m_Timer.Connect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
+  m_Timer.Start(1000);
 
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |
@@ -163,6 +165,9 @@ bool AutoTrackRaymarine_pi::DeInit(void)
 
   //  Close serial port and stop reader thread NGT-1
   delete (m_serial_comms);
+  m_Timer.Stop();
+  m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
+
   return true;
 }
 
@@ -223,6 +228,15 @@ void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
 
   delete m_PreferencesDialog;
   m_PreferencesDialog = NULL;
+}
+
+void AutoTrackRaymarine_pi::OnTimer(wxTimerEvent &)
+{
+  wxWindow *canvas = GetCanvasByIndex(0);
+  if (canvas) {
+    canvas->Refresh(false);
+    wxLogMessage(wxString("$$$$ canvas refreshed"));
+  }
 }
 
 bool AutoTrackRaymarine_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
