@@ -96,7 +96,7 @@ int AutoTrackRaymarine_pi::Init(void)
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
   m_heading_set = false;
-  m_pilot_state = 0;   // standby
+  m_pilot_state = STANDBY;
 
   // Mode
   preferences &p = prefs;
@@ -230,6 +230,7 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
     return true;
   }
   if (m_InfoDialog) {
+    wxLogMessage(wxString("$$$ update  i nfo called, m_pilot_state= %i"), m_pilot_state);
     m_InfoDialog->UpdateInfo();
   }
   if (m_XTE_refreshed) {
@@ -245,6 +246,7 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
   }
   if (m_InfoDialog) {
     m_InfoDialog->UpdateInfo();
+    wxLogMessage(wxString("$$$ update  info called, m_pilot_state= %i"), m_pilot_state);
   }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
@@ -352,7 +354,9 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     if (ParseMessage(message_body, root)) {
       ResetXTE();
       ShowConsoleCanvas();
-      m_pilot_state = 0;    // standby
+      if (m_pilot_state == TRACKING) {
+        m_pilot_state = STANDBY;
+      }
       m_route_active = true;
     }
   }
@@ -377,20 +381,19 @@ void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
   
   float xte;
 
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$SetNMEASentence %s"), sentence.c_str());
+  //wxLogMessage(wxT("AutoTrackRaymarine: $$$SetNMEASentence %s"), sentence.c_str());
   wxString nm = sentence;
   
 
   if (m_NMEA0183.PreParse()) {
     // it seems that we can't parse XTE, so do it ourselves
     if (m_NMEA0183.LastSentenceIDReceived == _T("XTE")) {
-      if (m_NMEA0183.Parse()) {
-        wxLogMessage(wxT("AutoTrackRaymarine: $$$ XTE received %f"), m_NMEA0183.Xte.CrossTrackErrorDistance);
-        //m_NMEA0183.Xte.CrossTrackErrorDistance;
-      }
-      else {
-        wxLogMessage(wxT("AutoTrackRaymarine: $$$ no parse"));
-      }
+      //if (m_NMEA0183.Parse()) {
+      //  //m_NMEA0183.Xte.CrossTrackErrorDistance;
+      //}
+      //else {
+      //  wxLogMessage(wxT("AutoTrackRaymarine: $$$ no parse"));
+      //}
     }
     if (sentence.c_str()[3] == 'X' && sentence.c_str()[4] == 'T' && sentence.c_str()[5] == 'E') {
       wxLogMessage(wxT("AutoTrackRaymarine: $$$SetNMEASentence XTE = %s"), sentence);
@@ -404,6 +407,7 @@ void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
         xte = - xte;
       }
       m_XTE = xte;
+      if (m_XTE > -0.00001 && m_XTE < 0.) m_XTE = 0.;
       m_XTE_refreshed = true;
       m_route_active = true;  // when XTE messages arrive a route must be active
     }
@@ -418,6 +422,10 @@ void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
 
+  if (m_pilot_state != TRACKING || !m_route_active) {
+    return;
+  }
+  wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters  // change into waypoint arrival distance  $$$
   double dist_nm = dist / 1852.;
 
@@ -458,7 +466,7 @@ void AutoTrackRaymarine_pi::Compute(){
     gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.14) * 360.;
   }
   double max_angle = prefs.max_angle;
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$$ initial gamma=%f, btw=%f, dist=%f, max_angle"), gamma, m_BTW, dist, max_angle);
+  wxLogMessage(wxT("AutoTrackRaymarine: $$$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
@@ -499,26 +507,25 @@ void AutoTrackRaymarine_pi::Compute(){
   }
   while (m_current_bearing >= 360.) m_current_bearing -= 360.;
   while (m_current_bearing < 0.) m_current_bearing += 360.;
-  if (m_pilot_state == TRACKING) {
-    wxLogMessage(wxT("AutoTrackRaymarine $$$ state == tracking, heading send to raymarine"));
-    m_serial_comms->SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
-    SendHSC(m_current_bearing);  
-  }
-  m_current_xte = m_XTE;
-  wxLogMessage(wxT("AutoTrackRaymarine $$$1 m_XTE=%f"), m_XTE);
+  wxLogMessage(wxT("AutoTrackRaymarine $$$ state == tracking, heading send to raymarine"));
+  m_serial_comms->SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
+  m_pilot_heading = m_current_bearing; // $$$ this should not be needed, pilot heading will come from pilot. For testing only.
+  SendHSC(m_current_bearing);
 }
 
 void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
   if (m_pilot_state == STANDBY) {
     return;
   }
-  if (m_pilot_state == TRACKING) {
+  if (m_pilot_state == TRACKING) {  // N.B.: for the pilot AUTO and TRACKING is the same
     m_pilot_state = AUTO;
   }
   double new_pilot_heading = m_pilot_heading + (double) degrees;
   if (new_pilot_heading >= 360.) m_pilot_heading -= 360.;
   if (new_pilot_heading < 0.) m_pilot_heading += 360.;
   m_serial_comms->SetAutopilotHeading(new_pilot_heading - m_var); //$$$  and display one decimal
+  m_pilot_heading = new_pilot_heading; // this should not be needed, pilot heading will come from pilot. For testing only.
+  SendHSC(new_pilot_heading);
   
 }
 
@@ -557,8 +564,6 @@ void AutoTrackRaymarine_pi::SendHSC(double course) {
   for (p = sentence; *p; p++) {
     checksum ^= *p;
   }
-
   nmea.Printf(wxT("$%s*%02X\r\n"), sentence, (unsigned)checksum);
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$sending HSC %s"), nmea);
   PushNMEABuffer(nmea);
 }

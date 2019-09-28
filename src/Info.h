@@ -41,12 +41,12 @@ public:
   ~InfoDialog() {};
   void UpdateInfo();
   void OnAuto(wxCommandEvent & event);
-  void OnStandBy(wxCommandEvent & event);
+  void OnStandby(wxCommandEvent & event);
   void OnTracking(wxCommandEvent & event);
-  void OnMinus10(wxCommandEvent & event);
-  void OnPlus10(wxCommandEvent & event);
-  void OnMinus1(wxCommandEvent & event);
-  void OnPlus1(wxCommandEvent & event);
+  void OnMinusTen(wxCommandEvent & event);
+  void OnPlusTen(wxCommandEvent & event);
+  void OnMinusOne(wxCommandEvent & event);
+  void OnPlusOne(wxCommandEvent & event);
 
 private:
   /*void OnCancel(wxCommandEvent& event);

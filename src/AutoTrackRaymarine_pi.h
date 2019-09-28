@@ -175,7 +175,7 @@ private:
 
     bool m_bArrival;
 
-    double m_current_bearing, m_current_xte;
+    double m_current_bearing;
 
 };
 

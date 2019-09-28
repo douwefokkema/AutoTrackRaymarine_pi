@@ -59,7 +59,7 @@ void InfoDialog::UpdateInfo() {
       xte = _("----");
     }
     else {
-      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE);
+      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE * 1852.);
     }
     TextStatus121->SetLabel(xte);
 }
@@ -67,35 +67,51 @@ void InfoDialog::UpdateInfo() {
 void InfoDialog::OnAuto(wxCommandEvent& event) {
   m_pi->m_serial_comms->SetAuto();
   m_pi->m_pilot_state = AUTO;
+  wxLogMessage(wxT("$$$ On Auto clicked"));
+  buttonDecOne->Enable();
+  buttonIncOne->Enable();
+  buttonDecTen->Enable();
+  buttonIncTen->Enable();
+  buttonStandby->Enable();
 }
 
-void InfoDialog::OnStandBy(wxCommandEvent& event) {
+void InfoDialog::OnStandby(wxCommandEvent& event) {
+  wxLogMessage(wxT("$$$ On Standby clicked"));
   m_pi->m_serial_comms->SetStandby();
+  m_pi->m_pilot_state = STANDBY;
+  buttonDecOne->Disable();
+  buttonIncOne->Disable();
+  buttonDecTen->Disable();
+  buttonIncTen->Disable();
 }
 
 void InfoDialog::OnTracking(wxCommandEvent& event) {
   if (m_pi->m_route_active) {
-    if (m_pi->m_pilot_state = STANDBY) {
+    if (m_pi->m_pilot_state == STANDBY) {
       m_pi->m_serial_comms->SetAuto();
     }
     m_pi->ResetXTE();
     ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
     m_pi->m_pilot_state = TRACKING;
+    buttonDecOne->Enable();
+    buttonIncOne->Enable();
+    buttonDecTen->Enable();
+    buttonIncTen->Enable();
   }
 }
 
-void InfoDialog::OnMinus10(wxCommandEvent& event) {
+void InfoDialog::OnMinusTen(wxCommandEvent& event) {
 m_pi->ChangePilotHeading(-10);
 }
 
-void InfoDialog::OnPlus10(wxCommandEvent& event) {
+void InfoDialog::OnPlusTen(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(10);
 }
 
-void InfoDialog::OnMinus1(wxCommandEvent& event) {
+void InfoDialog::OnMinusOne(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(-1);
 }
 
-void InfoDialog::OnPlus1(wxCommandEvent& event) {
+void InfoDialog::OnPlusOne(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(10);
 }

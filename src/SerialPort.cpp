@@ -229,7 +229,7 @@ void SerialPort::writeMessage(HANDLE handle, unsigned char command, const unsign
   *b++ = DLE;
   *b++ = ETX;
   if (!WriteFile(handle, bst, b - bst, &bytes_written, NULL)) {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi Error. Writing to serial port"));
+  //  wxLogMessage(wxT("AutoTrackRaymarine_pi Error. Writing to serial port"));
     CloseHandle(m_hSerialin);
     int Dummy = toupper(_getch());
   }
