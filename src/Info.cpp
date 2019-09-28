@@ -76,7 +76,6 @@ void InfoDialog::OnAuto(wxCommandEvent& event) {
 }
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
-  wxLogMessage(wxT("$$$ On Standby clicked"));
   m_pi->m_serial_comms->SetStandby();
   m_pi->m_pilot_state = STANDBY;
   buttonDecOne->Disable();

@@ -385,6 +385,8 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     m_active_guid = "";
     m_route_active = false;
     m_XTE = 100000.;  // undefined
+    wxCommandEvent event;
+    m_InfoDialog->OnStandby(event);
   }
 }
 
