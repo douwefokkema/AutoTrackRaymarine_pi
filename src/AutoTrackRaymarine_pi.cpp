@@ -78,6 +78,7 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
   initialize_images();
   m_InfoDialog = NULL;
   m_PreferencesDialog = NULL;
+  m_pdeficon = new wxBitmap(*_img_AutoTrackRaymarine);
   m_initialized = false;
 }
 
@@ -114,7 +115,7 @@ int AutoTrackRaymarine_pi::Init(void)
 
   m_serial_comms = new SerialPort(this);
 
-  ShowConsoleCanvas();
+  ShowInfoDialog();
   m_XTE_refreshed = false;
   m_initialized = true;
   m_route_active = false;
@@ -125,6 +126,14 @@ int AutoTrackRaymarine_pi::Init(void)
   m_Timer.Connect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
   m_Timer.Start(1000);
 
+  //    This PlugIn needs a toolbar icon
+
+  wxString svg_normal = m_shareLocn + wxT("radar_standby.svg");
+  wxString svg_rollover = m_shareLocn + wxT("radar_searching.svg");
+  wxString svg_toggled = m_shareLocn + wxT("radar_active.svg");
+  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_rollover, svg_toggled, wxITEM_NORMAL, wxT("Tracking"),
+    _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |
     WANTS_CURSOR_LATLON |
@@ -134,6 +143,20 @@ int AutoTrackRaymarine_pi::Init(void)
     WANTS_PLUGIN_MESSAGING |
     WANTS_PREFERENCES |
     WANTS_CONFIG);
+}
+
+wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
+
+void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
+  if (!m_initialized) {
+    return;
+  }
+  wxLogMessage(wxString("$$$ toolbar clicked"));
+  if (m_InfoDialog->IsShown()) {
+    m_InfoDialog->Hide();
+  } else {
+    m_InfoDialog->Show();
+  }
 }
 
 bool AutoTrackRaymarine_pi::DeInit(void)
@@ -191,10 +214,10 @@ int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
   return PLUGIN_VERSION_MINOR;
 }
 
-wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
-{
-  return new wxBitmap(_img_AutoTrackRaymarine->ConvertToImage().Copy());
-}
+//wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
+//{
+//  return new wxBitmap(_img_AutoTrackRaymarine->ConvertToImage().Copy());
+//}
 
 wxString AutoTrackRaymarine_pi::GetCommonName()
 {
@@ -270,7 +293,7 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
 }
 
 
-void AutoTrackRaymarine_pi::ShowConsoleCanvas()
+void AutoTrackRaymarine_pi::ShowInfoDialog()
 {
   wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show1"));
   if (!m_InfoDialog) {
@@ -280,6 +303,8 @@ void AutoTrackRaymarine_pi::ShowConsoleCanvas()
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
 
     m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), this);
+    m_InfoDialog->EnableHeadingButtons(false);
+    m_InfoDialog->EnableTrackButton(false);
     //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
     wxSize sz = m_InfoDialog->GetSize();
     m_InfoDialog->Show();
@@ -365,19 +390,17 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
   else if (message_id == wxS("AIS")) {
   }
   else if (message_id == "OCPN_RTE_ACTIVATED") {
-    if (ParseMessage(message_body, root)) {
-      ResetXTE();
-      ShowConsoleCanvas();
-      if (m_pilot_state == TRACKING) {
-        m_pilot_state = STANDBY;
-      }
-      m_route_active = true;
+    ResetXTE();
+    if (m_pilot_state == TRACKING) {
+      m_pilot_state = STANDBY;
     }
+    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ RTEenable track button"));
+    m_InfoDialog->EnableTrackButton(true);
+    m_route_active = true;
   }
   else if (message_id == "OCPN_WPT_ACTIVATED") {
     wxString guid = root["GUID"].asString();
     m_last_wpt_activated_guid = guid;
-    //ShowConsoleCanvas();
   }
   else if (message_id == "OCPN_WPT_ARRIVED") {
   }
@@ -387,6 +410,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     m_XTE = 100000.;  // undefined
     wxCommandEvent event;
     m_InfoDialog->OnStandby(event);
+    m_InfoDialog->EnableTrackButton(false);
   }
 }
 

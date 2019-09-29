@@ -31,6 +31,7 @@
 #include "AutoTrackRaymarine_pi.h"
 #include "SerialPort.h"
 #include "actisense.h"
+#include "info.h"
 
 #define NGT1ADDRESS 7  // enter NGT-1 device address here
 
@@ -276,6 +277,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
                 m_pi->ResetXTE();
                 ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
                 m_pi->m_pilot_state = TRACKING;
+                m_pi->m_InfoDialog->EnableHeadingButtons(true);
               }
             }
           }

@@ -66,8 +66,6 @@ protected:
   void *Entry(void);
 
 private:
-  //bool ProcessReport(const NetworkAddress &radar_address, const uint8_t *data, size_t len);
-
   AutoTrackRaymarine_pi *m_pi;
   volatile bool m_shutdown;
 

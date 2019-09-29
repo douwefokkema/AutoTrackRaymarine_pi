@@ -47,6 +47,8 @@ public:
   void OnPlusTen(wxCommandEvent & event);
   void OnMinusOne(wxCommandEvent & event);
   void OnPlusOne(wxCommandEvent & event);
+  void EnableHeadingButtons(bool enable);
+  void EnableTrackButton(bool enable);
 
 private:
   /*void OnCancel(wxCommandEvent& event);

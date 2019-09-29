@@ -68,20 +68,39 @@ void InfoDialog::OnAuto(wxCommandEvent& event) {
   m_pi->m_serial_comms->SetAuto();
   m_pi->m_pilot_state = AUTO;
   wxLogMessage(wxT("$$$ On Auto clicked"));
-  buttonDecOne->Enable();
-  buttonIncOne->Enable();
-  buttonDecTen->Enable();
-  buttonIncTen->Enable();
-  buttonStandby->Enable();
+  EnableHeadingButtons(true);
 }
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
   m_pi->m_serial_comms->SetStandby();
   m_pi->m_pilot_state = STANDBY;
-  buttonDecOne->Disable();
-  buttonIncOne->Disable();
-  buttonDecTen->Disable();
-  buttonIncTen->Disable();
+  EnableHeadingButtons(false);
+}
+
+void InfoDialog::EnableHeadingButtons(bool show) {
+  if (show) {
+    buttonDecOne->Enable();
+    buttonIncOne->Enable();
+    buttonDecTen->Enable();
+    buttonIncTen->Enable();
+  }
+  else {
+    buttonDecOne->Disable();
+    buttonIncOne->Disable();
+    buttonDecTen->Disable();
+    buttonIncTen->Disable();
+  }
+}
+
+void InfoDialog::EnableTrackButton(bool enable) {
+  if (enable) {
+    buttonTrack->Enable();
+    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ trackbutton enabled"));
+  }
+  else {
+    buttonTrack->Disable();
+    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ trackbutton disabled"));
+  }
 }
 
 void InfoDialog::OnTracking(wxCommandEvent& event) {
@@ -92,10 +111,7 @@ void InfoDialog::OnTracking(wxCommandEvent& event) {
     m_pi->ResetXTE();
     ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
     m_pi->m_pilot_state = TRACKING;
-    buttonDecOne->Enable();
-    buttonIncOne->Enable();
-    buttonDecTen->Enable();
-    buttonIncTen->Enable();
+    EnableHeadingButtons(true);
   }
 }
 

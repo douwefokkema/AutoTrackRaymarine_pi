@@ -97,7 +97,7 @@ public:
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
   bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
-  void ShowConsoleCanvas();
+  void ShowInfoDialog();
   void ShowPreferences();
   void ChangePilotHeading(int degrees);
 
@@ -147,6 +147,14 @@ public:
     } prefs;
     
     PreferencesDialog *m_PreferencesDialog;
+    InfoDialog *m_InfoDialog;
+    void OnToolbarToolCallback(int id);
+
+    // Icons
+    wxString m_shareLocn;
+    int m_tool_id;
+    wxBitmap *m_pdeficon;
+#define TRACKING_TOOL_POSITION -1  // Request default positioning of toolbar tool
 
 protected:   
     wxPoint m_cursor_position;
@@ -165,7 +173,7 @@ private:
 
     int m_leftclick_tool_id;
 
-    InfoDialog *m_InfoDialog;
+    
     
 
    // PI_ColorScheme m_colorscheme; $$$
