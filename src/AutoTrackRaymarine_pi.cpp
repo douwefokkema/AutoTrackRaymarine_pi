@@ -418,29 +418,16 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
 void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
   m_NMEA0183 << sentence;
   time_t now = time(0);
-  
   float xte;
-
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$SetNMEASentence %s"), sentence.c_str());
   wxString nm = sentence;
-  
-
   if (m_NMEA0183.PreParse()) {
     // it seems that we can't parse XTE, so do it ourselves
     if (m_NMEA0183.LastSentenceIDReceived == _T("XTE")) {
-      //if (m_NMEA0183.Parse()) {
-      //  //m_NMEA0183.Xte.CrossTrackErrorDistance;
-      //}
-      //else {
-      //  wxLogMessage(wxT("AutoTrackRaymarine: $$$ no parse"));
-      //}
     }
     if (sentence.c_str()[3] == 'X' && sentence.c_str()[4] == 'T' && sentence.c_str()[5] == 'E') {
-      wxLogMessage(wxT("AutoTrackRaymarine: $$$SetNMEASentence XTE = %s"), sentence);
       for (int i = 0; i < 3; i++) {
         nm = nm.AfterFirst(',');
       }
-      
       sscanf(nm, "%f", &xte);
       nm = nm.AfterFirst(',');
       if (nm[0] == 'L') {
@@ -455,7 +442,6 @@ void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
       m_BTW = m_NMEA0183.Apb.BearingPresentPositionToDestination;
     }
   }
-
 }
 
 void AutoTrackRaymarine_pi::Compute(){
