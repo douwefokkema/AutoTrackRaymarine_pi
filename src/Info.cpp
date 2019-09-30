@@ -67,7 +67,6 @@ void InfoDialog::UpdateInfo() {
 void InfoDialog::OnAuto(wxCommandEvent& event) {
   m_pi->m_serial_comms->SetAuto();
   m_pi->m_pilot_state = AUTO;
-  wxLogMessage(wxT("$$$ On Auto clicked"));
   EnableHeadingButtons(true);
 }
 
@@ -95,11 +94,9 @@ void InfoDialog::EnableHeadingButtons(bool show) {
 void InfoDialog::EnableTrackButton(bool enable) {
   if (enable) {
     buttonTrack->Enable();
-    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ trackbutton enabled"));
   }
   else {
     buttonTrack->Disable();
-    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ trackbutton disabled"));
   }
 }
 

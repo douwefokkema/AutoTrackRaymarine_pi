@@ -171,9 +171,10 @@ bool AutoTrackRaymarine_pi::DeInit(void)
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
   if (m_InfoDialog) {
-    wxPoint p = GetFrameAuiManager()->GetPane(m_InfoDialog).floating_pos;
+    wxPoint p = m_InfoDialog->GetPosition();
     pConf->Write("PosX", p.x);
     pConf->Write("PosY", p.y);
+    wxLogMessage(wxString("$$$ posx=%i"), p.x);
   }
   delete m_InfoDialog;
 
@@ -303,6 +304,7 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
 
     m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), this);
+    m_InfoDialog->SetPosition(pos);
     m_InfoDialog->EnableHeadingButtons(false);
     m_InfoDialog->EnableTrackButton(false);
     //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
@@ -547,12 +549,11 @@ void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
     m_pilot_state = AUTO;
   }
   double new_pilot_heading = m_pilot_heading + (double) degrees;
-  if (new_pilot_heading >= 360.) m_pilot_heading -= 360.;
-  if (new_pilot_heading < 0.) m_pilot_heading += 360.;
-  m_serial_comms->SetAutopilotHeading(new_pilot_heading - m_var); //$$$  and display one decimal
+  if (new_pilot_heading >= 360.) new_pilot_heading -= 360.;
+  if (new_pilot_heading < 0.) new_pilot_heading += 360.;
+  m_serial_comms->SetAutopilotHeading(new_pilot_heading - m_var); //send magnitic heading to Raymarine
   m_pilot_heading = new_pilot_heading; // this should not be needed, pilot heading will come from pilot. For testing only.
   SendHSC(new_pilot_heading);
-  
 }
 
 
