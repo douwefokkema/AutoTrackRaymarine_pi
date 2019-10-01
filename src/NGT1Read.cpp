@@ -178,7 +178,7 @@ void NGT1Input::messageReceived(const unsigned char * msg, size_t msgLen)
 
   if (checksum)
   {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ Ignoring message with invalid checksum"));
+    wxLogMessage(wxT("AutoTrackRaymarine_pi: Ignoring message with invalid checksum"));
     return;
   }
 

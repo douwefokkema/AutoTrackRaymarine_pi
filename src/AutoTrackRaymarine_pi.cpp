@@ -127,11 +127,10 @@ int AutoTrackRaymarine_pi::Init(void)
   m_Timer.Start(1000);
 
   //    This PlugIn needs a toolbar icon
-
-  wxString svg_normal = m_shareLocn + wxT("radar_standby.svg");
-  wxString svg_rollover = m_shareLocn + wxT("radar_searching.svg");
-  wxString svg_toggled = m_shareLocn + wxT("radar_active.svg");
-  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_rollover, svg_toggled, wxITEM_NORMAL, wxT("Tracking"),
+  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") + wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
+    wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
+  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
+  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
     _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
 
   return (WANTS_OVERLAY_CALLBACK |
@@ -296,9 +295,7 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
 
 void AutoTrackRaymarine_pi::ShowInfoDialog()
 {
-  wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show1"));
   if (!m_InfoDialog) {
-    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show2"));
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
@@ -307,12 +304,9 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
     m_InfoDialog->SetPosition(pos);
     m_InfoDialog->EnableHeadingButtons(false);
     m_InfoDialog->EnableTrackButton(false);
-    //wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
     wxSize sz = m_InfoDialog->GetSize();
     m_InfoDialog->Show();
-    
   }
-  wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ show3"));
 }
 
 void AutoTrackRaymarine_pi::ShowPreferences()
@@ -396,7 +390,6 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     if (m_pilot_state == TRACKING) {
       m_pilot_state = STANDBY;
     }
-    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$ RTEenable track button"));
     m_InfoDialog->EnableTrackButton(true);
     m_route_active = true;
   }
@@ -453,7 +446,7 @@ void AutoTrackRaymarine_pi::Compute(){
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
+ // wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters  // change into waypoint arrival distance  $$$
   double dist_nm = dist / 1852.;
 
@@ -463,38 +456,33 @@ void AutoTrackRaymarine_pi::Compute(){
   }
   else if (m_XTE > -0.5 * dist_nm && m_XTE < 0.5 * dist_nm) {
     m_XTE_I += 0.5 * m_XTE;
-   // wxLogMessage(wxT("AutoTrackRaymarine: $$$4 added .5"));
   }
   else if (m_XTE > - dist_nm && m_XTE < dist_nm) {
     m_XTE_I += 0.2 * m_XTE;
-   // wxLogMessage(wxT(AutoTrackRaymarine: $$$4 added .2"));
   }
   else {
-   // wxLogMessage(wxT("AutoTrackRaymarine: $$$4 added nothing"));
   };            // do nothing for now
 
   m_XTE_D = m_XTE - m_XTE_P;  // difference
   m_XTE_P = m_XTE;            // proportional used as previous xte next timw
 
   if (m_XTE_I > 0.5 * dist_nm / I_FACTOR) { // in NM
-    wxLogMessage(wxT("AutoTrackRaymarine: $$$4 limited1"));
     m_XTE_I = 0.5 * dist_nm / I_FACTOR;
   }
   if (m_XTE_I < -0.5 * dist_nm / I_FACTOR) { // in NM
     m_XTE_I = -0.5 * dist_nm / I_FACTOR;
-    wxLogMessage(wxT("AutoTrackRaymarine: $$$4 limited2"));
   }
 
   XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
-    m_XTE_P, m_XTE_I, m_XTE_D, XTE_for_correction);
+  //wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
+  //  m_XTE_P, m_XTE_I, m_XTE_D, XTE_for_correction);
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
   if (dist > 1.) {
     gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.14) * 360.;
   }
   double max_angle = prefs.max_angle;
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
+ // wxLogMessage(wxT("AutoTrackRaymarine: $$$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
