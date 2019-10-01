@@ -249,7 +249,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
            // field 8 should be the address of origin
           wxLogMessage(wxT(" $$$ source address = %i"), msg[8]);
           if (msg[8] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
-            m_pi->m_pilot_state == AUTO;
+            m_pi->m_pilot_state = AUTO;
             wxLogMessage(wxT("$$$ set to auto by incoming message"));
           }
         }
