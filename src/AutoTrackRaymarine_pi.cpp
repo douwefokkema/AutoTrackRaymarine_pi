@@ -76,7 +76,7 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
 {
   // Create the PlugIn icons
   initialize_images();
-  m_InfoDialog = NULL;
+  m_info_dialog = NULL;
   m_PreferencesDialog = NULL;
   m_pdeficon = new wxBitmap(*_img_AutoTrackRaymarine);
   m_initialized = false;
@@ -97,7 +97,7 @@ int AutoTrackRaymarine_pi::Init(void)
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
   m_heading_set = false;
-  m_pilot_state = STANDBY;
+  SetStandby();
 
   // Mode
   preferences &p = prefs;
@@ -151,10 +151,10 @@ void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
     return;
   }
   wxLogMessage(wxString("$$$ toolbar clicked"));
-  if (m_InfoDialog->IsShown()) {
-    m_InfoDialog->Hide();
+  if (m_info_dialog->IsShown()) {
+    m_info_dialog->Hide();
   } else {
-    m_InfoDialog->Show();
+    m_info_dialog->Show();
   }
 }
 
@@ -169,13 +169,13 @@ bool AutoTrackRaymarine_pi::DeInit(void)
   wxFileConfig *pConf = GetOCPNConfigObject();
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
-  if (m_InfoDialog) {
-    wxPoint p = m_InfoDialog->GetPosition();
+  if (m_info_dialog) {
+    wxPoint p = m_info_dialog->GetPosition();
     pConf->Write("PosX", p.x);
     pConf->Write("PosY", p.y);
     wxLogMessage(wxString("$$$ posx=%i"), p.x);
   }
-  delete m_InfoDialog;
+  delete m_info_dialog;
 
   preferences &p = prefs;
   
@@ -238,8 +238,8 @@ Route tracking and remote control for Raymarine Evolution pilots");
 //void AutoTrackRaymarine_pi::SetColorScheme(PI_ColorScheme cs) // $$$
 //{
 //  m_colorscheme = cs;
-//  if (m_InfoDialog)
-//    m_InfoDialog->SetColorScheme(cs);
+//  if (m_info_dialog)
+//    m_info_dialog->SetColorScheme(cs);
 //}
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
@@ -266,9 +266,9 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
   if (!m_initialized) {
     return true;
   }
-  if (m_InfoDialog) {
+  if (m_info_dialog) {
     wxLogMessage(wxString("$$$ update  i nfo called, m_pilot_state= %i"), m_pilot_state);
-    m_InfoDialog->UpdateInfo();
+    m_info_dialog->UpdateInfo();
   }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
@@ -281,8 +281,8 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
   if (!m_initialized) {
     return true;
   }
-  if (m_InfoDialog) {
-    m_InfoDialog->UpdateInfo();
+  if (m_info_dialog) {
+    m_info_dialog->UpdateInfo();
     wxLogMessage(wxString("$$$ update  info called, m_pilot_state= %i"), m_pilot_state);
   }
   if (m_XTE_refreshed) {
@@ -295,17 +295,17 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
 
 void AutoTrackRaymarine_pi::ShowInfoDialog()
 {
-  if (!m_InfoDialog) {
+  if (!m_info_dialog) {
     wxFileConfig *pConf = GetOCPNConfigObject();
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
     wxPoint pos(pConf->Read("PosX", 0L), pConf->Read("PosY", 50));
 
-    m_InfoDialog = new InfoDialog(GetOCPNCanvasWindow(), this);
-    m_InfoDialog->SetPosition(pos);
-    m_InfoDialog->EnableHeadingButtons(false);
-    m_InfoDialog->EnableTrackButton(false);
-    wxSize sz = m_InfoDialog->GetSize();
-    m_InfoDialog->Show();
+    m_info_dialog = new InfoDialog(GetOCPNCanvasWindow(), this);
+    m_info_dialog->SetPosition(pos);
+    m_info_dialog->EnableHeadingButtons(false);
+    m_info_dialog->EnableTrackButton(false);
+    wxSize sz = m_info_dialog->GetSize();
+    m_info_dialog->Show();
   }
 }
 
@@ -388,9 +388,9 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
   else if (message_id == "OCPN_RTE_ACTIVATED") {
     ResetXTE();
     if (m_pilot_state == TRACKING) {
-      m_pilot_state = STANDBY;
+      SetStandby();
     }
-    m_InfoDialog->EnableTrackButton(true);
+    m_info_dialog->EnableTrackButton(true);
     m_route_active = true;
   }
   else if (message_id == "OCPN_WPT_ACTIVATED") {
@@ -404,11 +404,42 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     m_route_active = false;
     m_XTE = 100000.;  // undefined
     wxCommandEvent event;
-    m_InfoDialog->OnStandby(event);
-    m_InfoDialog->EnableTrackButton(false);
+    if (m_info_dialog) {
+      m_info_dialog->OnStandby(event);
+      m_info_dialog->EnableTrackButton(false);
+    }
   }
 }
 
+void AutoTrackRaymarine_pi::SetStandby() {
+  if (m_pilot_state) {
+    m_pilot_state = STANDBY;
+  }
+  if (m_info_dialog) {
+    m_info_dialog->EnableHeadingButtons(false);
+    m_info_dialog->EnableTrackButton(true);
+  }
+}
+
+void AutoTrackRaymarine_pi::SetAuto() {
+  if (m_pilot_state) {
+    m_pilot_state = AUTO;
+  }
+  if (m_info_dialog) {
+    m_info_dialog->EnableHeadingButtons(true);
+  }
+}
+
+void AutoTrackRaymarine_pi::SetTracking() {
+  if (m_pilot_state) {
+    m_pilot_state = TRACKING;
+  }
+  if (m_info_dialog) {
+    m_info_dialog->EnableHeadingButtons(true);
+  }
+  ResetXTE();  // reset local XTE calculations
+  ZeroXTE();   // zero XTE on OpenCPN
+}
 
 void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
   m_NMEA0183 << sentence;
@@ -534,7 +565,7 @@ void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
     return;
   }
   if (m_pilot_state == TRACKING) {  // N.B.: for the pilot AUTO and TRACKING is the same
-    m_pilot_state = AUTO;
+    SetAuto();
   }
   double new_pilot_heading = m_pilot_heading + (double) degrees;
   if (new_pilot_heading >= 360.) new_pilot_heading -= 360.;

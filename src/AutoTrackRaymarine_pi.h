@@ -100,6 +100,9 @@ public:
   void ShowInfoDialog();
   void ShowPreferences();
   void ChangePilotHeading(int degrees);
+  void SetStandby();
+  void SetAuto();
+  void SetTracking();
 
   SerialPort *m_serial_comms;
 
@@ -147,7 +150,7 @@ public:
     } prefs;
     
     PreferencesDialog *m_PreferencesDialog;
-    InfoDialog *m_InfoDialog;
+    InfoDialog *m_info_dialog;
     void OnToolbarToolCallback(int id);
 
     // Icons

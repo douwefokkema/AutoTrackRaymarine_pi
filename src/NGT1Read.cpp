@@ -232,7 +232,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###receiving 65360"));
     if (m_pi->m_pilot_state == STANDBY) {
       printf("new state = AUTO");
-      m_pi->m_pilot_state = AUTO;
+      m_pi->SetAuto();
     }
     p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
     if (m_pi->m_pilot_heading != p_h) {
@@ -249,7 +249,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
            // field 8 should be the address of origin
           wxLogMessage(wxT(" $$$ source address = %i"), msg[8]);
           if (msg[8] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
-            m_pi->m_pilot_state = AUTO;
+            m_pi->SetAuto();
             wxLogMessage(wxT("$$$ set to auto by incoming message"));
           }
         }
@@ -263,21 +263,18 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
         if (msgLen == 28) {//    messages that originate from a keystroke auto / standly
           //wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$ lengt 23, fiels22=%0x, f19=%0x, f20=%0x, len=%i"), msg[22], msg[23], msg[24], msgLen);
           if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {
-            m_pi->m_pilot_state = STANDBY;  // standly
+            m_pi->SetStandby();
             wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
             m_pi->m_pilot_heading = -1.; // undefined
           }
           if (msg[23] == 0x40) {  // AUTO
             if (m_pi->m_pilot_state == STANDBY) {
-              m_pi->m_pilot_state = AUTO;
+              m_pi->SetAuto();
               wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###New pilot state = AUTO"));
             }
             else {
               if (m_pi->m_route_active) {
-                m_pi->ResetXTE();
-                ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
-                m_pi->m_pilot_state = TRACKING;
-                m_pi->m_InfoDialog->EnableHeadingButtons(true);
+                m_pi->SetTracking();
               }
             }
           }
@@ -290,12 +287,12 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       break;
     }
     if (msg[19] == 0x40 && m_pi->m_pilot_state != STANDBY) {
-      m_pi->m_pilot_state = STANDBY;
+      m_pi->SetStandby();
       wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###1New pilot state = STANDBY "));
     }
     if (msg[19] == 0x42) {  // AUTO
       if (m_pi->m_pilot_state == STANDBY) {
-        m_pi->m_pilot_state = AUTO;                       // 
+        m_pi->SetAuto();                       // 
         wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###1New pilot state = AUTO "));
       }
     }
