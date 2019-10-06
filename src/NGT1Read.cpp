@@ -285,7 +285,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       break;
 
   case 126720:
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi: 126720 len= %i"), len);
+    wxLogMessage(wxT("AutoTrackRaymarine_pi:$$$ 126720 len= %i, msg[19] = %0x"), len, msg[19]);
     if (len != 13) {
       break;
     }
