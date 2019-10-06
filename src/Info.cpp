@@ -65,15 +65,13 @@ void InfoDialog::UpdateInfo() {
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
-  m_pi->m_serial_comms->SetAuto();
-  m_pi->m_pilot_state = AUTO;
-  EnableHeadingButtons(true);
+  m_pi->m_serial_comms->SetAuto();   // sent auto command to pilot
+  m_pi->SetAuto();
 }
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
   m_pi->m_serial_comms->SetStandby();
-  m_pi->m_pilot_state = STANDBY;
-  EnableHeadingButtons(false);
+  m_pi->SetStandby();
 }
 
 void InfoDialog::EnableHeadingButtons(bool show) {
@@ -92,7 +90,7 @@ void InfoDialog::EnableHeadingButtons(bool show) {
 }
 
 void InfoDialog::EnableTrackButton(bool enable) {
-  if (enable) {
+  if (enable && m_pi->m_route_active) {
     buttonTrack->Enable();
   }
   else {
@@ -105,10 +103,7 @@ void InfoDialog::OnTracking(wxCommandEvent& event) {
     if (m_pi->m_pilot_state == STANDBY) {
       m_pi->m_serial_comms->SetAuto();
     }
-    m_pi->ResetXTE();
-    ZeroXTE();  // Zero XTE in OpenCPN;  to be added in new plugin API! $$$
-    m_pi->m_pilot_state = TRACKING;
-    EnableHeadingButtons(true);
+    m_pi->SetTracking();
   }
 }
 
@@ -125,5 +120,5 @@ void InfoDialog::OnMinusOne(wxCommandEvent& event) {
 }
 
 void InfoDialog::OnPlusOne(wxCommandEvent& event) {
-  m_pi->ChangePilotHeading(10);
+  m_pi->ChangePilotHeading(1);
 }

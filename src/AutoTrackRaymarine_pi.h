@@ -169,27 +169,10 @@ private:
     void SetNMEASentence(wxString &sentence);
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
-
-    
     void Compute();
     void SendHSC(double course);
-
     int m_leftclick_tool_id;
-
-    
-    
-
-   // PI_ColorScheme m_colorscheme; $$$
-
-    wxString m_active_guid, m_active_request_guid;
-    wxDateTime m_active_request_time;
-    
-    wxString m_last_wp_name, m_last_wpt_activated_guid;
-
-    bool m_bArrival;
-
     double m_current_bearing;
-
 };
 
 #endif

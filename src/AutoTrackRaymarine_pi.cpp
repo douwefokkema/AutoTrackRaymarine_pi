@@ -393,14 +393,9 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     m_info_dialog->EnableTrackButton(true);
     m_route_active = true;
   }
-  else if (message_id == "OCPN_WPT_ACTIVATED") {
-    wxString guid = root["GUID"].asString();
-    m_last_wpt_activated_guid = guid;
-  }
   else if (message_id == "OCPN_WPT_ARRIVED") {
   }
   else if (message_id == "OCPN_RTE_DEACTIVATED" || message_id == "OCPN_RTE_ENDED") {
-    m_active_guid = "";
     m_route_active = false;
     m_XTE = 100000.;  // undefined
     wxCommandEvent event;
