@@ -238,7 +238,7 @@ void SerialPort::writeMessage(HANDLE handle, unsigned char command, const unsign
 }
 
 void SerialPort::SetAutopilotHeading(double heading) {
-  // wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
+   wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
   
   // commands for NGT-1 in Canboat format
   string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
@@ -283,6 +283,7 @@ void SerialPort::SetAutopilotHeading(double heading) {
 }
 
 void SerialPort::SetAuto() {
+  wxLogMessage(wxT("$$$# set pilot auto"));
   string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
   unsigned char msg[500];
   for (unsigned int i = 0; i <= auto_command.length(); i++) {
@@ -292,6 +293,7 @@ void SerialPort::SetAuto() {
 }
 
 void SerialPort::SetStandby() {
+  wxLogMessage(wxT("$$$# set pilot standby"));
   string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
   unsigned char msg[500];
   for (unsigned int i = 0; i <= standby_command.length(); i++) {
@@ -320,7 +322,7 @@ void SerialPort::parseAndWriteIn(HANDLE handle, const unsigned char * cmd)
   {
     return;
   }
-
+  wxLogMessage(wxT("$$$# parse and writein"));
   p = strchr((char *)cmd, ',');
   if (!p)
   {

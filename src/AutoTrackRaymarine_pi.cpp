@@ -390,8 +390,8 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
     if (m_pilot_state == TRACKING) {
       SetStandby();
     }
-    m_info_dialog->EnableTrackButton(true);
     m_route_active = true;
+    m_info_dialog->EnableTrackButton(true);
   }
   else if (message_id == "OCPN_WPT_ARRIVED") {
   }
@@ -407,9 +407,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &mes
 }
 
 void AutoTrackRaymarine_pi::SetStandby() {
-  if (m_pilot_state) {
-    m_pilot_state = STANDBY;
-  }
+  m_pilot_state = STANDBY;
   if (m_info_dialog) {
     m_info_dialog->EnableHeadingButtons(false);
     m_info_dialog->EnableTrackButton(true);
@@ -417,18 +415,16 @@ void AutoTrackRaymarine_pi::SetStandby() {
 }
 
 void AutoTrackRaymarine_pi::SetAuto() {
-  if (m_pilot_state) {
-    m_pilot_state = AUTO;
-  }
+  wxLogMessage(wxT("$$$set auto1  called"));
+  m_pilot_state = AUTO;
   if (m_info_dialog) {
     m_info_dialog->EnableHeadingButtons(true);
   }
+  wxLogMessage(wxT("$$$set auto2  called m_pilot_state= %i"), m_pilot_state);
 }
 
 void AutoTrackRaymarine_pi::SetTracking() {
-  if (m_pilot_state) {
-    m_pilot_state = TRACKING;
-  }
+  m_pilot_state = TRACKING;
   if (m_info_dialog) {
     m_info_dialog->EnableHeadingButtons(true);
   }

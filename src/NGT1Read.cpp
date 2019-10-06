@@ -33,7 +33,7 @@
 #include "actisense.h"
 #include "info.h"
 
-#define NGT1ADDRESS 7  // enter NGT-1 device address here
+#define NGT1ADDRESS 1  // enter NGT-1 device address here
 
 enum MSG_State
 {
@@ -246,9 +246,9 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     	//heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
       
         if (msgLen == 25) {  // should be the heading command
-           // field 8 should be the address of origin
-          wxLogMessage(wxT(" $$$ source address = %i"), msg[8]);
-          if (msg[8] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
+           // field 5 is the address of origin
+          wxLogMessage(wxT(" $$$ source address = %i"), msg[5]);
+          if (msg[5] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
             m_pi->SetAuto();
             wxLogMessage(wxT("$$$ set to auto by incoming message"));
           }
