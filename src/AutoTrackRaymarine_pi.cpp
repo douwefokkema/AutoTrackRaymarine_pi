@@ -117,7 +117,6 @@ int AutoTrackRaymarine_pi::Init(void)
 
   ShowInfoDialog();
   m_XTE_refreshed = false;
-  m_initialized = true;
   m_route_active = false;
   m_pilot_heading = -1.;     // undefined
   m_vessel_heading = -1.;       // current heading of vessel according to pilot, undefined
@@ -132,6 +131,8 @@ int AutoTrackRaymarine_pi::Init(void)
   wxString svg_normal = m_shareLocn + wxT("tracking.svg");
   m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
     _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+  SetStandby();
+  m_initialized = true;
 
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |

@@ -282,10 +282,14 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       break;
 
   case 126720:
-    wxLogMessage(wxT("AutoTrackRaymarine_pi:$$$ 126720 len= %i, msg[19] = %0x"), len, msg[19]);
+    wxLogMessage(wxT("AutoTrackRaymarine_pi:$$$ 126720 len= %i, msg[19] = %0x, msg[5] = %i"), len, msg[19], msg[5]);
     if (len != 13) {
       break;
     }
+    wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
+      msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
+      msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);
+
     if (msg[19] == 0x40 && m_pi->m_pilot_state != STANDBY) {
       m_pi->SetStandby();
       wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###1New pilot state = STANDBY "));
