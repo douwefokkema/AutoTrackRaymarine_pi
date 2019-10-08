@@ -52,5 +52,6 @@ public:
   void SetAutopilotHeading(double heading);
   void SetAuto();
   void SetStandby();
+  void SetP70Tracking();
 
 };

@@ -242,7 +242,7 @@ void SerialPort::SetAutopilotHeading(double heading) {
   
   // commands for NGT-1 in Canboat format
   string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
-  // string auto_command    = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+  // string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
   string msg2 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,00,00";  //set 0 magnetic
   // string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";  //set 92 magnetic
   // string msg4 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,4e,3f";  //set 93 example only, magnetic
@@ -298,6 +298,17 @@ void SerialPort::SetStandby() {
   unsigned char msg[500];
   for (unsigned int i = 0; i <= standby_command.length(); i++) {
     msg[i] = standby_command[i];
+  }
+  parseAndWriteIn(m_hSerialin, msg);
+}
+
+void SerialPort::SetP70Tracking() {
+  //string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";
+  //string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+  string track =          "Z,3,126208,7,204,0d,3b,9f,f0,81,84,46,27,9d,4a,00,00,02,08,4e";  // status message for track
+  unsigned char msg[500];
+  for (unsigned int i = 0; i <= track.length(); i++) {
+    msg[i] = track[i];
   }
   parseAndWriteIn(m_hSerialin, msg);
 }

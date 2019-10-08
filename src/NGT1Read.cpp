@@ -235,10 +235,8 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       m_pi->SetAuto();
     }
     p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
-    if (m_pi->m_pilot_heading != p_h) {
-      m_pi->m_pilot_heading = p_h;
-      printf("auto = %f \n", m_pi->m_pilot_heading);  // only print when heading is changed, take out later $$$
-    }
+    m_pi->m_pilot_heading = p_h + m_pi->m_var;    // received heading is magnetic
+    printf(" $$$ auto = %f \n", m_pi->m_pilot_heading);
     break;
 
     case 126208:  // if length is 28: command to set to standby or auto 
@@ -281,24 +279,29 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
         }
       break;
 
-  case 126720:
+  case 126720:   // message from EV1 (204) indicating auto or standby state
     wxLogMessage(wxT("AutoTrackRaymarine_pi:$$$ 126720 len= %i, msg[19] = %0x, msg[5] = %i"), len, msg[19], msg[5]);
     if (len != 13) {
       break;
     }
-    wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
+    /*wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
       msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
-      msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);
+      msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);*/
 
     if (msg[19] == 0x40 && m_pi->m_pilot_state != STANDBY) {
       m_pi->SetStandby();
       wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###1New pilot state = STANDBY "));
     }
     if (msg[19] == 0x42) {  // AUTO
+      wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$pilot state is auto state =%i"), m_pi->m_pilot_state);
       if (m_pi->m_pilot_state == STANDBY) {
         m_pi->SetAuto();                       // 
         wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###1New pilot state = AUTO "));
       }
+      /*if (m_pi->m_pilot_state == TRACKING) {
+        m_pi->m_serial_comms->SetP70Tracking();
+        wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###tracking command send"));
+      }*/
     }
     break;
 
