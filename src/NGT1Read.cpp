@@ -134,7 +134,7 @@ void NGT1Input::readNGT1Byte(unsigned char c)
     }
     else
     {
-      //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ DLE followed by unexpected char %02X, ignore message"), c);
+      //wxLogMessage(wxT("AutoTrackRaymarine_pi: DLE followed by unexpected char %02X, ignore message"), c);
       state = MSG_START;
     }
   }
@@ -203,13 +203,9 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   unsigned int prio, src, dst;
   unsigned int pgn;
   unsigned int len;
-  double new_heading, p_h;
-  static int test = 3;
-
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ n2kMessage reseived  msgLen=%i"), msgLen);
+  double p_h;
   if (msgLen < 11)
   {
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$Ignoring N2K message - too short"));
     return;
   }
   prio = msg[0];
@@ -218,25 +214,20 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
   src = msg[5];
   /* Skip the timestamp logged by the NGT-1-A in bytes 6-9 */
   len = msg[10];
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ n2kMessage received  msgLen=%i, pgn=%i"), msgLen, pgn);
   if (len > 223)
   {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$Ignoring N2K message - too long (%u)"), len);
     return;
   }
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ message received %i"), pgn);
   double heading = -1000.;
 
   switch (pgn) {
   case 65360:  // Autopilot heading. From pilot. Transmitted only when pilot is auto.
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###receiving 65360"));
     if (m_pi->m_pilot_state == STANDBY) {
       printf("new state = AUTO");
       m_pi->SetAuto();
     }
     p_h = ((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000;
     m_pi->m_pilot_heading = p_h + m_pi->m_var;    // received heading is magnetic
-    printf(" $$$ auto = %f \n", m_pi->m_pilot_heading);
     break;
 
     case 126208:  // if length is 28: command to set to standby or auto 
@@ -245,30 +236,26 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       
         if (msgLen == 25) {  // should be the heading command
            // field 5 is the address of origin
-          wxLogMessage(wxT(" $$$ source address = %i"), msg[5]);
           if (msg[5] != NGT1ADDRESS && m_pi->m_pilot_state == TRACKING) { // if we did not send the heading command ourselves, switch to AUTO
-            m_pi->SetAuto();
-            wxLogMessage(wxT("$$$ set to auto by incoming message"));
+            m_pi->SetAuto();     // if the user presses a +/- 1 or 10 pi we will switch from Tracking to Auto
           }
         }
 
-        wxLogMessage(wxT("              $$$  #received message 126208  len= %i \n"), msgLen);
+        /*wxLogMessage(wxT("     #received message 126208  len= %i \n"), msgLen);
         wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
           msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
           msg[16], msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);
-        
+        */
 
         if (msgLen == 28) {//    messages that originate from a keystroke auto / standly
-          //wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$ lengt 23, fiels22=%0x, f19=%0x, f20=%0x, len=%i"), msg[22], msg[23], msg[24], msgLen);
+          //wxLogMessage(wxT("AutoTrackRaymarine_pi: length 23, fiels22=%0x, f19=%0x, f20=%0x, len=%i"), msg[22], msg[23], msg[24], msgLen);
           if (msg[23] == 0x00 && m_pi->m_pilot_state != STANDBY) {
             m_pi->SetStandby();
-            wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###New pilot state = STANDBY "));
             m_pi->m_pilot_heading = -1.; // undefined
           }
           if (msg[23] == 0x40) {  // AUTO
             if (m_pi->m_pilot_state == STANDBY) {
               m_pi->SetAuto();
-              wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###New pilot state = AUTO"));
             }
             else {
               if (m_pi->m_route_active) {
@@ -280,7 +267,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
       break;
 
   case 126720:   // message from EV1 (204) indicating auto or standby state
-    wxLogMessage(wxT("AutoTrackRaymarine_pi:$$$ 126720 len= %i, msg[19] = %0x, msg[5] = %i"), len, msg[19], msg[5]);
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi: 126720 len= %i, msg[19] = %0x, msg[5] = %i"), len, msg[19], msg[5]);
     if (len != 13) {
       break;
     }
@@ -290,18 +277,11 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
 
     if (msg[19] == 0x40 && m_pi->m_pilot_state != STANDBY) {
       m_pi->SetStandby();
-      wxLogMessage(wxT("AutoTrackRaymarine_pi:  $$$###1New pilot state = STANDBY "));
     }
     if (msg[19] == 0x42) {  // AUTO
-      wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$pilot state is auto state =%i"), m_pi->m_pilot_state);
       if (m_pi->m_pilot_state == STANDBY) {
-        m_pi->SetAuto();                       // 
-        wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###1New pilot state = AUTO "));
+        m_pi->SetAuto();
       }
-      /*if (m_pi->m_pilot_state == TRACKING) {
-        m_pi->m_serial_comms->SetP70Tracking();
-        wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$###tracking command send"));
-      }*/
     }
     break;
 
@@ -310,8 +290,7 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     //  heading all the time
      p_h = (((unsigned int)msg[16] + 256 * (unsigned int)msg[17]) * 360. / 3.141 / 20000);
      m_pi->m_vessel_heading = p_h;
-     wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$heading updated by 65359 %f "), m_pi->m_vessel_heading);
-    break;
+     break;
 
     //case 65379:
     //	if (len != 8) {
@@ -327,20 +306,16 @@ void NGT1Input::n2kMessageReceived(const unsigned char * msg, size_t msgLen)
     //	}
     //	break;
 
-  case 127250:   // vessel heading, standard nmea2000
-    if (len != 8) {
-      break;
-    }
-    if (test >= 0) {
+  // not used now, we use heading from 65359
+  //case 127250:   // vessel heading, standard nmea2000
+  //  if (len != 8) {
+  //    break;
+  //  }
+  //  
+  //  new_heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
+  //  heading = new_heading;
+  //  break;
 
-      test--;
-      printf("%x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x, %x\n", msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14]);
-    }
-    new_heading = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
-    if ((int)new_heading != heading) {
-      heading = (int)new_heading;
-    }
-    break;
   default:
     break;
   }

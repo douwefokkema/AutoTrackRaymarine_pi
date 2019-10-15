@@ -91,7 +91,6 @@ public:
   wxString GetShortDescription();
   wxString GetLongDescription();
 
- // void SetColorScheme(PI_ColorScheme cs);  $$$
   void ShowPreferencesDialog(wxWindow* parent);
 
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);

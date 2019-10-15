@@ -151,7 +151,6 @@ void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
   if (!m_initialized) {
     return;
   }
-  wxLogMessage(wxString("$$$ toolbar clicked"));
   if (m_info_dialog->IsShown()) {
     m_info_dialog->Hide();
   } else {
@@ -174,8 +173,7 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     wxPoint p = m_info_dialog->GetPosition();
     pConf->Write("PosX", p.x);
     pConf->Write("PosY", p.y);
-    wxLogMessage(wxString("$$$ posx=%i"), p.x);
-  }
+    }
   delete m_info_dialog;
 
   preferences &p = prefs;
@@ -236,13 +234,6 @@ wxString AutoTrackRaymarine_pi::GetLongDescription()
 Route tracking and remote control for Raymarine Evolution pilots");
 }
 
-//void AutoTrackRaymarine_pi::SetColorScheme(PI_ColorScheme cs) // $$$
-//{
-//  m_colorscheme = cs;
-//  if (m_info_dialog)
-//    m_info_dialog->SetColorScheme(cs);
-//}
-
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
 {
   if (NULL == m_PreferencesDialog)
@@ -259,7 +250,6 @@ void AutoTrackRaymarine_pi::OnTimer(wxTimerEvent &)
   wxWindow *canvas = GetCanvasByIndex(0);
   if (canvas) {
     canvas->Refresh(false);
-    wxLogMessage(wxString("$$$$ canvas refreshed"));
   }
 }
 
@@ -268,8 +258,7 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp) {
     return true;
   }
   if (m_info_dialog) {
-    wxLogMessage(wxString("$$$ update  i nfo called, m_pilot_state= %i"), m_pilot_state);
-    m_info_dialog->UpdateInfo();
+     m_info_dialog->UpdateInfo();
   }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
@@ -284,8 +273,7 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPo
   }
   if (m_info_dialog) {
     m_info_dialog->UpdateInfo();
-    wxLogMessage(wxString("$$$ update  info called, m_pilot_state= %i"), m_pilot_state);
-  }
+    }
   if (m_XTE_refreshed) {
     m_XTE_refreshed = false;
     Compute();
@@ -416,12 +404,10 @@ void AutoTrackRaymarine_pi::SetStandby() {
 }
 
 void AutoTrackRaymarine_pi::SetAuto() {
-  wxLogMessage(wxT("$$$set auto1  called"));
   m_pilot_state = AUTO;
   if (m_info_dialog) {
     m_info_dialog->EnableHeadingButtons(true);
   }
-  wxLogMessage(wxT("$$$set auto2  called m_pilot_state= %i"), m_pilot_state);
 }
 
 void AutoTrackRaymarine_pi::SetTracking() {
@@ -470,7 +456,7 @@ void AutoTrackRaymarine_pi::Compute(){
     return;
   }
  // wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
-  dist = 50; // in meters  // change into waypoint arrival distance  $$$
+  dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
   // integration of XTE, but prevent increase of m_XTE_I when XTE is large
@@ -497,7 +483,7 @@ void AutoTrackRaymarine_pi::Compute(){
   }
 
   XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
+  //wxLogMessage(wxT("AutoTrackRaymarine: m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
   //  m_XTE_P, m_XTE_I, m_XTE_D, XTE_for_correction);
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
@@ -505,7 +491,7 @@ void AutoTrackRaymarine_pi::Compute(){
     gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.14) * 360.;
   }
   double max_angle = prefs.max_angle;
- // wxLogMessage(wxT("AutoTrackRaymarine: $$$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
+ // wxLogMessage(wxT("AutoTrackRaymarine: initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
@@ -546,9 +532,8 @@ void AutoTrackRaymarine_pi::Compute(){
   }
   while (m_current_bearing >= 360.) m_current_bearing -= 360.;
   while (m_current_bearing < 0.) m_current_bearing += 360.;
-  wxLogMessage(wxT("AutoTrackRaymarine $$$ state == tracking, heading send to raymarine"));
   m_serial_comms->SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
-  m_pilot_heading = m_current_bearing; // $$$ this should not be needed, pilot heading will come from pilot. For testing only.
+  m_pilot_heading = m_current_bearing; // This should not be needed, pilot heading will come from pilot. For testing only.
   SendHSC(m_current_bearing);
 }
 

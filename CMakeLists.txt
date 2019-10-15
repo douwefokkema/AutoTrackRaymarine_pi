@@ -27,22 +27,22 @@ SET(PLUGIN_VERSION "${PLUGIN_VERSION_MAJOR}.${PLUGIN_VERSION_MINOR}.${PLUGIN_VER
 INCLUDE("cmake/PluginConfigure.cmake")
 
 SET(SRC_AUTOTRACKRAYMARINE
-            src/AutoTrackRaymarine_pi.cpp
+      src/AutoTrackRaymarine_pi.cpp
 			src/AutoTrackRaymarine_pi.h
-            src/PreferencesDialog.cpp
+      src/PreferencesDialog.cpp
 			src/PreferencesDialog.h
-            src/AutoTrackInfoUI.cpp
+      src/AutoTrackInfoUI.cpp
 			src/AutoTrackInfoUI.h
 			src/AutoTrackPrefsUI.cpp
 			src/AutoTrackPrefsUI.h
-            src/Info.h
+      src/Info.h
 			src/Info.cpp
-            src/icons.cpp
-            src/ODAPI.h
+      src/icons.cpp
+      src/ODAPI.h
 			src/TexFont.cpp
-            src/NGT1Read.h
-            src/NGT1Read.cpp
-            src/actisense.h
+      src/NGT1Read.h
+      src/NGT1Read.cpp
+      src/actisense.h
 			src/SerialPort.h
 			src/SerialPort.cpp
 	)
