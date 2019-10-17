@@ -43,7 +43,6 @@ class PreferencesDialogBase;
 
 SerialPort::SerialPort(AutoTrackRaymarine_pi *pi) {
   m_pi = pi;
-  wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ entering SerialPort"));
   // initialise NGT-1 com port
   //char s[20];
   wchar_t pcCommPort[20];
@@ -84,7 +83,6 @@ SerialPort::SerialPort(AutoTrackRaymarine_pi *pi) {
     wxLogMessage(wxT("AutoTrackRaymarine_pi: Found serial port %s and it's ready to use"), m_pi->prefs.com_port);
   }
   // now really open com port
-  wxLogMessage(wxT("AutoTrackRaymarine_pi $$$ going to call oopenserial port"));
   if (!OpenSerialPort(pcCommPort, &m_hSerialin)) {            // open serial port for NGT-1
     wxLogMessage(wxT("AutoTrackRaymarine_pi Error making serial port for NGT-1"));
   }
