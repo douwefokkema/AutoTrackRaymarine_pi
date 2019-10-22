@@ -351,12 +351,12 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
   m_var = pfix.Var;
 }
 
-void AutoTrackRaymarine_pi::SetLegInfo(Plugin_Active_Leg_Info &leg_info) {
- // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
+void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info) {
+ // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
   m_XTE = leg_info.xte;
   if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
-  m_route_active = true;  // when SetLegInfo is called a route must be active
+  m_route_active = true;  // when SetActiveLegInfo is called a route must be active
   m_BTW = leg_info.btw;
 }
 

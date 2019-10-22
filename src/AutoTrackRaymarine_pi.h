@@ -167,7 +167,7 @@ protected:
 private:
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
-    void SetLegInfo(Plugin_Active_Leg_Info &leg_info);
+    void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;

@@ -573,7 +573,7 @@ class DECL_EXP opencpn_plugin_117 : public opencpn_plugin_116
 public:
   opencpn_plugin_117(void *pmgr);
   virtual ~opencpn_plugin_117();
-  virtual void SetLegInfo(Plugin_Active_Leg_Info &leg_info);
+  virtual void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
 };
 
 //------------------------------------------------------------------
