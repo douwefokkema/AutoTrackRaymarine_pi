@@ -164,10 +164,10 @@ void NGT1Input::messageReceived(const unsigned char * msg, size_t msgLen)
   unsigned char checksum = 0;
   unsigned char payloadLen;
   size_t i;
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ messageReceived len = %i"), msgLen);
+  //wxLogMessage(wxT("AutoTrackRaymarine_pi:  messageReceived len = %i"), msgLen);
   if (msgLen < 3)
   {
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ Ignore short command len = %i"), msgLen);
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi:  Ignore short command len = %i"), msgLen);
     return;
   }
 
@@ -184,8 +184,6 @@ void NGT1Input::messageReceived(const unsigned char * msg, size_t msgLen)
 
   command = msg[0];
   payloadLen = msg[1];
-
-  //wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$ X message command = %02x len = %u"), command, payloadLen);
 
   if (command == N2K_MSG_RECEIVED)
   {

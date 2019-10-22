@@ -138,6 +138,16 @@ class PlugIn_ViewPort
             bool     bValid;                 // This VP is valid
 };
 
+class Plugin_Active_Leg_Info
+{
+public:
+  double xte;               // Negative value means steer Left
+  double btw;
+  double dtw;
+  wxString wp_name;         // Name of destination waypoint for active leg
+  bool arrival;             // True when within arrival circle
+};
+
 class PlugIn_Position_Fix
 {
    public:
@@ -558,6 +568,14 @@ public:
 
 };
 
+class DECL_EXP opencpn_plugin_117 : public opencpn_plugin_116
+{
+public:
+  opencpn_plugin_117(void *pmgr);
+  virtual ~opencpn_plugin_117();
+  virtual void SetLegInfo(Plugin_Active_Leg_Info &leg_info);
+};
+
 //------------------------------------------------------------------
 //      Route and Waypoint PlugIn support
 //
@@ -683,8 +701,6 @@ extern "C"  DECL_EXP wxAuiManager *GetFrameAuiManager(void);
 extern "C"  DECL_EXP bool AddLocaleCatalog( wxString catalog );
 
 extern "C"  DECL_EXP void PushNMEABuffer( wxString str );
-
-extern "C"  DECL_EXP void ZeroXTE();
 
 extern  DECL_EXP wxXmlDocument GetChartDatabaseEntryXML(int dbIndex, bool b_getGeom);
 
@@ -1338,5 +1354,9 @@ enum SDDMFORMAT
 };
 
 extern DECL_EXP int GetLatLonFormat(void);
+
+// API 1.17
+extern "C"  DECL_EXP void ZeroXTE();
+
 
 #endif //_PLUGIN_H_

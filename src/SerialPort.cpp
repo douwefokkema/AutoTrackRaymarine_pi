@@ -108,7 +108,7 @@ SerialPort::SerialPort(AutoTrackRaymarine_pi *pi) {
   wxLogMessage(wxT("AutoTrackRaymarine_pi Device is a serial port, send the startup sequence."));
 
   writeMessage(m_hSerialin, NGT_MSG_SEND, NGT_STARTUP_SEQ, sizeof(NGT_STARTUP_SEQ));
-  Sleep(100);  // $$$ this was 2000 earlier, why so long? for startup only.
+  Sleep(100);
 
 
   m_NGT1_read = new NGT1Input(m_pi);
@@ -231,12 +231,12 @@ void SerialPort::writeMessage(HANDLE handle, unsigned char command, const unsign
     CloseHandle(m_hSerialin);
     int Dummy = toupper(_getch());
   }
-  // wxLogMessage(wxT("AutoTrackRaymarine_pi $$$length=%i, written %i "), length, bytes_written);
+  // wxLogMessage(wxT("AutoTrackRaymarine_pi length=%i, written %i "), length, bytes_written);
   //  if (write(handle, bst, b - bst) != b - bst)
 }
 
 void SerialPort::SetAutopilotHeading(double heading) {
-   wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
+  // wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
   
   // commands for NGT-1 in Canboat format
   string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
@@ -249,7 +249,7 @@ void SerialPort::SetAutopilotHeading(double heading) {
   while (heading_normal < 0) heading_normal += 360;
   while (heading_normal >= 360) heading_normal -= 360;
   uint16_t heading_radials1000 = (uint16_t)(heading_normal * 174.53); // heading to be set in thousands of radials
-                                                                      //wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading2 radials = %i %000x"), heading_radials1000, heading_radials1000);
+                                                                      //wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading2 radials = %i %000x"), heading_radials1000, heading_radials1000);
   uint8_t byte0, byte1;
   byte0 = heading_radials1000 & 0xff;
   byte1 = heading_radials1000 >> 8;
@@ -281,7 +281,6 @@ void SerialPort::SetAutopilotHeading(double heading) {
 }
 
 void SerialPort::SetAuto() {
-  wxLogMessage(wxT("$$$# set pilot auto"));
   string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
   unsigned char msg[500];
   for (unsigned int i = 0; i <= auto_command.length(); i++) {
@@ -291,7 +290,6 @@ void SerialPort::SetAuto() {
 }
 
 void SerialPort::SetStandby() {
-  wxLogMessage(wxT("$$$# set pilot standby"));
   string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
   unsigned char msg[500];
   for (unsigned int i = 0; i <= standby_command.length(); i++) {
@@ -331,7 +329,6 @@ void SerialPort::parseAndWriteIn(HANDLE handle, const unsigned char * cmd)
   {
     return;
   }
-  wxLogMessage(wxT("$$$# parse and writein"));
   p = strchr((char *)cmd, ',');
   if (!p)
   {
@@ -350,14 +347,13 @@ void SerialPort::parseAndWriteIn(HANDLE handle, const unsigned char * cmd)
     *m++ = (unsigned char)dst;
     //*m++ = (unsigned char) 0;
     *m++ = (unsigned char)bytes;
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi $$$write message prio %i, pgn %i, src %i, dst %i, bytes %i, i %i "), prio, pgn, src, dst, bytes, i);
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi write message prio %i, pgn %i, src %i, dst %i, bytes %i, i %i "), prio, pgn, src, dst, bytes, i);
 
     for (b = 0; m < msg + sizeof(msg) && b < bytes; b++)
     {
       if ((sscanf(p, ",%x%n", &byt, &i) == 1) && (byt < 256))
       {
         *m++ = byt;
-        //wxLogMessage(wxT("AutoTrackRaymarine_pi byt=%0x "), byt);   // $$$
       }
       else
       {
@@ -375,14 +371,14 @@ void SerialPort::parseAndWriteIn(HANDLE handle, const unsigned char * cmd)
   }
   /*wxLogMessage(wxT("AutoTrackRaymarine_pi                  write message called len= %i "), m - msg)*/;
 
-  /* wxLogMessage(wxT("              $$$  write message called len= %i \n"), m - msg);
+  /* wxLogMessage(wxT("                write message called len= %i \n"), m - msg);
   wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x \n"),
   msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8], msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15],
   msg[16], msg[17], msg[18], msg[19], msg[20]);*/
 
 
   writeMessage(handle, N2K_MSG_SEND, msg, m - msg);
-  /*wxLogMessage(wxT("AutoTrackRaymarine_pi: $$$message written to Actisense"));*/
+  /*wxLogMessage(wxT("AutoTrackRaymarine_pi: message written to Actisense"));*/
 }
 
 

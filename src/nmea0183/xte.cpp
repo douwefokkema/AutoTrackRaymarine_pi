@@ -111,7 +111,7 @@ bool XTE::Parse( const SENTENCE& sentence )
    CrossTrackErrorDistance                  = sentence.Double( 3 );
    DirectionToSteer                         = sentence.LeftOrRight( 4 );
    CrossTrackUnits                          = sentence.Field( 5 );
-   wxLogMessage(wxT("AutoTrackRaymarine: $$$ CrossTrackErrorDistance XTE = %f"), CrossTrackErrorDistance);
+  
    return( TRUE );
 }
 

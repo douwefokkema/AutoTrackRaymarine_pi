@@ -40,7 +40,7 @@
 
 
 //using namespace std;
-#define TURNRATE 10.   // turnrate per second
+#define TURNRATE 30.   // turnrate per second
 
 double heading_resolve(double degrees, double offset = 0)
 {
@@ -72,7 +72,7 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 //-----------------------------------------------------------------------------
 
 AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
-  : opencpn_plugin_110(ppimgr)
+  : opencpn_plugin_117(ppimgr)
 {
   // Create the PlugIn icons
   initialize_images();
@@ -351,24 +351,17 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
   m_var = pfix.Var;
 }
 
-static bool ParseMessage(wxString &message_body, Json::Value &root)
-{
-  Json::Reader reader;
-  if (reader.parse(std::string(message_body), root))
-    return true;
-
-  wxLogMessage(wxString("AutoTrackRaymarine_pi: Error parsing JSON message: ") + reader.getFormattedErrorMessages());
-  return false;
+void AutoTrackRaymarine_pi::SetLegInfo(Plugin_Active_Leg_Info &leg_info) {
+ // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
+  m_XTE = leg_info.xte;
+  if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
+  m_XTE_refreshed = true;
+  m_route_active = true;  // when SetLegInfo is called a route must be active
+  m_BTW = leg_info.btw;
 }
-
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
 {
-  // construct the JSON root object
-  Json::Value  root;
-  // construct a JSON parser
-  wxString    out;
-
   if (message_id == wxS("AutoTrackRaymarine_pi")) {
     return; // nothing yet
   }
@@ -419,35 +412,6 @@ void AutoTrackRaymarine_pi::SetTracking() {
   ZeroXTE();   // zero XTE on OpenCPN
 }
 
-void AutoTrackRaymarine_pi::SetNMEASentence(wxString &sentence) {
-  m_NMEA0183 << sentence;
-  time_t now = time(0);
-  float xte;
-  wxString nm = sentence;
-  if (m_NMEA0183.PreParse()) {
-    // it seems that we can't parse XTE, so do it ourselves
-    if (m_NMEA0183.LastSentenceIDReceived == _T("XTE")) {
-    }
-    if (sentence.c_str()[3] == 'X' && sentence.c_str()[4] == 'T' && sentence.c_str()[5] == 'E') {
-      for (int i = 0; i < 3; i++) {
-        nm = nm.AfterFirst(',');
-      }
-      sscanf(nm, "%f", &xte);
-      nm = nm.AfterFirst(',');
-      if (nm[0] == 'L') {
-        xte = - xte;
-      }
-      m_XTE = xte;
-      if (m_XTE > -0.00001 && m_XTE < 0.) m_XTE = 0.;
-      m_XTE_refreshed = true;
-      m_route_active = true;  // when XTE messages arrive a route must be active
-    }
-    else if (m_NMEA0183.LastSentenceIDReceived == _T("APB") && m_NMEA0183.Parse()) {
-      m_BTW = m_NMEA0183.Apb.BearingPresentPositionToDestination;
-    }
-  }
-}
-
 void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
@@ -455,7 +419,7 @@ void AutoTrackRaymarine_pi::Compute(){
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
- // wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
+ // wxLogMessage(wxT("AutoTrackRaymarine: compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
@@ -558,6 +522,10 @@ NMEA0183    NMEA0183;
 
 
 void AutoTrackRaymarine_pi::SendHSC(double course) {
+
+  // For autopilots that aaccept this message, I do not know if they exist
+  // Used for testing with a modified shipdriver_pi
+
   /*
   HSC - Heading Steering Command
 

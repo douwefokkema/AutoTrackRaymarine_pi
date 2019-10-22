@@ -36,7 +36,7 @@
 #include "nmea0183/nmea0183.h"
 
 #define     MY_API_VERSION_MAJOR    1
-#define     MY_API_VERSION_MINOR    10
+#define     MY_API_VERSION_MINOR    17
 
 #define ABOUT_AUTHOR_URL 
 #define OPC wxS("opencpn-AutoTrackRaymarine_pi")
@@ -74,7 +74,7 @@ class SerialPort;
 //class m_dialog;
 class InfoDialog;
 
-class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_110
+class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_117
 {
   //friend InfoDialog;
 public:
@@ -165,9 +165,9 @@ protected:
     wxTimer m_Timer;
 
 private:
-    void SetNMEASentence(wxString &sentence);
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
+    void SetLegInfo(Plugin_Active_Leg_Info &leg_info);
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;
