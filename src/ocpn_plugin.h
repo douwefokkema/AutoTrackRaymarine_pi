@@ -66,7 +66,7 @@ class wxGLContext;
 //    PlugIns conforming to API Version less then the most modern will also
 //    be correctly supported.
 #define API_VERSION_MAJOR           1
-#define API_VERSION_MINOR           16
+#define API_VERSION_MINOR           17
 
 //    Fwd Definitions
 class       wxFileConfig;
@@ -138,16 +138,6 @@ class PlugIn_ViewPort
             bool     bValid;                 // This VP is valid
 };
 
-class Plugin_Active_Leg_Info
-{
-public:
-  double xte;               // Negative value means steer Left
-  double btw;
-  double dtw;
-  wxString wp_name;         // Name of destination waypoint for active leg
-  bool arrival;             // True when within arrival circle
-};
-
 class PlugIn_Position_Fix
 {
    public:
@@ -172,6 +162,16 @@ class PlugIn_Position_Fix_Ex
             double Hdt;
             time_t FixTime;
             int    nSats;
+};
+
+class Plugin_Active_Leg_Info
+{
+public:
+  double Xte;               // Left side of the track -> negative XTE
+  double Btw;
+  double Dtw;
+  wxString wp_name;         // Name of destination waypoint for active leg
+  bool arrival;             // True when within arrival circle
 };
 
 //    Describe AIS Alarm state
@@ -554,7 +554,6 @@ class DECL_EXP opencpn_plugin_115 : public opencpn_plugin_114
 public:
     opencpn_plugin_115(void *pmgr);
     virtual ~opencpn_plugin_115();
-
 };
 
 class DECL_EXP opencpn_plugin_116 : public opencpn_plugin_115
@@ -571,11 +570,25 @@ public:
 class DECL_EXP opencpn_plugin_117 : public opencpn_plugin_116
 {
 public:
-  opencpn_plugin_117(void *pmgr);
-  virtual ~opencpn_plugin_117();
-  virtual void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
-};
+    opencpn_plugin_117(void *pmgr);
+    /*
+     * Forms a semantic version together with GetPlugInVersionMajor() and
+     * GetPlugInVersionMinor(), see https://semver.org/
+     */
+    virtual int GetPlugInVersionPatch();
 
+    /** Post-release version part, extends the semver spec. */
+    virtual int GetPlugInVersionPost();
+
+    /** Pre-release tag version part, see GetPlugInVersionPatch() */
+    virtual const char* GetPlugInVersionPre();
+
+    /** Build version part  see GetPlugInVersionPatch(). */
+    virtual const char* GetPlugInVersionBuild();
+
+    /*Provide active leg data to plugins*/
+    virtual void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
+};
 //------------------------------------------------------------------
 //      Route and Waypoint PlugIn support
 //
@@ -1123,6 +1136,7 @@ extern DECL_EXP void SetCanvasTilt(double tilt);
 extern DECL_EXP bool PlugInPlaySoundEx( wxString &sound_file, int deviceIndex=-1 );
 extern DECL_EXP void AddChartDirectory( wxString &path );
 extern DECL_EXP void ForceChartDBUpdate();
+extern DECL_EXP void ForceChartDBRebuild();
 
 extern  DECL_EXP wxString GetWritableDocumentsDir( void );
 extern  DECL_EXP wxDialog *GetActiveOptionsDialog();
@@ -1276,6 +1290,13 @@ extern   DECL_IMP wxEventType wxEVT_DOWNLOAD_EVENT;
 extern   DECL_EXP wxEventType wxEVT_DOWNLOAD_EVENT;
 #endif
 
+
+/* API 1.14  */
+/* API 1.14  adds some more common functions to avoid unnecessary code duplication */
+
+bool LaunchDefaultBrowser_Plugin( wxString url );
+    
+    
 // API 1.14 Extra canvas Support
 
 /* Allow drawing of objects onto other OpenGL canvases */
@@ -1345,6 +1366,10 @@ extern DECL_EXP int GetCanvasCount( );
 extern DECL_EXP bool CheckMUIEdgePan_PlugIn( int x, int y, bool dragging, int margin, int delta, int canvasIndex );
 extern DECL_EXP void SetMUICursor_PlugIn( wxCursor *pCursor, int canvasIndex );
 
+// API 1.17
+//
+extern DECL_EXP wxRect GetMasterToolbarRect();
+
 enum SDDMFORMAT
 {
     DEGREES_DECIMAL_MINUTES = 0,
@@ -1357,6 +1382,5 @@ extern DECL_EXP int GetLatLonFormat(void);
 
 // API 1.17
 extern "C"  DECL_EXP void ZeroXTE();
-
 
 #endif //_PLUGIN_H_

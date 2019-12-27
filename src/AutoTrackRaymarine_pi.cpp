@@ -40,7 +40,7 @@
 
 
 //using namespace std;
-#define TURNRATE 30.   // turnrate per second
+#define TURNRATE 10.   // turnrate per second
 
 double heading_resolve(double degrees, double offset = 0)
 {
@@ -353,11 +353,12 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info) {
  // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
-  m_XTE = leg_info.xte;
+  m_XTE = leg_info.Xte;
   if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
   m_route_active = true;  // when SetActiveLegInfo is called a route must be active
-  m_BTW = leg_info.btw;
+  m_BTW = leg_info.Btw;
+  wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE=%f"), m_XTE);
 }
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
@@ -415,11 +416,12 @@ void AutoTrackRaymarine_pi::SetTracking() {
 void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
-
+  if (m_pilot_state == TRACKING) wxLogMessage(wxT("AutoTrackRaymarine: $$$ tracking"));
+    if(m_route_active)wxLogMessage(wxT("AutoTrackRaymarine: $$$ route active"));
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
- // wxLogMessage(wxT("AutoTrackRaymarine: compute m_XTE= %f"), m_XTE);
+  wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
@@ -446,16 +448,16 @@ void AutoTrackRaymarine_pi::Compute(){
     m_XTE_I = -0.5 * dist_nm / I_FACTOR;
   }
 
-  XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
-  //wxLogMessage(wxT("AutoTrackRaymarine: m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
-  //  m_XTE_P, m_XTE_I, m_XTE_D, XTE_for_correction);
+  XTE_for_correction = 5 * m_XTE /*+ I_FACTOR * m_XTE_I*/ /*+ D_FACTOR * m_XTE_D*/;
+  wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE_P=%f, m_XTE_I=%f, m_XTE_D=%f, XTE_for_correction=%f"),
+    m_XTE_P, m_XTE_I, m_XTE_D, XTE_for_correction);
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
   if (dist > 1.) {
-    gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.14) * 360.;
+    gamma = atan(-XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;   // minus sign, negative XTE is left of track, requires positive correction
   }
   double max_angle = prefs.max_angle;
- // wxLogMessage(wxT("AutoTrackRaymarine: initial gamma=%f, btw=%f, dist=%f, max_angle= %f"), gamma, m_BTW, dist, max_angle);
+  wxLogMessage(wxT("AutoTrackRaymarine $$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
