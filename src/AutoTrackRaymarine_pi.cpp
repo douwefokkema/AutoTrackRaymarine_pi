@@ -454,7 +454,7 @@ void AutoTrackRaymarine_pi::Compute(){
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
   if (dist > 1.) {
-    gamma = atan(-XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;   // minus sign, negative XTE is left of track, requires positive correction
+    gamma = atan( XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;   // minus sign, negative XTE is left of track, requires positive correction
   }
   double max_angle = prefs.max_angle;
   wxLogMessage(wxT("AutoTrackRaymarine $$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
