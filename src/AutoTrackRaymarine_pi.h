@@ -126,8 +126,8 @@ public:
 #define STANDBY 0
 #define AUTO 1
 #define TRACKING 2
-#define I_FACTOR 0.25
-#define D_FACTOR 10.0
+#define I_FACTOR 0.3
+#define D_FACTOR 10.
 
 public:
   void ResetXTE() {
