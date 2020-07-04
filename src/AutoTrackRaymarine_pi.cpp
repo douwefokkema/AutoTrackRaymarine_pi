@@ -448,9 +448,10 @@ void AutoTrackRaymarine_pi::Compute(){
     m_XTE_I = -0.5 * dist_nm / I_FACTOR;
   }
 
-  XTE_for_correction = 5 * m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
-  wxLogMessage(wxT("$$$$ XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR * m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
-   XTE_for_correction, 5 * m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D);
+  XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
+
+  //wxLogMessage(wxT("$$$$ XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR * m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
+  // XTE_for_correction, 5 * m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D);
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
   if (dist > 1.) {
