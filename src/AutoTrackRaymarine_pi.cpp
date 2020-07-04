@@ -358,7 +358,7 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info) {
   m_XTE_refreshed = true;
   m_route_active = true;  // when SetActiveLegInfo is called a route must be active
   m_BTW = leg_info.Btw;
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE=%f"), m_XTE);
+  //wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE=%f"), m_XTE);
 }
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
@@ -410,18 +410,18 @@ void AutoTrackRaymarine_pi::SetTracking() {
     m_info_dialog->EnableHeadingButtons(true);
   }
   ResetXTE();  // reset local XTE calculations
-  // $$$ZeroXTE();   // zero XTE on OpenCPN
+  ZeroXTE();   // zero XTE on OpenCPN
 }
 
 void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
-  if (m_pilot_state == TRACKING) wxLogMessage(wxT("AutoTrackRaymarine: $$$ tracking"));
-    if(m_route_active)wxLogMessage(wxT("AutoTrackRaymarine: $$$ route active"));
+  //if (m_pilot_state == TRACKING) wxLogMessage(wxT("AutoTrackRaymarine: $$$ tracking"));
+  //if(m_route_active)wxLogMessage(wxT("AutoTrackRaymarine: $$$ route active"));
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
-  wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
+  //wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
@@ -457,7 +457,7 @@ void AutoTrackRaymarine_pi::Compute(){
     gamma = atan( XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;
   }
   double max_angle = prefs.max_angle;
-  wxLogMessage(wxT("AutoTrackRaymarine $$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
+  //wxLogMessage(wxT("AutoTrackRaymarine $$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
