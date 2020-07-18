@@ -126,8 +126,8 @@ public:
 #define STANDBY 0
 #define AUTO 1
 #define TRACKING 2
-#define I_FACTOR 0.3
-#define D_FACTOR 10.
+#define I_FACTOR 0.0075   // was 0.3, instable occillations
+#define D_FACTOR 5.
 
 public:
   void ResetXTE() {
