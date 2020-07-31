@@ -40,7 +40,7 @@
 
 
 //using namespace std;
-#define TURNRATE 10.   // turnrate per second
+#define TURNRATE 20.   // turnrate per second
 
 double heading_resolve(double degrees, double offset = 0)
 {
