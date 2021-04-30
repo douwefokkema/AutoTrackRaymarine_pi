@@ -1,0 +1,121 @@
+:imagedir: ../images/
+
+== AutoTrackRaymarine
+
+by Douwe Fokkema
+
+* https://github.com/douwefokkema/AutoTrackRaymarine_pi[Github
+Repository]
+* http://www.cruisersforum.com/forums/f134/autotrackraymarine_pi-remote-control-and-route-following-for-evolution-pilots-225322.html[Cruiser
+Forum Thread] AutoTrackRaymarine_pi Remote control and route following
+for Evolution pilots
+
+Will provide remote control of a Raymarine Evolution autopilot from
+OpenCPN and route following for complex routes from start to finish.
+
+So you make up your route in OpenCPN. Activate it. Cast off. Put the
+ship on course. Press Auto on the Raymarine P70 pilot head. Pilot takes
+over as usual. Press auto again: the plugin takes control of the
+autopilot and will steer your ship along the activated route to your
+destination. Following the route with a margin (XTE) normally less than
+2 meters, independent of cross currents and compass errors. Only thing
+to do is keep a lookout for obstacles and traffic. As soon as you press
+Standby the autopilot returns to standby and you can steer manually
+again. When you press one of the buttons +/- 1 or 10, pilot will switch
+to regular auto on the last heading plus the button you pressed. Auto
+button when pilot is in auto activates the tracking again.
+
+Alternatively this may be handled from the plugin window on the OpenCPN
+screen, see attached image.
+
+The Auto, Standby and +/- buttons work as usual with your Evolution
+pilot. On top of this comes the Tracking button which is enabled only
+when a route is active. It will make you follow the active route as
+described below. Buttons are large for easy use on touch screens.
+
+Currently this is a beta version. The user interface needs some
+improvements, I am trying to get used to the wxFormBuilder. To use the
+plugin you need an Actisense NGT-1 to connect to the Raymarine
+Raytalk-ng network, which is an nmea 2000 network with lots of
+proprietary pgn's. Some of these I have decoded to get access to the
+required functions. The current code (Windows only) can be found at
+https://github.com/douwefokkema/AutoTrackRaymarine_pi . To my regret,
+the this plugin requires some updates in OpenCPN to function properly.
+The present version of O provides the XTE (the source for our steering)
+in nm with 3 decimals. This accuracy is insufficient, we need at least 5
+decimals, though the real accuracy is limited by the GPS. And to avoid
+unexpected behavior at activation we need to set the XTE to zero, I have
+added that function to the plugin manager. For these modifications in
+OpenCPN I have submitted a PR, pending. In the meantime I use my own
+version, at https://github.com/douwefokkema/OpenCPN-1
+
+If you want to try this plugin, at
+https://www.dropbox.com/sh/7j3vs6s9l...TMymjgJSa?dl=0 you will find: -
+opencpn.exe, the compiled version, replace your opencpn.exe with this
+one. - the installer for AutoTrackRaymarine_pi or if you prefer -
+AutoTrackRaymarine_pi.dll
+
+In preferences, set the serial port number of your Actisense NGT-1. You
+may forget about the rest. For the technically interested, the plugin is
+using a PID based steering function that calculates corrections on the
+Bearing to Waypoint (BTW) based on the XTE as received from OpenCPN. It
+normally sticks to the route within 2 meters, on heading changes at
+waypoints it may overshoot a little. With large compass errors or strong
+cross currents, it may take a minute or so to settle down on the track.
+
+This plugin was inspired by and may use code from autopilot_route_pi,
+Autopilot-Plugin and Canboat (for controlling the Actisense NGT-1).
+
+Warning: this plugin may take full control of your autopilot. In case of
+system or software errors be ready to switch the autopilot off (never
+happened).
+
+=== Feb 9, 2020 CF Post
+
+https://www.cruisersforum.com/forums/f134/opencpn-nmea2000-and-autopilots-229737.html#post3070984[CF
+Post #9] I have two reasons to control the autopilot from my computer,
+and specifically from OpenCPN. My arguments apply specifically to my
+Raymarine Evolution pilot, communicating with Raytalk ng which is
+NMEA2000.
+
+. I want a remote control with the possibility to set the autopilot to
+Auto/Standby and to adjust the heading set. The wireless remote control
+that Raymarine provides is too expensive and rather old fashioned,
+connected through the old Seatalk with a converter that caused all kinds
+of problems.
+. The Track function on the autopilot is difficult or impossible to use
+with OpenCPN. It needs data from O, but whatever you send it, after some
+time it switches off with a “No data” message. I have the impression it
+requires a Raymarine display to function.
+. When the Raymarine track function does work, it behaves very
+erratically at startup, steering crazy headings for some minutes, then
+stabilizing on the right track. Further it requires confirmation at
+every waypoint, which is not practical when you have routes with
+hundreds of waypoints often very close together.
+
+To do a better job one needs to control the autopilot for at least the
+following functions: set heading, set auto/standby. I have decoded the
+communication of the autopilot with the pilot head and deciphered the
+proprietary pgn's that perform these functions. With this I have build a
+plugin for O that provides a remote control for the autopilot and a
+route following function. The plugin is using a Actisense NGT-1 for the
+communication with the NMEA2000 network of Raymarine. The plugin is also
+monitoring the keystrokes on the Raymarine P70 pilot head and acts on
+that to activate the route following. The current version of the plugin
+does however not function (yet) with the released version of O, it needs
+a higher version of the plugin API in O which is already in O master,
+coming out in next release. Further details on this plugin:
+https://www.cruisersforum.com/forums...ts-225322.html. I will have a
+updated version of this plugin available before summer.
+
+Douwe Fokkema
+
+Note: The PGN's I am using to control the Raymarine pilot are
+proprietary and don't have nmea183 equivalents. So I don not see how a
+SignalK server can do a conversion. Further I have no need of a
+conversion, my plugin is working and tested during a full sailing
+season. To follow a route I do not need the full route in the plugin. I
+just use the DTW, BTW and XTE for the current leg, that is sufficient to
+steer on track. Reason I needed an update in O is that the accuracy of
+the XTE in the nmea183 message lacks precision. I want to steer within
+meters from the track, limited only by the accuracy provided by the GPS
