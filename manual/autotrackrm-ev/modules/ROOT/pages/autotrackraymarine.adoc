@@ -39,21 +39,12 @@ plugin you need an Actisense NGT-1 to connect to the Raymarine
 Raytalk-ng network, which is an nmea 2000 network with lots of
 proprietary pgn's. Some of these I have decoded to get access to the
 required functions. The current code (Windows only) can be found at
-https://github.com/douwefokkema/AutoTrackRaymarine_pi . To my regret,
-the this plugin requires some updates in OpenCPN to function properly.
-The present version of O provides the XTE (the source for our steering)
-in nm with 3 decimals. This accuracy is insufficient, we need at least 5
-decimals, though the real accuracy is limited by the GPS. And to avoid
-unexpected behavior at activation we need to set the XTE to zero, I have
-added that function to the plugin manager. For these modifications in
-OpenCPN I have submitted a PR, pending. In the meantime I use my own
-version, at https://github.com/douwefokkema/OpenCPN-1
+https://github.com/douwefokkema/AutoTrackRaymarine_pi . This version works
+fine with OpenCPN version 5.0 and later.
 
 If you want to try this plugin, at
-https://www.dropbox.com/sh/7j3vs6s9l...TMymjgJSa?dl=0 you will find: -
-opencpn.exe, the compiled version, replace your opencpn.exe with this
-one. - the installer for AutoTrackRaymarine_pi or if you prefer -
-AutoTrackRaymarine_pi.dll
+At https://www.dropbox.com/s/kh87usvy1otrrlp/AutoTrackRaymarine_pi-0.0.0-ov50-win32.exe?dl=0 
+you will find the installer for AutoTrackRaymarine_pi.
 
 In preferences, set the serial port number of your Actisense NGT-1. You
 may forget about the rest. For the technically interested, the plugin is
@@ -78,16 +69,16 @@ and specifically from OpenCPN. My arguments apply specifically to my
 Raymarine Evolution pilot, communicating with Raytalk ng which is
 NMEA2000.
 
-. I want a remote control with the possibility to set the autopilot to
+I want a remote control with the possibility to set the autopilot to
 Auto/Standby and to adjust the heading set. The wireless remote control
 that Raymarine provides is too expensive and rather old fashioned,
 connected through the old Seatalk with a converter that caused all kinds
 of problems.
-. The Track function on the autopilot is difficult or impossible to use
+The Track function on the autopilot is difficult or impossible to use
 with OpenCPN. It needs data from O, but whatever you send it, after some
 time it switches off with a “No data” message. I have the impression it
 requires a Raymarine display to function.
-. When the Raymarine track function does work, it behaves very
+When the Raymarine track function does work, it behaves very
 erratically at startup, steering crazy headings for some minutes, then
 stabilizing on the right track. Further it requires confirmation at
 every waypoint, which is not practical when you have routes with
