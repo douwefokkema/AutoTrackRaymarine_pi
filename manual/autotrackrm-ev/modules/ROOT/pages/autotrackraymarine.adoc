@@ -1,4 +1,3 @@
-:imagedir: ../images/
 
 == AutoTrackRaymarine
 
@@ -33,16 +32,14 @@ pilot. On top of this comes the Tracking button which is enabled only
 when a route is active. It will make you follow the active route as
 described below. Buttons are large for easy use on touch screens.
 
-Currently this is a beta version. The user interface needs some
-improvements, I am trying to get used to the wxFormBuilder. To use the
-plugin you need an Actisense NGT-1 to connect to the Raymarine
+To use the plugin you need an Actisense NGT-1 to connect to the Raymarine
 Raytalk-ng network, which is an nmea 2000 network with lots of
-proprietary pgn's. Some of these I have decoded to get access to the
+proprietary pgn's. Some of these are decoded to get access to the
 required functions. The current code (Windows only) can be found at
 https://github.com/douwefokkema/AutoTrackRaymarine_pi . This version works
-fine with OpenCPN version 5.0 and later.
+fine with OpenCPN version 5.2 and later.
 
-If you want to try this plugin, at
+If you want to use this plugin, at
 At https://www.dropbox.com/s/kh87usvy1otrrlp/AutoTrackRaymarine_pi-0.0.0-ov50-win32.exe?dl=0 
 you will find the installer for AutoTrackRaymarine_pi.
 
@@ -61,15 +58,7 @@ Warning: this plugin may take full control of your autopilot. In case of
 system or software errors be ready to switch the autopilot off (never
 happened).
 
-=== Feb 9, 2020 CF Post
-
-https://www.cruisersforum.com/forums/f134/opencpn-nmea2000-and-autopilots-229737.html#post3070984[CF
-Post #9] I have two reasons to control the autopilot from my computer,
-and specifically from OpenCPN. My arguments apply specifically to my
-Raymarine Evolution pilot, communicating with Raytalk ng which is
-NMEA2000.
-
-I want a remote control with the possibility to set the autopilot to
+This plugin also functios a remote control with the possibility to set the autopilot to
 Auto/Standby and to adjust the heading set. The wireless remote control
 that Raymarine provides is too expensive and rather old fashioned,
 connected through the old Seatalk with a converter that caused all kinds
@@ -88,18 +77,14 @@ To do a better job one needs to control the autopilot for at least the
 following functions: set heading, set auto/standby. I have decoded the
 communication of the autopilot with the pilot head and deciphered the
 proprietary pgn's that perform these functions. With this I have build a
-plugin for O that provides a remote control for the autopilot and a
+plugin for OpenCPN that provides a remote control for the autopilot and a
 route following function. The plugin is using a Actisense NGT-1 for the
 communication with the NMEA2000 network of Raymarine. The plugin is also
 monitoring the keystrokes on the Raymarine P70 pilot head and acts on
-that to activate the route following. The current version of the plugin
-does however not function (yet) with the released version of O, it needs
-a higher version of the plugin API in O which is already in O master,
-coming out in next release. Further details on this plugin:
-https://www.cruisersforum.com/forums...ts-225322.html. I will have a
-updated version of this plugin available before summer.
-
-Douwe Fokkema
+that to activate the route following. When the plugin observes that the 
+auto is pressed while the pilot is on auto already, the plugin activates 
+the route following. Further details on this plugin:
+https://www.cruisersforum.com/forums/f134/autotrackraymarine_pi-remote-control-and-route-following-for-evolution-pilots-225322-2.html 
 
 Note: The PGN's I am using to control the Raymarine pilot are
 proprietary and don't have nmea183 equivalents. So I don not see how a
