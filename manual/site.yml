@@ -1,7 +1,7 @@
 site:
   title: AutoTrackRaymarine Plugin Manual
   url:  https://nowhere.net
-  start_page: autotrackraymarine:ROOT:autotrackraymarine.adoc
+  start_page: autotrackraymarine:ROOT:index.adoc
 
 content:
   sources:
