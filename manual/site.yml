@@ -5,8 +5,8 @@ site:
 
 content:
   sources:
-    - url: ../..
-      start_path: manual/autotrackrm-ev
+    - url: ..
+      start_path: manual
       branches: HEAD
       edit_url: https://github.com/opencpn-manuals/AutoTrackRaymarine_pi/edit/master/{path}
 
