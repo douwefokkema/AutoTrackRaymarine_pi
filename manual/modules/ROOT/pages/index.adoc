@@ -1,5 +1,5 @@
 
-== AutoTrackRaymarine
+= AutoTrackRaymarine
 
 by Douwe Fokkema
 
