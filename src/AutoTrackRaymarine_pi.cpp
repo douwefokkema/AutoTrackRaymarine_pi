@@ -27,7 +27,7 @@
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
-#include "jsoncpp/json/json.h"
+#include "json/json.h"
 #include "AutoTrackRaymarine_pi.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
@@ -195,22 +195,22 @@ bool AutoTrackRaymarine_pi::DeInit(void)
 
 int AutoTrackRaymarine_pi::GetAPIVersionMajor()
 {
-  return MY_API_VERSION_MAJOR;
+      return OCPN_API_VERSION_MAJOR;
 }
 
 int AutoTrackRaymarine_pi::GetAPIVersionMinor()
 {
-  return MY_API_VERSION_MINOR;
+      return OCPN_API_VERSION_MINOR;
 }
 
 int AutoTrackRaymarine_pi::GetPlugInVersionMajor()
 {
-  return PLUGIN_VERSION_MAJOR;
+       return PLUGIN_VERSION_MAJOR;
 }
 
 int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
 {
-  return PLUGIN_VERSION_MINOR;
+      return PLUGIN_VERSION_MINOR;
 }
 
 //wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
@@ -220,18 +220,17 @@ int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
 
 wxString AutoTrackRaymarine_pi::GetCommonName()
 {
-  return _("AutoTrackRaymarine");
+	      return _T(PLUGIN_COMMON_NAME);
 }
 
 wxString AutoTrackRaymarine_pi::GetShortDescription()
 {
-  return _("AutoTrackRaymarine PlugIn for OpenCPN");
+   return _(PLUGIN_SHORT_DESCRIPTION);
 }
 
 wxString AutoTrackRaymarine_pi::GetLongDescription()
 {
-  return _("AutoTrackRaymarine PlugIn for OpenCPN\n\
-Route tracking and remote control for Raymarine Evolution pilots");
+    return _(PLUGIN_LONG_DESCRIPTION);
 }
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
