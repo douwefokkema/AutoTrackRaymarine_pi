@@ -1,7 +1,7 @@
 src/AutoTrackRaymarine_pi.cpp
 src/PreferencesDialog.cpp
-src/AutoTrackInfoUI.cpp
-src/AutoTrackPrefsUI.cpp
+src/AutotrackInfoUI.cpp
+src/AutotrackPrefsUI.cpp
 src/Info.cpp
 src/icons.cpp
 src/TexFont.cpp
@@ -9,8 +9,8 @@ src/NGT1Read.cpp
 src/SerialPort.cpp
 src/AutoTrackRaymarine_pi.h
 src/PreferencesDialog.h
-src/AutoTrackInfoUI.h
-src/AutoTrackPrefsUI.h
+src/AutotrackInfoUI.h
+src/AutotrackPrefsUI.h
 src/Info.h
 src/NGT1Read.h
 src/actisense.h
