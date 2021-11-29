@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# Frontend2 Author:      jongough aka. Jon Gough Copyright: License:     wxWidgets License
+# TP 1.0.183.1   Author: Jon Gough   Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -146,7 +146,7 @@ include("PluginConfigure")
 SET(SRCS
       src/AutoTrackRaymarine_pi.cpp
       src/PreferencesDialog.cpp
-      src/AutoTrackInfoUI.cpp
+      src/AutoTrackinfoUI.cpp
       src/AutoTrackPrefsUI.cpp
       src/Info.cpp
       src/icons.cpp
@@ -158,7 +158,7 @@ SET(SRCS
 SET (HDRS
       src/AutoTrackRaymarine_pi.h
       src/PreferencesDialog.h
-      src/AutoTrackInfoUI.h
+      src/AutoTrackinfoUI.h
       src/AutoTrackPrefsUI.h
       src/Info.h
 #      src/ODAPI.h
