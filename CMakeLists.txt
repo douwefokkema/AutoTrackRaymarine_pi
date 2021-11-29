@@ -146,8 +146,8 @@ include("PluginConfigure")
 SET(SRCS
       src/AutoTrackRaymarine_pi.cpp
       src/PreferencesDialog.cpp
-      src/AutoTrackInfoUI.cpp
-      src/AutoTrackPrefsUI.cpp
+      src/AutotrackInfoUI.cpp
+      src/AutotrackPrefsUI.cpp
       src/Info.cpp
       src/icons.cpp
       src/TexFont.cpp
@@ -158,8 +158,8 @@ SET(SRCS
 SET (HDRS
       src/AutoTrackRaymarine_pi.h
       src/PreferencesDialog.h
-      src/AutoTrackInfoUI.h
-      src/AutoTrackPrefsUI.h
+      src/AutotrackInfoUI.h
+      src/AutotrackPrefsUI.h
       src/Info.h
 #      src/ODAPI.h
       src/NGT1Read.h
