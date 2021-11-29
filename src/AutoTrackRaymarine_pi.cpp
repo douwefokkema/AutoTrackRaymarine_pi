@@ -126,13 +126,20 @@ int AutoTrackRaymarine_pi::Init(void)
   m_Timer.Start(1000);
 
   //    This PlugIn needs a toolbar icon
-  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") + wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
-    wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
-  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
-  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
-    _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+
+  m_tool_id = InsertPlugInToolSVG(_T( "AutoTrackRaymarine" ),
+       _svg_tracking, _svg_tracking, _svg_tracking_toggled,
+       wxITEM_NORMAL, _("Tracking"), _T( "Track Following for Raymarine Evolution Pilots" ), NULL, TRACKING_TOOL_POSITION, 0, this);
   SetStandby();
   m_initialized = true;
+
+//  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") + wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
+//   wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
+//  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
+//  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
+//    _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+//  SetStandby();
+//  m_initialized = true;
 
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |

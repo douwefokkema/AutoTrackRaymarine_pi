@@ -7,8 +7,17 @@
 #	include <wx/wx.h>
 #endif
 
+#include <wx/filename.h>
+#include <wx/mstream.h>
+
 extern void initialize_images(void);
 
 extern wxBitmap *_img_AutoTrackRaymarine;
+
+#ifdef PLUGIN_USE_SVG
+   extern wxString _svg_tracking;
+   extern wxString _svg_tracking_rollover;
+   extern wxString _svg_tracking_toggled;
+#endif
 
 #endif /* ICONS_H */

@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
-// C++ code generated with wxFormBuilder (version Jul 28 2019)
+// C++ code generated with wxFormBuilder (version 3.10.1-0-g8feb16b3)
 // http://www.wxformbuilder.org/
 //
 // PLEASE DO *NOT* EDIT THIS FILE!
@@ -39,7 +39,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText101->Wrap( -1 );
 	fgSizer191->Add( m_staticText101, 0, wxALL, 5 );
 
-	m_sMaxAngle1 = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( 60,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
+	m_sMaxAngle1 = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
 	fgSizer191->Add( m_sMaxAngle1, 0, wxALL, 5 );
 
 
@@ -54,10 +54,11 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText102->Wrap( -1 );
 	fgSizer192->Add( m_staticText102, 0, wxALL, 5 );
 
-	m_comboBox1 = new wxComboBox( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
+	m_comboBox1 = new wxComboBox( sbSizer5->GetStaticBox(), wxID_ANY, _("COM1"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
 	m_comboBox1->Append( _("COM1") );
 	m_comboBox1->Append( _("COM2") );
 	m_comboBox1->Append( _("COM3") );
+	m_comboBox1->SetSelection( 0 );
 	fgSizer192->Add( m_comboBox1, 0, wxALL, 5 );
 
 

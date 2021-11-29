@@ -4,7 +4,7 @@ version: 2.1
 parameters:
     run_workflow_deploy:
         type: boolean
-        default: false
+        default: true
 
 std-filters: &std-filters
     filters:
@@ -18,36 +18,36 @@ std-filters: &std-filters
 workflows:
     build_all:
         jobs:
-#        - build-armhf-stretch:
+        - build-armhf-stretch:
             <<: *std-filters
-#        - build-armhf-buster:
+        - build-armhf-buster:
             <<: *std-filters
 ## Currently circleci does not build armf64 correctly due to no suitable docker image
 ##        - build-armhf-bionic-64:
 ##            <<: *std-filters
-#        - build-xenial:
+        - build-xenial:
             <<: *std-filters
         - build-bionic:
             <<: *std-filters
-#        - build-bionic-gtk3:
+        - build-bionic-gtk3:
             <<: *std-filters
-#        - build-focal-gtk3:
+        - build-focal-gtk3:
             <<: *std-filters
-#        - build-buster:
+        - build-buster:
             <<: *std-filters
-#        - build-flatpak-arm64:
+        - build-flatpak-arm64:
             <<: *std-filters
         - build-flatpak-x86-2008:
             <<: *std-filters
-#        - build-flatpak-x86-1808:
+        - build-flatpak-x86-1808:
             <<: *std-filters
-#        - build-macos:
+        - build-macos:
             <<: *std-filters
-#        - build-macos-wx315:
+        - build-macos-wx315:
             <<: *std-filters
-#        - build-android-arm64:
+        - build-android-arm64:
             <<: *std-filters
-#        - build-android-armhf:
+        - build-android-armhf:
             <<: *std-filters
 
 orbs:
