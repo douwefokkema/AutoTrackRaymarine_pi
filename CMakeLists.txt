@@ -45,7 +45,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "3")
 SET(VERSION_PATCH "1")
-set(VERSION_TWEAK "10")
+set(VERSION_TWEAK "11")
 SET(VERSION_DATE "29/11/2021") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -146,7 +146,7 @@ include("PluginConfigure")
 SET(SRCS
       src/AutoTrackRaymarine_pi.cpp
       src/PreferencesDialog.cpp
-      src/AutoTrackinfoUI.cpp
+      src/AutoTrackInfoUI.cpp
       src/AutoTrackPrefsUI.cpp
       src/Info.cpp
       src/icons.cpp
@@ -158,7 +158,7 @@ SET(SRCS
 SET (HDRS
       src/AutoTrackRaymarine_pi.h
       src/PreferencesDialog.h
-      src/AutoTrackinfoUI.h
+      src/AutoTrackInfoUI.h
       src/AutoTrackPrefsUI.h
       src/Info.h
 #      src/ODAPI.h
