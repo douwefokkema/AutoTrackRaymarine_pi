@@ -76,6 +76,35 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
 {
   // Create the PlugIn icons
   initialize_images();
+
+ 	 //original way usingimages in file  icon.cpp
+     // s_climatology_pi = this;
+
+// Create the PlugIn icons  -from shipdriver
+// loads png file for the listing panel icon
+    wxFileName fn;
+    auto path = GetPluginDataDir("AutoTrackRaymarine_pi");
+    fn.SetPath(path);
+    fn.AppendDir("data");
+    fn.SetFullName("tracking_panel.png");
+
+    path = fn.GetFullPath();
+
+    wxInitAllImageHandlers();
+
+    wxLogDebug(wxString("Using icon path: ") + path);
+    if (!wxImage::CanRead(path)) {
+        wxLogDebug("Initiating image handlers.");
+        wxInitAllImageHandlers();
+    }
+    wxImage panelIcon(path);
+    if (panelIcon.IsOk())
+        m_panelBitmap = wxBitmap(panelIcon);
+    else
+        wxLogWarning("AutoTrackRaymarine panel icon has NOT been loaded");
+// End of from Shipdrive 
+  
+  
   m_info_dialog = NULL;
   m_PreferencesDialog = NULL;
   m_pdeficon = new wxBitmap(*_img_AutoTrackRaymarine);
@@ -126,10 +155,16 @@ int AutoTrackRaymarine_pi::Init(void)
   m_Timer.Start(1000);
 
   //    This PlugIn needs a toolbar icon
-
-  m_tool_id = InsertPlugInToolSVG(_T( "AutoTrackRaymarine" ),
-       _svg_tracking, _svg_tracking, _svg_tracking_toggled,
+#ifdef PLUGIN_USE_SVG
+   m_tool_id = InsertPlugInToolSVG(_T( "AutoTrackRaymarine" ),
+       _svg_tracking, _svg_tracking_toggled, _svg_tracking_toggled,
        wxITEM_NORMAL, _("Tracking"), _T( "Track Following for Raymarine Evolution Pilots" ), NULL, TRACKING_TOOL_POSITION, 0, this);
+#else
+   m_tool_id  = InsertPlugInTool( _T(""), _img_AutoTrackRaymarine,
+      _img_AutoTrackRaymarine, wxITEM_NORMAL, _("AutoTrackRaymarine"), _T(""), NULL,
+	  TRACKING_TOOL_POSITION, 0, this);
+#endif 
+	   
   SetStandby();
   m_initialized = true;
 
@@ -152,7 +187,7 @@ int AutoTrackRaymarine_pi::Init(void)
     WANTS_CONFIG);
 }
 
-wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
+// wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
 void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
   if (!m_initialized) {
@@ -224,6 +259,10 @@ int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
 //{
 //  return new wxBitmap(_img_AutoTrackRaymarine->ConvertToImage().Copy());
 //}
+
+// Uses the tracking_panel.png file to make the bitmap.
+wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
+// End of  process  (from Shipdriver)
 
 wxString AutoTrackRaymarine_pi::GetCommonName()
 {

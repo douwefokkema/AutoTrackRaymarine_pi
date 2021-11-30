@@ -35,9 +35,6 @@
 #include "wxWTranslateCatalog.h"
 #include "nmea0183.h"
 
-//#define     MY_API_VERSION_MAJOR    1
-//#define     MY_API_VERSION_MINOR    17
-
 #define ABOUT_AUTHOR_URL 
 #define OPC wxS("opencpn-AutoTrackRaymarine_pi")
 
@@ -90,6 +87,7 @@ public:
   wxString GetCommonName();
   wxString GetShortDescription();
   wxString GetLongDescription();
+  wxBitmap m_panelBitmap;  
 
   void ShowPreferencesDialog(wxWindow* parent);
 
