@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="8.4666672mm"
+   height="8.4666672mm"
+   viewBox="0 0 8.4666674 8.4666671"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="ap_route_toggled.svg"
+   inkscape:export-filename="C:\Users\fcgle\Downloads\windvane_toggled.png"
+   inkscape:export-xdpi="97.324699"
+   inkscape:export-ydpi="97.324699"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="16"
+     inkscape:cx="14.78125"
+     inkscape:cy="16.5"
+     inkscape:window-width="1920"
+     inkscape:window-height="1122"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     inkscape:snap-global="true" />
+  <defs
+     id="defs2">
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5488">
+      <stop
+         style="stop-color:#333333;stop-opacity:1;"
+         offset="0"
+         id="stop5484" />
+      <stop
+         style="stop-color:#333333;stop-opacity:0;"
+         offset="1"
+         id="stop5486" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5488"
+       id="linearGradient5490"
+       x1="46.102947"
+       y1="75.732521"
+       x2="47.128208"
+       y2="75.600227"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.5610716,0,0,1.5629444,-26.37084,-42.913225)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-43.589405,-69.638832)"
+     style="opacity:1">
+    <rect
+       style="display:inline;opacity:0;fill-opacity:0.849398;stroke:#f7f7f7;stroke-width:0.0570597;stroke-opacity:1"
+       id="rect34654"
+       width="8.3404169"
+       height="8.3504229"
+       x="43.687183"
+       y="69.667358"
+       ry="0.00089836697"
+       inkscape:export-filename="C:\Users\fcgle\source\autopilot_route_update\data\ap_route_panel.png"
+       inkscape:export-xdpi="97.324699"
+       inkscape:export-ydpi="97.324699"
+       inkscape:label="boundary-transparent" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.50103px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#e6e6e6;fill-opacity:1;stroke:#e7e7e7;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="44.309692"
+       y="72.970657"
+       id="text12072"
+       transform="scale(0.99603004,1.0039858)"
+       inkscape:export-filename="C:\Users\fcgle\source\autopilot_route_update\data\ap_route_panel.png"
+       inkscape:export-xdpi="97.324699"
+       inkscape:export-ydpi="97.324699"
+       inkscape:label="AP text"><tspan
+         sodipodi:role="line"
+         id="tspan12070"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:3.50103px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#e6e6e6;stroke:#e7e7e7;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         x="44.309692"
+         y="72.970657">RTE</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.57087px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;display:inline;fill:#e6e6e6;fill-opacity:1;stroke:#e7e7e7;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       x="51.826401"
+       y="72.056053"
+       id="text27358"
+       transform="scale(0.92858469,1.0769077)"
+       inkscape:export-filename="C:\Users\fcgle\source\autopilot_route_update\data\ap_route_panel.png"
+       inkscape:export-xdpi="97.324699"
+       inkscape:export-ydpi="97.324699"
+       inkscape:label="RTE text"><tspan
+         sodipodi:role="line"
+         id="tspan27356"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:2.57087px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#e6e6e6;stroke:#e7e7e7;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+         x="51.826401"
+         y="72.056053">AP</tspan></text>
+    <ellipse
+       style="opacity:1;fill:url(#linearGradient5490);fill-opacity:1;stroke-width:1.56201"
+       id="path5092"
+       cx="46.257431"
+       cy="75.245728"
+       rx="0.94223273"
+       ry="0.94336307"
+       inkscape:export-filename="C:\Users\fcgle\source\autopilot_route_update\data\ap_route_panel.png"
+       inkscape:export-xdpi="97.324699"
+       inkscape:export-ydpi="97.324699" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.286908px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 45.880241,75.574916 43.69619,78.009637 Z"
+       id="path5714"
+       inkscape:export-filename="C:\Users\fcgle\source\autopilot_route_update\data\ap_route_panel.png"
+       inkscape:export-xdpi="97.324699"
+       inkscape:export-ydpi="97.324699" />
+  </g>
+</svg>
