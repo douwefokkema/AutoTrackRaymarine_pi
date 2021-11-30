@@ -45,7 +45,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "3")
 SET(VERSION_PATCH "1")
-set(VERSION_TWEAK "11")
+set(VERSION_TWEAK "21")
 SET(VERSION_DATE "29/11/2021") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -226,7 +226,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/src/serial)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 
 #
@@ -276,11 +276,13 @@ if(NOT OCPN_FLATPAK_CONFIG)
 
 	add_subdirectory(libs/jsoncpp)
     add_subdirectory(libs/nmea0183)
+    add_subdirectory(libs/serial)	
     add_subdirectory(libs/tinyxml)
 #	add_subdirectory(libs/plugingl)
 
     target_link_libraries(${PACKAGE_NAME} ocpn::jsoncpp)
     target_link_libraries(${PACKAGE_NAME} ocpn::nmea0183)
+    target_link_libraries(${PACKAGE_NAME} ocpn::serial)
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 #	target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 	

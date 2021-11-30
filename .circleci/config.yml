@@ -16,9 +16,9 @@ std-filters: &std-filters
             only: /.*/
 
 workflows:
-    build_all:
-        jobs:
-        - build-armhf-stretch:
+#    build_all:
+#        jobs:
+#        - build-armhf-stretch:
             <<: *std-filters
 #        - build-armhf-buster:
             <<: *std-filters
@@ -29,7 +29,7 @@ workflows:
             <<: *std-filters
 #        - build-bionic:
             <<: *std-filters
-        - build-bionic-gtk3:
+#        - build-bionic-gtk3:
             <<: *std-filters
 #        - build-focal-gtk3:
             <<: *std-filters
@@ -37,7 +37,7 @@ workflows:
             <<: *std-filters
 #        - build-flatpak-arm64:
             <<: *std-filters
-        - build-flatpak-x86-2008:
+#        - build-flatpak-x86-2008:
             <<: *std-filters
 #        - build-flatpak-x86-1808:
             <<: *std-filters
