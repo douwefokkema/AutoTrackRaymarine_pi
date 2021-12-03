@@ -220,6 +220,13 @@ int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
       return PLUGIN_VERSION_MINOR;
 }
 
+int AutoTrackRaymarine_pi::GetPlugInVersionPatch()
+{
+      return PLUGIN_VERSION_PATCH;
+}
+
+
+
 //wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
 //{
 //  return new wxBitmap(_img_AutoTrackRaymarine->ConvertToImage().Copy());

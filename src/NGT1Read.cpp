@@ -31,7 +31,7 @@
 #include "AutoTrackRaymarine_pi.h"
 #include "SerialPort.h"
 #include "actisense.h"
-#include "info.h"
+#include "Info.h"
 
 #define NGT1ADDRESS 1  // enter NGT-1 device address here
 
