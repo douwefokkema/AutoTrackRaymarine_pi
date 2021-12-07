@@ -128,7 +128,7 @@ int AutoTrackRaymarine_pi::Init(void)
   //    This PlugIn needs a toolbar icon
 
   m_tool_id = InsertPlugInToolSVG(_T( "AutoTrackRaymarine" ),
-       _svg_tracking, _svg_tracking, _svg_tracking_toggled,
+       _svg_tracking, _svg_tracking_toggled, _svg_tracking_toggled,
        wxITEM_NORMAL, _("Tracking"), _T( "Track Following for Raymarine Evolution Pilots" ), NULL, TRACKING_TOOL_POSITION, 0, this);
   SetStandby();
   m_initialized = true;

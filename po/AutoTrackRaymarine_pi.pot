@@ -1,0 +1,78 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the AutoTrackRaymarine_pi package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoTrackRaymarine_pi 0.3.1.21\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-12-06 20:18-0500\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: src/AutoTrackRaymarine_pi.cpp:132 src/Info.cpp:36
+msgid "Tracking"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:31
+msgid "Settings"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:38
+msgid "Max Error Angle"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:53
+msgid "Com port NGT-1"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:57 src/AutotrackPrefsUI.cpp:58
+msgid "COM1"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:59
+msgid "COM2"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:60
+msgid "COM3"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:80
+msgid "Options"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:87
+msgid ""
+"Confirm Bearing Change\n"
+"On Waypoint Arrival"
+msgstr ""
+
+#: src/AutotrackPrefsUI.cpp:90
+msgid ""
+"Intercept Route\n"
+"On Current Course"
+msgstr ""
+
+#: src/AutotrackPrefsUI.h:56
+msgid "Autopilot Route Preferences"
+msgstr ""
+
+#: src/Info.cpp:38
+msgid "Auto"
+msgstr ""
+
+#: src/Info.cpp:40
+msgid "Standby"
+msgstr ""
+
+#: src/Info.cpp:43 src/Info.cpp:51 src/Info.cpp:59
+msgid "----"
+msgstr ""
