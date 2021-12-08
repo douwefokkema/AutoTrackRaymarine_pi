@@ -43,12 +43,9 @@ cmake  \
   ..
 
 # Get number of processors and use this on make to speed up build
-if type nproc &> /dev/null
-then
-    make_cmd="make -j"$(nproc)
-else
-    make_cmd="make"
-fi
+procs=$(awk -F- '{print $2}' /sys/fs/cgroup/cpuset/cpuset.cpus)
+procs=$((procs + 1))
+make_cmd="make -j"$procs
 eval $make_cmd
 make package
 
