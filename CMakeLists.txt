@@ -45,8 +45,8 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "3")
 SET(VERSION_PATCH "4")
-set(VERSION_TWEAK "12")
-SET(VERSION_DATE "08/12/2021") # DD/MM/YYYY format
+set(VERSION_TWEAK "13")
+SET(VERSION_DATE "11/12/2021") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
@@ -64,7 +64,7 @@ set(ALPHA "alpha")  # Standard Repos
 
 # set this if your cloudsmith repository name does not match your git repository name
 #set(CLOUDSMITH_BASE_REPOSITORY "AutoTrackRaymarine")
-set(CLOUDSMITH_BASE_REPOSITORY "AutoTrackRaymarine")
+set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
 
 #set(CLOUDSMITH_USER "rick-gleason")
