@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# TP 1.0.184.3 08/12/2021   Author: Jon Gough   Copyright: License:     wxWidgets License
+# TP 1.0.185.0 08/12/2021   Author: Jon Gough   Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -45,7 +45,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "3")
 SET(VERSION_PATCH "4")
-set(VERSION_TWEAK "11")
+set(VERSION_TWEAK "12")
 SET(VERSION_DATE "08/12/2021") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
@@ -216,7 +216,7 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 # ----- If using JSON validation in plugin section above is needed ----- ##
 #
 
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
@@ -240,29 +240,6 @@ endif(QT_ANDROID)
 ## ----- Change above to match project requirements for android build ----- ##
 ##
 
-#INCLUDE("PluginNMEA")
-#INCLUDE("PluginJSON")
-
-#IF(UNIX)
-#     INCLUDE("cmake/FindTinyXML.cmake")
-#     FIND_PACKAGE(TinyXML QUIET)
-#ENDIF(UNIX)
-
-#IF(TINYXML_FOUND)
-#     message (STATUS "Building with system tinyxml")
-#     INCLUDE_DIRECTORIES(${TINYXML_INCLUDE_DIR})
-#     ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOTRACKRAYMARINE} ${SRC_JSON} ${SRC_NMEA0183})
-#     TARGET_LINK_LIBRARIES(${PACKAGE_NAME} ${TINYXML_LIBRARIES})
-#ELSE(TINYXML_FOUND)
-#     message (STATUS "Building with embedded tinyxml")
-#     INCLUDE_DIRECTORIES(src/tinyxml/)
-#     SET(SRC_LTINYXML
-#            src/tinyxml/tinyxml.cpp
-#            src/tinyxml/tinyxmlparser.cpp
-#            src/tinyxml/tinyxmlerror.cpp
-# )
-#ADD_LIBRARY(${PACKAGE_NAME} SHARED ${SRC_AUTOTRACKRAYMARINE} ${SRC_JSON} ${SRC_NMEA0183} ${SRC_LTINYXML})
-#ENDIF(TINYXML_FOUND)
 
 # ------------------------------------------------------------------------------------------
 target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
