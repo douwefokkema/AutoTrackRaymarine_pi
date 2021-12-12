@@ -27,7 +27,7 @@
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
-#include "jsoncpp/json/json.h"
+#include "json/json.h"
 #include "AutoTrackRaymarine_pi.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
@@ -72,10 +72,36 @@ extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p)
 //-----------------------------------------------------------------------------
 
 AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
-  : opencpn_plugin_117(ppimgr)
+  :opencpn_plugin_117(ppimgr)
 {
   // Create the PlugIn icons
   initialize_images();
+  
+// Create the PlugIn icons  -from shipdriver
+// loads png file for the listing panel icon
+    wxFileName fn;
+    auto path = GetPluginDataDir("AutoTrackRaymarine_pi");
+    fn.SetPath(path);
+    fn.AppendDir("data");
+    fn.SetFullName("tracking_panel.png");
+
+    path = fn.GetFullPath();
+
+    wxInitAllImageHandlers();
+
+    wxLogDebug(wxString("Using icon path: ") + path);
+    if (!wxImage::CanRead(path)) {
+        wxLogDebug("Initiating image handlers.");
+        wxInitAllImageHandlers();
+    }
+    wxImage panelIcon(path);
+    if (panelIcon.IsOk())
+        m_panelBitmap = wxBitmap(panelIcon);
+    else
+        wxLogWarning("AutoTrackRaymarine panel icon has NOT been loaded");
+// End of from Shipdrive 
+  
+  
   m_info_dialog = NULL;
   m_PreferencesDialog = NULL;
   m_pdeficon = new wxBitmap(*_img_AutoTrackRaymarine);
@@ -126,13 +152,27 @@ int AutoTrackRaymarine_pi::Init(void)
   m_Timer.Start(1000);
 
   //    This PlugIn needs a toolbar icon
-  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") + wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
-    wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
-  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
-  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
-    _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+
+#ifdef PLUGIN_USE_SVG
+   m_tool_id = InsertPlugInToolSVG(_T( "AutoTrackRaymarine" ),
+       _svg_tracking, _svg_tracking_toggled, _svg_tracking_toggled,
+       wxITEM_NORMAL, _("Tracking"), _T( "Track Following for Raymarine Evolution Pilots" ), NULL, TRACKING_TOOL_POSITION, 0, this);
+#else
+   m_tool_id  = InsertPlugInTool( _T(""), _img_AutoTrackRaymarine,
+      _img_AutoTrackRaymarine, wxITEM_NORMAL, _("AutoTrackRaymarine"), _T(""), NULL,
+	  TRACKING_TOOL_POSITION, 0, this);
+#endif 
+
   SetStandby();
   m_initialized = true;
+
+//  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") + wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
+//   wxFileName::GetPathSeparator() + _T("data") + wxFileName::GetPathSeparator();
+//  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
+//  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal, svg_normal, wxITEM_NORMAL, wxT("Tracking"),
+//    _("Track following for Raymarine Evolution pilots"), NULL, TRACKING_TOOL_POSITION, 0, this);
+//  SetStandby();
+//  m_initialized = true;
 
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |
@@ -145,7 +185,7 @@ int AutoTrackRaymarine_pi::Init(void)
     WANTS_CONFIG);
 }
 
-wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
+// wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
 void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
   if (!m_initialized) {
@@ -195,43 +235,54 @@ bool AutoTrackRaymarine_pi::DeInit(void)
 
 int AutoTrackRaymarine_pi::GetAPIVersionMajor()
 {
-  return MY_API_VERSION_MAJOR;
+      return OCPN_API_VERSION_MAJOR;
 }
 
 int AutoTrackRaymarine_pi::GetAPIVersionMinor()
 {
-  return MY_API_VERSION_MINOR;
+      return OCPN_API_VERSION_MINOR;
 }
 
 int AutoTrackRaymarine_pi::GetPlugInVersionMajor()
 {
-  return PLUGIN_VERSION_MAJOR;
+       return PLUGIN_VERSION_MAJOR;
 }
 
 int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
 {
-  return PLUGIN_VERSION_MINOR;
+      return PLUGIN_VERSION_MINOR;
 }
+
+int AutoTrackRaymarine_pi::GetPlugInVersionPatch()
+{
+      return PLUGIN_VERSION_PATCH;
+}
+
 
 //wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
 //{
 //  return new wxBitmap(_img_AutoTrackRaymarine->ConvertToImage().Copy());
 //}
 
+// Uses the tracking_panel.png file to make the bitmap.
+wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
+// End of  process  (from Shipdriver)
+
+
+
 wxString AutoTrackRaymarine_pi::GetCommonName()
 {
-  return _("AutoTrackRaymarine");
+   return _T(PLUGIN_COMMON_NAME);
 }
 
 wxString AutoTrackRaymarine_pi::GetShortDescription()
 {
-  return _("AutoTrackRaymarine PlugIn for OpenCPN");
+   return _(PLUGIN_SHORT_DESCRIPTION);
 }
 
 wxString AutoTrackRaymarine_pi::GetLongDescription()
 {
-  return _("AutoTrackRaymarine PlugIn for OpenCPN\n\
-Route tracking and remote control for Raymarine Evolution pilots");
+    return _(PLUGIN_LONG_DESCRIPTION);
 }
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)

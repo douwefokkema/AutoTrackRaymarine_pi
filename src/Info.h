@@ -30,7 +30,7 @@
 #define INC_INFO_H
 
 #include "AutoTrackRaymarine_pi.h"
-#include "AutoTrackInfoUI.h"
+#include "AutotrackInfoUI.h"
 
 class InfoDialog : public m_dialog
 {
