@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# TP 1.0.185.0 08/12/2021   Author: Jon Gough   Copyright: License:     wxWidgets License
+# TP 1.0.213.0 16/06/2022   Author: Jon Gough   Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -45,8 +45,8 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "0")
 SET(VERSION_MINOR "3")
 SET(VERSION_PATCH "4")
-set(VERSION_TWEAK "13")
-SET(VERSION_DATE "11/12/2021") # DD/MM/YYYY format
+set(VERSION_TWEAK "14")
+SET(VERSION_DATE "23/06/2022") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
