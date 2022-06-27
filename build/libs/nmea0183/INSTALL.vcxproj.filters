@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\fcgle\source\AutoTrackRaymarine_pi\build\CMakeFiles\7eb14dd0c17ccac5eab7631a7ed36dfc\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{C3CE7E90-22A2-3B93-AF09-1BADE52FDFB3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

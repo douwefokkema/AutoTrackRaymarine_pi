@@ -33,6 +33,7 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # define plugin name, owner and versions
+# PROJECT(AutoTrackRaymarine_pi)
 set(VERBOSE_NAME "AutoTrackRaymarine")
 set(COMMON_NAME "AutoTrackRaymarine")
 set(TITLE_NAME "AutoTrackRaymarine")
@@ -41,12 +42,12 @@ set(PACKAGE "AutoTrackRaymarine")
 set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
 set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
 
-SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "1")
-set(VERSION_TWEAK "2")
+SET(VERSION_MAJOR "0")
+SET(VERSION_MINOR "3")
+SET(VERSION_PATCH "4")
+set(VERSION_TWEAK "14")
 SET(VERSION_DATE "23/06/2022") # DD/MM/YYYY format
-set(OCPN_MIN_VERSION "ov50")
+SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
 set(TP_COMMENT "  * Release for O5 using CI")
@@ -62,15 +63,17 @@ set(BETA "beta")    # Standard Repos
 set(ALPHA "alpha")  # Standard Repos
 
 # set this if your cloudsmith repository name does not match your git repository name
-
+#set(CLOUDSMITH_BASE_REPOSITORY "AutoTrackRaymarine")
 set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
-set(CLOUDSMITH_USER "opencpn")
+
 #set(CLOUDSMITH_USER "rick-gleason")
+set(CLOUDSMITH_USER "opencpn")
 
 set(XML_INFO_URL "https://opencpn-manuals.github.io/main/autotrackraymarine/0.1/index.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
+
 
 ##
 ## ----- Modify section above to include all the details for your plugin ----- ##
@@ -90,7 +93,7 @@ set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 
-option(USE_GL "Enable OpenGL support" ON)
+option(USE_GL "Enable OpenGL support" On)
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -163,40 +166,41 @@ SET (HDRS
       src/SerialPort.h
 )	
 	
-set(OCPNSRC
-    ocpnsrc/cutil.cpp
-    ocpnsrc/TexFont.cpp
-)
+	
+#set(OCPNSRC
+#    ocpnsrc/cutil.cpp
+#    ocpnsrc/TexFont.cpp
+#)
 
-set(OCPNHDRS
-    ocpninclude/cutil.h
-    ocpninclude/ocpn_plugin.h
-    ocpninclude/pluginmanager.h
-    ocpninclude/shaders.h
-    ocpninclude/TexFont.h
-    ocpninclude/vector2D.h
-    libs/ocpn-api/ocpn_plugin.h
-)
+#set(OCPNHDRS
+#    ocpninclude/cutil.h
+#    ocpninclude/pluginmanager.h
+#    ocpninclude/shaders.h
+#    ocpninclude/TexFont.h
+#    ocpninclude/vector2D.h
+#    ocpninclude/ocpn_plugin.h
+#    libs/ocpn-api/ocpn_plugin.h
+#)
 
-set(EXTSRC
-)
+#set(EXTSRC
+#)
 
 set(EXTINCLUDE
     extinclude/ODAPI.h
     extinclude/ODJSONSchemas.h
 )
 
-set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
-set(LIBHDRS
-    libs/GL/gl.h
-    libs/GL/gl_private.h
-    libs/GL/glext.h
-    libs/GL/glu.h
-    libs/wxJSON/include/json_defs.h
-    libs/wxJSON/include/jsonreader.h
-    libs/wxJSON/include/jsonval.h
-    libs/wxJSON/include/jsonwriter.h)
+#set(LIBHDRS
+#    libs/GL/gl.h
+#    libs/GL/gl_private.h
+#    libs/GL/glext.h
+#    libs/GL/glu.h
+#    libs/wxJSON/include/json_defs.h
+#    libs/wxJSON/include/jsonreader.h
+#    libs/wxJSON/include/jsonval.h
+#    libs/wxJSON/include/jsonwriter.h)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -213,12 +217,12 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 #
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
@@ -274,6 +278,7 @@ add_definitions(-DTIXML_USE_STL)
 ##
 ## ----- do not change next section - needed to configure build process ----- ##
 ##
+
 
 # Needed for android builds
 if(QT_ANDROID)
