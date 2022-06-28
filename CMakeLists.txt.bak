@@ -2,7 +2,6 @@
 ## Author:      Douwe Fokkema, following a model of Sean D'Epagnier
 ## Copyright:   
 ## License:     GPLv3+
-##    NOTE: Plugin uses API 1.17
 ##---------------------------------------------------------------------------
 # TP 1.0.213.0 16/06/2022   Author: Jon Gough   Copyright: License:     wxWidgets License
 # ---------------------------------------------------------------------------
@@ -42,12 +41,12 @@ set(PACKAGE "AutoTrackRaymarine")
 set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
 set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
 
-SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "1")
-set(VERSION_TWEAK "2")
+SET(VERSION_MAJOR "0")
+SET(VERSION_MINOR "3")
+SET(VERSION_PATCH "4")
+set(VERSION_TWEAK "14")
 SET(VERSION_DATE "23/06/2022") # DD/MM/YYYY format
-set(OCPN_MIN_VERSION "ov50")
+SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
 set(TP_COMMENT "  * Release for O5 using CI")
@@ -63,7 +62,7 @@ set(BETA "beta")    # Standard Repos
 set(ALPHA "alpha")  # Standard Repos
 
 # set this if your cloudsmith repository name does not match your git repository name
-
+#set(CLOUDSMITH_BASE_REPOSITORY "AutoTrackRaymarine")
 set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
 set(CLOUDSMITH_USER "opencpn")
@@ -91,7 +90,7 @@ set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 
-option(USE_GL "Enable OpenGL support" ON)
+option(USE_GL "Enable OpenGL support" On)
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -162,8 +161,8 @@ SET (HDRS
       src/NGT1Read.h
       src/actisense.h
       src/SerialPort.h
-      libs/ocpn-api/ocpn_plugin.h
 )	
+	
 	
 #set(OCPNSRC
 #    ocpnsrc/cutil.cpp
@@ -172,21 +171,21 @@ SET (HDRS
 
 #set(OCPNHDRS
 #    ocpninclude/cutil.h
-#    ocpninclude/ocpn_plugin.h
 #    ocpninclude/pluginmanager.h
 #    ocpninclude/shaders.h
 #    ocpninclude/TexFont.h
 #    ocpninclude/vector2D.h
+#    ocpninclude/ocpn_plugin.h
 #    libs/ocpn-api/ocpn_plugin.h
 #)
 
 #set(EXTSRC
 #)
 
-#set(EXTINCLUDE
-#    extinclude/ODAPI.h
-#    extinclude/ODJSONSchemas.h
-#)
+set(EXTINCLUDE
+    extinclude/ODAPI.h
+    extinclude/ODJSONSchemas.h
+)
 
 #set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
@@ -276,6 +275,7 @@ add_definitions(-DTIXML_USE_STL)
 ##
 ## ----- do not change next section - needed to configure build process ----- ##
 ##
+
 
 # Needed for android builds
 if(QT_ANDROID)

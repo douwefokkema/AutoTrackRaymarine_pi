@@ -33,7 +33,6 @@ if(COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 # define plugin name, owner and versions
-# PROJECT(AutoTrackRaymarine_pi)
 set(VERBOSE_NAME "AutoTrackRaymarine")
 set(COMMON_NAME "AutoTrackRaymarine")
 set(TITLE_NAME "AutoTrackRaymarine")
@@ -66,14 +65,12 @@ set(ALPHA "alpha")  # Standard Repos
 #set(CLOUDSMITH_BASE_REPOSITORY "AutoTrackRaymarine")
 set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
-
-#set(CLOUDSMITH_USER "rick-gleason")
 set(CLOUDSMITH_USER "opencpn")
+#set(CLOUDSMITH_USER "rick-gleason")
 
 set(XML_INFO_URL "https://opencpn-manuals.github.io/main/autotrackraymarine/0.1/index.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
-
 
 ##
 ## ----- Modify section above to include all the details for your plugin ----- ##
@@ -93,7 +90,7 @@ set(USE_LOCAL_GLU TRUE)
 # Prefer libGL.so to libOpenGL.so, see CMP0072
 set(OpenGL_GL_PREFERENCE "LEGACY")
 
-option(USE_GL "Enable OpenGL support" On)
+option(USE_GL "Enable OpenGL support" ON)
 message(STATUS "${CMLOC}USE_GL: ${USE_GL}")
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -278,7 +275,6 @@ add_definitions(-DTIXML_USE_STL)
 ##
 ## ----- do not change next section - needed to configure build process ----- ##
 ##
-
 
 # Needed for android builds
 if(QT_ANDROID)
