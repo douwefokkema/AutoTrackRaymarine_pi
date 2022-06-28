@@ -41,11 +41,11 @@ set(PACKAGE "AutoTrackRaymarine")
 set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
 set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
 
-SET(VERSION_MAJOR "0")
-SET(VERSION_MINOR "3")
-SET(VERSION_PATCH "4")
-set(VERSION_TWEAK "14")
-SET(VERSION_DATE "23/06/2022") # DD/MM/YYYY format
+SET(VERSION_MAJOR "1")
+SET(VERSION_MINOR "1")
+SET(VERSION_PATCH "0")
+set(VERSION_TWEAK "beta")
+SET(VERSION_DATE "20/12/2021") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov50")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
