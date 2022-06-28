@@ -123,6 +123,15 @@ int AutoTrackRaymarine_pi::Init(void)
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
   m_heading_set = false;
+  m_current_bearing = 0.;
+  m_XTE = 0.;
+  m_BTW = 0.;
+  m_var = 0.;
+  m_XTE_P = 0.;
+  m_XTE_I = 0.;
+  m_XTE_D = 0.;
+  m_pilot_heading = -1.;  // target heading of pilot in auto mode, -1 means undefined
+  m_vessel_heading = -1.;
   SetStandby();
 
   // Mode
@@ -227,9 +236,12 @@ bool AutoTrackRaymarine_pi::DeInit(void)
 
   //  Close serial port and stop reader thread NGT-1
   delete (m_serial_comms);
+  wxLogMessage(wxT("m_serial_comms deleted"));
   m_Timer.Stop();
+  wxLogMessage(wxT("timer stopped"));
   m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
-
+  wxLogMessage(wxT("ready closing"));
+  wxMilliSleep(100);
   return true;
 }
 
@@ -405,11 +417,16 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info) {
  // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
   m_XTE = leg_info.Xte;
+  if (isnan(m_XTE)) {
+      m_XTE = 0.;
+      wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
+  }
   if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
   m_route_active = true;  // when SetActiveLegInfo is called a route must be active
-  m_BTW = leg_info.Btw;
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE=%f"), m_XTE);
+  if (!isnan(leg_info.Btw)) {
+      m_BTW = leg_info.Btw;
+  }
 }
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
@@ -467,12 +484,11 @@ void AutoTrackRaymarine_pi::SetTracking() {
 void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
-  //if (m_pilot_state == TRACKING) wxLogMessage(wxT("AutoTrackRaymarine: $$$ tracking"));
-  //if(m_route_active)wxLogMessage(wxT("AutoTrackRaymarine: $$$ route active"));
+  if (isnan(m_BTW)) return;
+  if (isnan(m_XTE) || m_XTE == 100000.) return;
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
