@@ -120,27 +120,16 @@ SerialPort::SerialPort(AutoTrackRaymarine_pi *pi) {
 SerialPort::~SerialPort() {
   if (m_NGT1_read) {
     m_NGT1_read->Shutdown();
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: shut down NGT1read thread"));
+    while (!m_NGT1_read->m_is_shutdown) {
+        wxMilliSleep(100);
+    }
     delete m_NGT1_read;
   }
   if (m_hSerialin) {
-    if (CloseHandle(m_hSerialin) == 0) {
-      wxLogMessage(wxT("AutoTrackRaymarine_pi Error closing serial port NGT-1"));
+      CloseHandle(m_hSerialin);
+      m_hSerialin = INVALID_HANDLE_VALUE;
     }
-    else {
-      wxLogMessage(wxT("AutoTrackRaymarine_pi: closed serial port"), m_pi->prefs.com_port);
-    }
-    if (m_hSerialin) {
-      /*wxLogMessage(wxT("AutoTrackRaymarine_pi: m_hSerialin deleted0"));
-      delete m_hSerialin;
-      wxLogMessage(wxT("AutoTrackRaymarine_pi: m_hSerialin deleted1"));*/
-    }
-    else {
-      wxLogMessage(wxT("AutoTrackRaymarine_pi: m_hSerialin not deleted"));
-    }
-  }
-
-};
+  };
 
 bool SerialPort::OpenSerialPort(wchar_t* pcCommPort, HANDLE* handle) {
   // Open serial port number

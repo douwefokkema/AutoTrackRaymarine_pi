@@ -123,6 +123,15 @@ int AutoTrackRaymarine_pi::Init(void)
   pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
   m_heading_set = false;
+  m_current_bearing = 0.;
+  m_XTE = 0.;
+  m_BTW = 0.;
+  m_var = 0.;
+  m_XTE_P = 0.;
+  m_XTE_I = 0.;
+  m_XTE_D = 0.;
+  m_pilot_heading = -1.;  // target heading of pilot in auto mode, -1 means undefined
+  m_vessel_heading = -1.;
   SetStandby();
 
   // Mode
@@ -198,11 +207,10 @@ void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id) {
   }
 }
 
-bool AutoTrackRaymarine_pi::DeInit(void)
-{
-  //PlugInHandleAutoTrackRaymarine(false);
+bool AutoTrackRaymarine_pi::DeInit(void) {
+    // No logging here, will crash OpenCPN in DoLogRecord because of illegal pointer to file
+  if (!m_initialized) return true;
   delete m_PreferencesDialog;
-
   RemovePlugInTool(m_leftclick_tool_id);
 
   // save config
@@ -224,12 +232,15 @@ bool AutoTrackRaymarine_pi::DeInit(void)
   // Waypoint Arrival
   pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
   pConf->Write("InterceptRoute", p.intercept_route);
-
-  //  Close serial port and stop reader thread NGT-1
-  delete (m_serial_comms);
   m_Timer.Stop();
   m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
 
+  //  Close serial port and stop reader thread NGT-1
+  if (m_serial_comms) {
+      delete(m_serial_comms);
+      m_serial_comms = NULL;
+   }
+  m_initialized = false;
   return true;
 }
 
@@ -405,11 +416,16 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix)
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info) {
  // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"), leg_info.xte, leg_info.btw, leg_info.dtw, leg_info.wp_name);
   m_XTE = leg_info.Xte;
+  if (isnan(m_XTE)) {
+      m_XTE = 0.;
+      wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
+  }
   if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
   m_route_active = true;  // when SetActiveLegInfo is called a route must be active
-  m_BTW = leg_info.Btw;
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$ m_XTE=%f"), m_XTE);
+  if (!isnan(leg_info.Btw)) {
+      m_BTW = leg_info.Btw;
+  }
 }
 
 void AutoTrackRaymarine_pi::SetPluginMessage(wxString &message_id, wxString &message_body)
@@ -467,12 +483,11 @@ void AutoTrackRaymarine_pi::SetTracking() {
 void AutoTrackRaymarine_pi::Compute(){
   double dist;
   double XTE_for_correction;
-  //if (m_pilot_state == TRACKING) wxLogMessage(wxT("AutoTrackRaymarine: $$$ tracking"));
-  //if(m_route_active)wxLogMessage(wxT("AutoTrackRaymarine: $$$ route active"));
+  if (isnan(m_BTW)) return;
+  if (isnan(m_XTE) || m_XTE == 100000.) return;
   if (m_pilot_state != TRACKING || !m_route_active) {
     return;
   }
-  //wxLogMessage(wxT("AutoTrackRaymarine: $$$compute m_XTE= %f"), m_XTE);
   dist = 50; // in meters
   double dist_nm = dist / 1852.;
 
@@ -501,7 +516,7 @@ void AutoTrackRaymarine_pi::Compute(){
 
   XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
 
-  //wxLogMessage(wxT("$$$$ XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR * m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
+  //wxLogMessage(wxT(" XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR * m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
   // XTE_for_correction, 5 * m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D);
 
   double gamma, new_bearing;  // angle for correction of heading relative to BTW
@@ -509,7 +524,7 @@ void AutoTrackRaymarine_pi::Compute(){
     gamma = atan( XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;
   }
   double max_angle = prefs.max_angle;
-  //wxLogMessage(wxT("AutoTrackRaymarine $$$ initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
+  //wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, max_angle, XTE_for_correction);
   new_bearing = m_BTW + gamma;                          // bearing of next wp
 
   if (gamma > max_angle) {
