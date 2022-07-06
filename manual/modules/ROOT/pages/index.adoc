@@ -1,6 +1,8 @@
 
 = AutoTrackRaymarine Evo
 
+image::tracking-panel.png[autotrackraymarine,60,60]
+
 Developer: Douwe Fokkema
 
 * https://github.com/douwefokkema/AutoTrackRaymarine_pi[Github Repository]
