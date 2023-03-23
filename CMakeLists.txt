@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# TP 1.0.213.0 16/06/2022   Author: Jon Gough   Copyright: License:     wxWidgets License
+# CI-CMake: v1.0.230.0 05/03/2023  # DD/MM/YYYY format  CI-CMake Author: Jon Gough
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -43,13 +43,13 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "2")
-set(VERSION_TWEAK "1")
-SET(VERSION_DATE "06/07/2022") # DD/MM/YYYY format
-SET(OCPN_MIN_VERSION "ov50")
+SET(VERSION_PATCH "3")
+set(VERSION_TWEAK "0")
+SET(VERSION_DATE "22/03/2023") # DD/MM/YYYY format
+SET(OCPN_MIN_VERSION "ov57")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
-set(TP_COMMENT "  * Release for O5 using CI")
+set(TP_COMMENT "  * Release for O57 using CI")
 
 set(PARENT "opencpn")
 
