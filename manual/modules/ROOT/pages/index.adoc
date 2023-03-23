@@ -1,7 +1,7 @@
 
 = AutoTrackRaymarine Evo
 
-image::tracking-panel.png[autotrackraymarine,60,60]
+image::tracking_panel.png[autotrackraymarine,60,60]
 
 Developer: Douwe Fokkema
 
@@ -12,7 +12,9 @@ Forum - AutoTrackRaymarine_pi Remote control and route following for Evolution p
 == Purpose
 
 Will provide remote control of a Raymarine Evolution autopilot from
-OpenCPN and route following for complex routes from start to finish.
+OpenCPN and route following for complex routes from start to finish, but 
+requires Actisense NGT-1 to connect to the Raymarine Raytalk-ng network, 
+which is an nmea 2000 network with proprietary pgn’s
 
 == Operation from the Evo
 
