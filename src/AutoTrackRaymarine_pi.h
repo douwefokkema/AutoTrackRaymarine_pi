@@ -133,7 +133,7 @@ public:
 
 public:
   void ResetXTE() {
-    m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
+      m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
   }
     // these are stored to the config
     struct preferences {

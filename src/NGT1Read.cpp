@@ -70,10 +70,8 @@ void *NGT1Input::Entry(void) {
       break;
     }
   }
-
-
   // endless loop until thread destroy
-  wxLogMessage(wxT("AutoTrackRaymarine_pi: NGT1Read thread stopping"));
+
   m_is_shutdown = true;
   return 0;
 }
@@ -82,27 +80,19 @@ int NGT1Input::ReadNGT1(HANDLE handle)
 {
   size_t i;
   //   ssize_t r;
-  int r;
+  int r = 0;
   bool printed = 0;
   unsigned char c;
   unsigned char buf[500];
   DWORD dwBytesRead;
-
+  dwBytesRead = 0;
   r = ReadFile(handle, buf, sizeof(buf), &dwBytesRead, NULL);
-  //	r = read(handle, buf, sizeof(buf));
-  if (r <= 0) /* No char read, abort message read */
-  {
-    wxLogMessage(wxT("AutoTrackRaymarine_pi: Unable to read from NGT1 device"));
-  }
-
-  //  fprintf_s(stderr, "Read %d bytes from device \n", (int)dwBytesRead);
-
+  
   for (i = 0; i < dwBytesRead; i++)
   {
     c = buf[i];
     readNGT1Byte(c);
   }
-
   return r;
 }
 
@@ -134,7 +124,6 @@ void NGT1Input::readNGT1Byte(unsigned char c)
     }
     else
     {
-      //wxLogMessage(wxT("AutoTrackRaymarine_pi: DLE followed by unexpected char %02X, ignore message"), c);
       state = MSG_START;
     }
   }
