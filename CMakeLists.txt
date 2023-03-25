@@ -44,9 +44,9 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "1")
 SET(VERSION_PATCH "3")
-set(VERSION_TWEAK "0")
-SET(VERSION_DATE "22/03/2023") # DD/MM/YYYY format
-SET(OCPN_MIN_VERSION "ov57")
+set(VERSION_TWEAK "1")
+SET(VERSION_DATE "25/03/2023") # DD/MM/YYYY format
+SET(OCPN_MIN_VERSION "ov571")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
 set(TP_COMMENT "  * Release for O57 using CI")
@@ -68,7 +68,7 @@ set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")
 set(CLOUDSMITH_USER "opencpn")
 #set(CLOUDSMITH_USER "rick-gleason")
 
-set(XML_INFO_URL "https://opencpn-manuals.github.io/main/autotrackraymarine/0.1/index.html")
+set(XML_INFO_URL "https://opencpn-manuals.github.io/main/autotrackraymarine/index.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
 set(XML_DESCRIPTION ${LONG_DESCRIPTION})
 
