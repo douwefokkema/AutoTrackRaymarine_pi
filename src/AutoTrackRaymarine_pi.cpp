@@ -182,6 +182,35 @@ int AutoTrackRaymarine_pi::Init(void)
 //  SetStandby();
 //  m_initialized = true;
 
+    // initialize NavMsg listeners
+ //-----------------------------
+
+ // Heading PGN 127250
+  wxDEFINE_EVENT(EVT_N2K_127250, ObservedEvt);
+  NMEA2000Id id_127250 = NMEA2000Id(127250);
+  listener_127250 = std::move(GetListener(id_127250, EVT_N2K_127250, this));
+  Bind(EVT_N2K_127250, [&](ObservedEvt ev) {
+      HandleN2K_127250(ev);
+      });
+
+  /*std::vector<DriverHandle> drivers = GetActiveDrivers();*/
+  for (const auto& handle : GetActiveDrivers()) {
+      const auto& attributes = GetAttributes(handle);
+      if (attributes.find("protocol") == attributes.end()) continue;
+      wxLogMessage(wxT("$$$ handle proto %s"), attributes.at("protocol"));
+      if (attributes.at("protocol") == "nmea2000") {
+          m_handleN2k = handle;
+          wxLogMessage(wxT("$$$ handle  found"));
+          break; }
+      /*if (attributes.find("commPort") == attributes.end()) continue;
+      if (attributes.at("commPort").find(my_port) == string::npos) continue;*/
+      wxLogMessage(wxT("$$$ handle not found"));
+  }
+
+  std::vector<int> pgn_list = { 127250 };
+  CommDriverResult xx = RegisterTXPGNs(m_handleN2k, pgn_list);
+
+
   return (WANTS_OVERLAY_CALLBACK |
     WANTS_OPENGL_OVERLAY_CALLBACK |
     WANTS_CURSOR_LATLON |
@@ -192,19 +221,24 @@ int AutoTrackRaymarine_pi::Init(void)
     WANTS_PREFERENCES |
     WANTS_CONFIG);
 
-  // initialize NavMsg listeners
- //-----------------------------
 
- // Rudder data PGN 127250
-  wxDEFINE_EVENT(EVT_N2K_127250, ObservedEvt);
-  NMEA2000Id id_127250 = NMEA2000Id(127250);
-  listener_127250 = std::move(GetListener(id_127250, EVT_N2K_127250, this));
-  Bind(EVT_N2K_127250, [&](ObservedEvt ev) {
-      HandleN2K_127250(ev);
-      });
 
-  
+}
 
+//wxBitmap* AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
+
+wxString AutoTrackRaymarine_pi::GetCommonName() { return wxT("XX"); }
+
+wxString AutoTrackRaymarine_pi::GetShortDescription() { return _("XX"); }
+
+int AutoTrackRaymarine_pi::GetAPIVersionMajor() { return MY_API_VERSION_MAJOR; }
+
+int AutoTrackRaymarine_pi::GetAPIVersionMinor() { return MY_API_VERSION_MINOR; }
+
+//int AutoTrackRaymarine_pi::GetPlugInVersionMajor() { return PLUGIN_VERSION_MAJOR; }
+
+wxString AutoTrackRaymarine_pi::GetLongDescription() {
+    return _("Route following for Raymarine EV pilots") + wxT("\n") /*+ wxT(PLUGIN_VERSION_WITH_DATE)*/;
 }
 
 // wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
@@ -267,9 +301,11 @@ bool AutoTrackRaymarine_pi::DeInit(void) {
 
 void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev) {  // Vessel heading, standerd NMEA2000
     NMEA2000Id id_127250(127250);
+
     std::vector<uint8_t>msg = GetN2000Payload(id_127250, ev);
-    double p_h = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
+    double p_h = ((unsigned int)msg[14] + 256 * (unsigned int)msg[15]) * 360. / 3.141 / 20000;
     m_vessel_heading = p_h + m_var;
+    wxLogMessage(wxT("$$$ 127250 heading=%f"));
 }
 
 //int AutoTrackRaymarine_pi::GetAPIVersionMajor()
@@ -323,6 +359,8 @@ void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev) {  // Vessel headin
 //{
 //    return _(PLUGIN_LONG_DESCRIPTION);
 //}
+
+
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
 {
@@ -614,7 +652,7 @@ void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
 }
 
 
-NMEA0183    NMEA0183;
+//NMEA0183    NMEA0183;
 
 
 

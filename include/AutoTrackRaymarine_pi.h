@@ -66,6 +66,9 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
+#define MY_API_VERSION_MAJOR 1
+#define MY_API_VERSION_MINOR 8
+
 class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
@@ -109,19 +112,21 @@ public:
   AutoTrackRaymarine_pi(void *ppimgr);
   int Init(void);
   bool DeInit(void);
+  DriverHandle m_handleN2k;
 
-  /*int GetAPIVersionMajor();
-  int GetAPIVersionMinor();*/
-  /*int GetPlugInVersionMajor();
-  int GetPlugInVersionMinor();
-  int GetPlugInVersionPatch();*/
-  //wxBitmap *GetPlugInBitmap();/*
-  //wxString GetCommonName();
-  //wxString GetShortDescription();
-  //wxString GetLongDescription();*/
+  int GetAPIVersionMajor();
+  int GetAPIVersionMinor();
+  //int GetPlugInVersionPatch();
+  //wxBitmap *GetPlugInBitmap();
+  wxString GetCommonName();
+  wxString GetShortDescription();
+  wxString GetLongDescription();
   wxBitmap m_panelBitmap;  
 
   void ShowPreferencesDialog(wxWindow* parent);
+
+  //wxBitmap* GetPlugInBitmap();
+ 
 
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
   bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
