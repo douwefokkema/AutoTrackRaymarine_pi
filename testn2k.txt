@@ -1,0 +1,24 @@
+std::vector <unsigned char> qmsg = out_que.front();
+
+
+for (size_t i=0 ; i < load.size(); i++)
+    N2kMsg.AddByte(load.at(i));    //data
+
+std::vector<double> v;
+double* a = &v[0];
+
+int *arr = v.data();
+
+std::vector<int>().swap(v);  // release all memory of the vector
+
+
+                  ontvangen len = 22
+14:45:16.580 MESSAGE AutoTrackRaymarine_pi.cpp:554  93, 13, 2, 12, f1,  1, ff, cc, 9b, 0, 0, 0, 8, ff, f7, 4f, ff, 7f, ff, 7f, fd, a8/*, 60b88f30, 60bff250, 0*/ 
+                VERZONDEN logger            10  02  94  13 06  12  f1  01  ff  0d  eb 00 00 00 08  ff  14  3d  ff  7f  ff  7f  fd  07 10 03       
+                                                               PGN                                     heading(14)      
+
+                                            10, 2, 94, 13, 6, 12, f1, 1, ff, d, eb, 0, 0, 0, 8, ff, 14, 3d, ff, 7f, ff, 7f, fd, 7, 10 end of 25 
+ontvangen logger       ff 8c 4f ff 3a 10 03 10  02 93  13  02 12  f1 01  ff cc  7b 26 07 00 08  ff  90  4f  ff 7f ff 7f fd 02 10   Ì{&...ÿOÿÿý.. 
+
+
+

@@ -27,7 +27,6 @@
 #include <wx/wx.h>
 #include <wx/stdpaths.h>
 #include <wx/aui/aui.h>
-#include "json/json.h"
 #include "AutoTrackRaymarine_pi.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
@@ -116,7 +115,7 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void *ppimgr)
 
 int AutoTrackRaymarine_pi::Init(void)
 {
-  AddLocaleCatalog(PLUGIN_CATALOG_NAME);
+  //AddLocaleCatalog(PLUGIN_CATALOG_NAME);
   
   // Read Config
   wxFileConfig *pConf = GetOCPNConfigObject();
@@ -192,6 +191,20 @@ int AutoTrackRaymarine_pi::Init(void)
     WANTS_PLUGIN_MESSAGING |
     WANTS_PREFERENCES |
     WANTS_CONFIG);
+
+  // initialize NavMsg listeners
+ //-----------------------------
+
+ // Rudder data PGN 127250
+  wxDEFINE_EVENT(EVT_N2K_127250, ObservedEvt);
+  NMEA2000Id id_127250 = NMEA2000Id(127250);
+  listener_127250 = std::move(GetListener(id_127250, EVT_N2K_127250, this));
+  Bind(EVT_N2K_127250, [&](ObservedEvt ev) {
+      HandleN2K_127250(ev);
+      });
+
+  
+
 }
 
 // wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
@@ -244,30 +257,45 @@ bool AutoTrackRaymarine_pi::DeInit(void) {
   return true;
 }
 
-int AutoTrackRaymarine_pi::GetAPIVersionMajor()
-{
-      return OCPN_API_VERSION_MAJOR;
+
+//void HandleN2K_65360(ObservedEvt ev); // Pilot heading
+//void HandleN2K_126208(ObservedEvt ev); // Set Set pilot heading or set auto/standby
+//void HandleN2K_126720(ObservedEvt ev); // From EV1 (204) indicating auto or standby state
+//void HandleN2K_65359(ObservedEvt ev); // Vessel heading, proprietary
+
+
+
+void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev) {  // Vessel heading, standerd NMEA2000
+    NMEA2000Id id_127250(127250);
+    std::vector<uint8_t>msg = GetN2000Payload(id_127250, ev);
+    double p_h = ((unsigned int)msg[12] + 256 * (unsigned int)msg[13]) * 360. / 3.141 / 20000;
+    m_vessel_heading = p_h + m_var;
 }
 
-int AutoTrackRaymarine_pi::GetAPIVersionMinor()
-{
-      return OCPN_API_VERSION_MINOR;
-}
+//int AutoTrackRaymarine_pi::GetAPIVersionMajor()
+//{
+//      //return OCPN_API_VERSION_MAJOR;
+//}
 
-int AutoTrackRaymarine_pi::GetPlugInVersionMajor()
-{
-       return PLUGIN_VERSION_MAJOR;
-}
+//int AutoTrackRaymarine_pi::GetAPIVersionMinor()
+//{
+//     //return OCPN_API_VERSION_MINOR;
+//}
 
-int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
-{
-      return PLUGIN_VERSION_MINOR;
-}
-
-int AutoTrackRaymarine_pi::GetPlugInVersionPatch()
-{
-      return PLUGIN_VERSION_PATCH;
-}
+//int AutoTrackRaymarine_pi::GetPlugInVersionMajor()
+//{
+//       //return PLUGIN_VERSION_MAJOR;
+//}
+//
+//int AutoTrackRaymarine_pi::GetPlugInVersionMinor()
+//{
+//      //return PLUGIN_VERSION_MINOR;
+//}
+//
+//int AutoTrackRaymarine_pi::GetPlugInVersionPatch()
+//{
+//      //return PLUGIN_VERSION_PATCH;
+//}
 
 
 //wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()
@@ -276,25 +304,25 @@ int AutoTrackRaymarine_pi::GetPlugInVersionPatch()
 //}
 
 // Uses the tracking_panel.png file to make the bitmap.
-wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
+//wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap()  { return &m_panelBitmap; }
 // End of  process  (from Shipdriver)
 
 
 
-wxString AutoTrackRaymarine_pi::GetCommonName()
-{
-   return _T(PLUGIN_COMMON_NAME);
-}
-
-wxString AutoTrackRaymarine_pi::GetShortDescription()
-{
-   return _(PLUGIN_SHORT_DESCRIPTION);
-}
-
-wxString AutoTrackRaymarine_pi::GetLongDescription()
-{
-    return _(PLUGIN_LONG_DESCRIPTION);
-}
+//wxString AutoTrackRaymarine_pi::GetCommonName()
+//{
+//   return _T(PLUGIN_COMMON_NAME);
+//}
+//
+//wxString AutoTrackRaymarine_pi::GetShortDescription()
+//{
+//   return _(PLUGIN_SHORT_DESCRIPTION);
+//}
+//
+//wxString AutoTrackRaymarine_pi::GetLongDescription()
+//{
+//    return _(PLUGIN_LONG_DESCRIPTION);
+//}
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
 {

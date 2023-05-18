@@ -1,0 +1,31 @@
+id: org.opencpn.OpenCPN.Plugin.radar
+runtime: org.opencpn.OpenCPN
+runtime-version: beta
+sdk: org.freedesktop.Sdk//22.08
+build-extension: true
+separate-locales: false
+appstream-compose: false
+finish-args:
+  - --socket=x11
+  - --socket=pulseaudio
+  - --filesystem=home
+  - --device=all
+modules:
+  - name: radar
+    no-autogen: true
+    buildsystem: cmake
+    builddir: true
+    config-opts:
+      - -DCMAKE_INSTALL_PREFIX=/app/extensions/radar/
+      - -DCMAKE_BUILD_TYPE:STRING=Release
+      - -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+      - -DBUILD_TYPE:STRING=tarball
+      - -Uplugin_target
+    build-options:
+        cflags: -fPIC -I/run/build/radar/bundled-gl
+        cxxflags: -fPIC -I/run/build/radar/bundled-gl
+        strip: true
+    sources:
+      - type: git
+        url: ..
+        branch: HEAD
