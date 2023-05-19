@@ -65,12 +65,12 @@ void InfoDialog::UpdateInfo() {
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
-  m_pi->m_serial_comms->SetAuto();   // sent auto command to pilot
+  m_pi->SetPilotAuto();   // sent auto command to pilot
   m_pi->SetAuto();
 }
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
-  /*m_pi->m_serial_comms->SetStandby();
+  /*m_pi->SetStandby();
   m_pi->SetStandby();*/
 
 
@@ -109,7 +109,7 @@ void InfoDialog::EnableTrackButton(bool enable) {
 void InfoDialog::OnTracking(wxCommandEvent& event) {
   if (m_pi->m_route_active) {
     if (m_pi->m_pilot_state == STANDBY) {
-      m_pi->m_serial_comms->SetAuto();
+      m_pi->SetAuto();
     }
     m_pi->SetTracking();
   }

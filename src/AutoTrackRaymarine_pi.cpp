@@ -31,14 +31,10 @@
 #include "PreferencesDialog.h"
 #include "icons.h"
 #include "GL/gl.h"
-#include "actisense.h"
-#include "actisense.h"
-#include "SerialPort.h"
 #include "AutotrackInfoUI.h"
 #include "Info.h"
 
 
-//using namespace std;
 #define TURNRATE 20.   // turnrate per second
 
 double heading_resolve(double degrees, double offset = 0)
@@ -147,7 +143,6 @@ int AutoTrackRaymarine_pi::Init(void)
   p.boundary_guid = pConf->Read("Boundary", "");
   p.boundary_width = pConf->Read("BoundaryWidth", 30);
 
-  m_serial_comms = new SerialPort(this);
 
   ShowInfoDialog();
   m_XTE_refreshed = false;
@@ -282,11 +277,6 @@ bool AutoTrackRaymarine_pi::DeInit(void) {
   m_Timer.Stop();
   m_Timer.Disconnect(wxEVT_TIMER, wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
 
-  //  Close serial port and stop reader thread NGT-1
-  if (m_serial_comms) {
-      delete(m_serial_comms);
-      m_serial_comms = NULL;
-   }
   m_initialized = false;
   return true;
 }
@@ -631,7 +621,7 @@ void AutoTrackRaymarine_pi::Compute(){
   }
   while (m_current_bearing >= 360.) m_current_bearing -= 360.;
   while (m_current_bearing < 0.) m_current_bearing += 360.;
-  m_serial_comms->SetAutopilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
+  SetPilotHeading(m_current_bearing - m_var);  // the commands used expect magnetic heading
   m_pilot_heading = m_current_bearing; // This should not be needed, pilot heading will come from pilot. For testing only.
   SendHSC(m_current_bearing);
 }
@@ -646,7 +636,7 @@ void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees) {
   double new_pilot_heading = m_pilot_heading + (double) degrees;
   if (new_pilot_heading >= 360.) new_pilot_heading -= 360.;
   if (new_pilot_heading < 0.) new_pilot_heading += 360.;
-  m_serial_comms->SetAutopilotHeading(new_pilot_heading - m_var); //send magnitic heading to Raymarine
+  SetPilotHeading(new_pilot_heading - m_var); //send magnitic heading to Raymarine
   m_pilot_heading = new_pilot_heading; // this should not be needed, pilot heading will come from pilot. For testing only.
   SendHSC(new_pilot_heading);
 }
@@ -693,3 +683,79 @@ void AutoTrackRaymarine_pi::SendHSC(double course) {
   nmea.Printf(wxT("$%s*%02X\r\n"), sentence, (unsigned)checksum);
   PushNMEABuffer(nmea);
 }
+
+void AutoTrackRaymarine_pi::SetPilotHeading(double heading) {
+    // wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
+
+    // commands for NGT-1 in Canboat format
+    std::string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
+    // string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+    std::string msg2 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,00,00";  //set 0 magnetic
+    // string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";  //set 92 magnetic
+    // string msg4 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,4e,3f";  //set 93 example only, magnetic
+
+    double heading_normal = heading;
+    while (heading_normal < 0) heading_normal += 360;
+    while (heading_normal >= 360) heading_normal -= 360;
+    uint16_t heading_radials1000 = (uint16_t)(heading_normal * 174.53); // heading to be set in thousands of radials
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading2 radials = %i %000x"), heading_radials1000, heading_radials1000);
+    uint8_t byte0, byte1;
+    byte0 = heading_radials1000 & 0xff;
+    byte1 = heading_radials1000 >> 8;
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading byte0 = %0x, byte1 = %0x"), byte0, byte1);
+    char s[4];
+    sprintf_s(s, "%0x", byte0);
+    if (byte0 > 15) {
+        msg2[56] = s[0];
+        msg2[57] = s[1];
+    }
+    else {
+        msg2[56] = '0';
+        msg2[57] = s[0];
+    }
+    sprintf_s(s, "%0x", byte1);
+    if (byte1 > 15) {
+        msg2[59] = s[0];
+        msg2[60] = s[1];
+    }
+    else {
+        msg2[59] = '0';
+        msg2[60] = s[0];
+    }
+    unsigned char msg[500];
+    for (unsigned int i = 0; i <= msg2.length(); i++) {
+        msg[i] = msg2[i];
+    }
+    //parseAndWriteIn(m_hSerialin, msg);
+}
+
+void AutoTrackRaymarine_pi::SetPilotAuto() {
+    std::string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+    unsigned char msg[500];
+    for (unsigned int i = 0; i <= auto_command.length(); i++) {
+        msg[i] = auto_command[i];
+    }
+    //parseAndWriteIn(m_hSerialin, msg);
+}
+
+void AutoTrackRaymarine_pi::SetPilotStandby() {
+    std::string standby_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,05,ff,ff";  //set standby
+    unsigned char msg[500];
+    for (unsigned int i = 0; i <= standby_command.length(); i++) {
+        msg[i] = standby_command[i];
+    }
+    //parseAndWriteIn(m_hSerialin, msg);
+}
+
+void AutoTrackRaymarine_pi::SetP70Tracking() {
+    //string msg3 = "Z,3,126208,7,204,14,01,50,ff,00,f8,03,01,3b,07,03,04,06,9f,3e";
+    //string auto_command = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,40,00,05,ff,ff";  // set auto
+    std::string track = "Z,3,126208,7,204,0d,3b,9f,f0,81,84,46,27,9d,4a,00,00,02,08,4e";  // status message for track
+    unsigned char msg[500];
+    for (unsigned int i = 0; i <= track.length(); i++) {
+        msg[i] = track[i];
+    }
+    //parseAndWriteIn(m_hSerialin, msg);
+}
+
+

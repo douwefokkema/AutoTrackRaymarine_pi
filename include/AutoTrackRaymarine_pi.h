@@ -33,8 +33,6 @@
 #include "wxWTranslateCatalog.h"
 #include "nmea0183.h"
 
-#define MY_API_VERSION_MAJOR 1
-#define MY_API_VERSION_MINOR 17 
 
 #define ABOUT_AUTHOR_URL 
 #define OPC wxS("opencpn-AutoTrackRaymarine_pi")
@@ -72,9 +70,6 @@
 class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
-//class NGT1Input;
-class SerialPort;
-//class m_dialog;
 class InfoDialog;
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_117
@@ -142,8 +137,6 @@ public:
   void SetPilotStandby();
   void SetP70Tracking();
 
-  SerialPort *m_serial_comms;
-
   static wxString StandardPath();
 
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
@@ -173,6 +166,7 @@ public:
   void ResetXTE() {
       m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
   }
+  
     // these are stored to the config
     struct preferences {
         double max_angle;
