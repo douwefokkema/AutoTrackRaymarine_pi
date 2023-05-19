@@ -726,7 +726,7 @@ void AutoTrackRaymarine_pi::SetPilotHeading(double heading) {
     for (unsigned int i = 0; i <= msg2.length(); i++) {
         msg[i] = msg2[i];
     }
-    //parseAndWriteIn(m_hSerialin, msg);
+    //parseAndWriteIn( msg);
 }
 
 void AutoTrackRaymarine_pi::SetPilotAuto() {
@@ -735,7 +735,7 @@ void AutoTrackRaymarine_pi::SetPilotAuto() {
     for (unsigned int i = 0; i <= auto_command.length(); i++) {
         msg[i] = auto_command[i];
     }
-    //parseAndWriteIn(m_hSerialin, msg);
+    //parseAndWriteIn(, msg);
 }
 
 void AutoTrackRaymarine_pi::SetPilotStandby() {
@@ -744,7 +744,7 @@ void AutoTrackRaymarine_pi::SetPilotStandby() {
     for (unsigned int i = 0; i <= standby_command.length(); i++) {
         msg[i] = standby_command[i];
     }
-    //parseAndWriteIn(m_hSerialin, msg);
+    //parseAndWriteIn(, msg);
 }
 
 void AutoTrackRaymarine_pi::SetP70Tracking() {
@@ -755,7 +755,7 @@ void AutoTrackRaymarine_pi::SetP70Tracking() {
     for (unsigned int i = 0; i <= track.length(); i++) {
         msg[i] = track[i];
     }
-    //parseAndWriteIn(m_hSerialin, msg);
+    //parseAndWriteIn(, msg);
 }
 
 

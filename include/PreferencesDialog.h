@@ -40,9 +40,6 @@ public:
     ~PreferencesDialog();
 
     bool Show( bool show = true );
-    void FindSerialPorts();
-    wxArrayString *m_pSerialArray;
-    wxArrayString *EnumerateSerialPorts(void);
 
 private:
     void OnCancel( wxCommandEvent& event );

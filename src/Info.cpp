@@ -4,7 +4,7 @@
 * Project:  OpenCPN
 * Purpose:  AutoTrackRaymarine plugin
 * Author:   Douwe Fokkema
-*           David Register (The serial ports enumeration, copied from OpenCPN)
+*           David Register 
 *
 ***************************************************************************
 *   Copyright (C) 2019 by Douwe Fokkema                                   *
@@ -28,7 +28,6 @@
 
 #include "Info.h"
 #include "AutotrackInfoUI.h"
-#include "SerialPort.h"
 
 
 void InfoDialog::UpdateInfo() {
