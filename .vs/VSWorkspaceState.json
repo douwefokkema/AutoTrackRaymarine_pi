@@ -1,9 +1,14 @@
 {
+  "OutputFoldersPerTargetSystem": {
+    "Local Machine": [
+      "C:\\Users\\df\\CMakeBuilds\\da9cbcc9-759a-459c-b76f-96671e994efc\\build\\x86-Debug",
+      "C:\\Users\\df\\CMakeBuilds\\da9cbcc9-759a-459c-b76f-96671e994efc\\install\\x86-Debug"
+    ]
+  },
   "ExpandedNodes": [
     "",
     "\\.circleci",
-    "\\build"
+    "\\src"
   ],
-  "SelectedNode": "\\build\\AutoTrackRaymarine.sln",
   "PreviewInSolutionExplorer": false
 }

@@ -1,12 +1,12 @@
 
   execute_process(
-    COMMAND  cmake -E sha256sum C:/radar/radar_pi/Radar-v5.5.0-beta_msvc-wx32-10-win32.tar.gz
-    OUTPUT_FILE C:/radar/radar_pi/Radar-v5.5.0-beta_msvc-wx32-10-win32.sha256
+    COMMAND  cmake -E sha256sum D:/Radar/AutoTrackRaymarine_pi/Autotrackraymarine-5.5.1-beta+2305221233.b7f6a02_msvc-wx32-10.0.22621-win32.tar.gz
+    OUTPUT_FILE D:/Radar/AutoTrackRaymarine_pi/Autotrackraymarine-5.5.1-beta+2305221233.b7f6a02_msvc-wx32-10.0.22621-win32.sha256
   )
-  file(READ C:/radar/radar_pi/Radar-v5.5.0-beta_msvc-wx32-10-win32.sha256 _SHA256)
+  file(READ D:/Radar/AutoTrackRaymarine_pi/Autotrackraymarine-5.5.1-beta+2305221233.b7f6a02_msvc-wx32-10.0.22621-win32.sha256 _SHA256)
   string(REGEX MATCH "^[^ ]*" checksum ${_SHA256} )
   configure_file(
-    C:/radar/radar_pi/Radar-v5.5.0-beta-msvc-wx32-10.xml.in
-    C:/radar/radar_pi/Radar-v5.5.0-beta-msvc-wx32-10.xml
+    D:/Radar/AutoTrackRaymarine_pi/Autotrackraymarine-5.5-msvc-wx32-10.0.22621.xml.in
+    D:/Radar/AutoTrackRaymarine_pi/Autotrackraymarine-5.5-msvc-wx32-10.0.22621.xml
     @ONLY
   )

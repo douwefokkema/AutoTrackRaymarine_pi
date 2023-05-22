@@ -84,8 +84,6 @@ private:
     void HandleN2K_65359 (ObservedEvt ev); // Vessel heading, proprietary
     void HandleN2K_127250(ObservedEvt ev); // Vessel heading, standerd NMEA2000
 
-    std::shared_ptr<ObservableListener> listener_128259;
-    std::shared_ptr<ObservableListener> listener_128267;
     std::shared_ptr<ObservableListener> listener_65360;  // Autopilot heading if auto
     std::shared_ptr<ObservableListener> listener_126208; // Set pilot heading or set auto/standby
     std::shared_ptr<ObservableListener> listener_126720; // From EV1 (204) indicating auto or standby state
