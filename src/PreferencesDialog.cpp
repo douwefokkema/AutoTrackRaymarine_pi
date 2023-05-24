@@ -36,7 +36,6 @@ bool PreferencesDialog::Show( bool show )
         // load preferences
         AutoTrackRaymarine_pi::preferences &p = m_pi.prefs;
         m_sMaxAngle1->SetValue(p.max_angle);
-        m_comboBox1->SetValue(p.com_port);
 
         // Waypoint Arrival
         m_cbConfirmBearingChange->SetValue(p.confirm_bearing_change);
@@ -60,8 +59,6 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     // Waypoint Arrival
     p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
     p.intercept_route = m_cbInterceptRoute->GetValue();
-    p.com_port = m_comboBox1->GetValue();
-    // make com port now
     Hide();
 }
 

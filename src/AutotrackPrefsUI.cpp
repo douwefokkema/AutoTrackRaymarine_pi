@@ -50,16 +50,9 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer192->SetFlexibleDirection( wxBOTH );
 	fgSizer192->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText102 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Com port NGT-1"), wxDefaultPosition, wxDefaultSize, 0 );
-	m_staticText102->Wrap( -1 );
-	fgSizer192->Add( m_staticText102, 0, wxALL, 5 );
+	
 
-	m_comboBox1 = new wxComboBox( sbSizer5->GetStaticBox(), wxID_ANY, _("COM1"), wxDefaultPosition, wxDefaultSize, 0, NULL, 0 );
-	m_comboBox1->Append( _("COM1") );
-	m_comboBox1->Append( _("COM2") );
-	m_comboBox1->Append( _("COM3") );
-	m_comboBox1->SetSelection( 0 );
-	fgSizer192->Add( m_comboBox1, 0, wxALL, 5 );
+	
 
 
 	sbSizer5->Add( fgSizer192, 1, wxEXPAND, 5 );

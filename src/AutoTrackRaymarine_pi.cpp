@@ -30,9 +30,8 @@
 #include "Info.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
-#include <wx/aui/aui.h>
+
 #include <wx/stdpaths.h>
-#include <wx/wx.h>
 
 #define TURNRATE 20. // turnrate per second
 
@@ -127,7 +126,6 @@ int AutoTrackRaymarine_pi::Init(void)
     preferences& p = prefs;
 
     p.max_angle = pConf->Read("MaxAngle", 30);
-    p.com_port = pConf->Read("ActisenseComPort", "");
 
     // options
     p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
@@ -163,18 +161,6 @@ int AutoTrackRaymarine_pi::Init(void)
 
     SetStandby();
     m_initialized = true;
-
-    //  m_shareLocn = *GetpSharedDataLocation() + _T("plugins") +
-    //  wxFileName::GetPathSeparator() + _T("AutoTrackRaymarine_pi") +
-    //   wxFileName::GetPathSeparator() + _T("data") +
-    //   wxFileName::GetPathSeparator();
-    //  wxString svg_normal = m_shareLocn + wxT("tracking.svg");
-    //  m_tool_id = InsertPlugInToolSVG(wxT("Tracking"), svg_normal, svg_normal,
-    //  svg_normal, wxITEM_NORMAL, wxT("Tracking"),
-    //    _("Track following for Raymarine Evolution pilots"), NULL,
-    //    TRACKING_TOOL_POSITION, 0, this);
-    //  SetStandby();
-    //  m_initialized = true;
 
     // initialize NavMsg listeners
     //-----------------------------
@@ -235,16 +221,13 @@ int AutoTrackRaymarine_pi::Init(void)
 
 // wxBitmap* AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
-wxString AutoTrackRaymarine_pi::GetCommonName() { return wxT("XX"); }
+wxString AutoTrackRaymarine_pi::GetCommonName() { return wxT("AutotrackRaymarine_pi"); }
 
-wxString AutoTrackRaymarine_pi::GetShortDescription() { return _("XX"); }
+wxString AutoTrackRaymarine_pi::GetShortDescription() { return _("Route following for Raymarine EV-1 autopilots"); }
 
 int AutoTrackRaymarine_pi::GetAPIVersionMajor() { return MY_API_VERSION_MAJOR; }
 
 int AutoTrackRaymarine_pi::GetAPIVersionMinor() { return MY_API_VERSION_MINOR; }
-
-// int AutoTrackRaymarine_pi::GetPlugInVersionMajor() { return
-// PLUGIN_VERSION_MAJOR; }
 
 wxString AutoTrackRaymarine_pi::GetLongDescription()
 {
@@ -272,7 +255,9 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     // pointer to file
     if (!m_initialized)
         return true;
-    delete m_PreferencesDialog;
+    if (m_PreferencesDialog) {
+        delete m_PreferencesDialog;
+    }
     RemovePlugInTool(m_leftclick_tool_id);
 
     // save config
@@ -289,7 +274,6 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     preferences& p = prefs;
 
     pConf->Write("MaxAngle", p.max_angle);
-    pConf->Write("ActisenseComPort", p.com_port);
 
     // Waypoint Arrival
     pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
@@ -309,7 +293,7 @@ void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev){
     double p_h = ((unsigned int)msg[14] + 256 * (unsigned int)msg[15]) * 360.
         / 3.141 / 20000;
     m_vessel_heading = p_h + m_var;
-    wxLogMessage(wxT("$$$ 127250 heading=%f"));
+    wxLogMessage(wxT("$$$ 127250 heading=%f"), m_vessel_heading);
 }
 
 // 65360 Autopilot heading. From pilot. Transmitted only when pilot is Auto.
@@ -319,7 +303,7 @@ void AutoTrackRaymarine_pi::HandleN2K_65360(ObservedEvt ev)
     double p_h;
     std::vector<uint8_t> msg = GetN2000Payload(id_65360, ev);
     if (m_pilot_state == STANDBY) {
-        printf("new state = AUTO");
+        wxLogMessage(wxT("new state = AUTO"));
         SetAuto();
     }
     p_h = ((unsigned int)msg[8] + 256 * (unsigned int)msg[19]) * 360. / 3.141
@@ -414,9 +398,9 @@ void AutoTrackRaymarine_pi::HandleN2K_65359(ObservedEvt ev)
     NMEA2000Id id_65359(65359);
     std::vector<uint8_t> msg = GetN2000Payload(id_65359, ev);
     wxLogMessage(wxT("$$$ received 65359 len=%i"), msg.size());
-    m_vessel_heading = (((unsigned int)msg[16] + 256 * (unsigned int)msg[17])
+    m_vessel_heading = (((unsigned int)msg[18] + 256 * (unsigned int)msg[19])
         * 360. / 3.141 / 20000) + m_var;
-    wxLogMessage(wxT("$$$ 65359 heading=%f"));
+    wxLogMessage(wxT("$$$ 65359 heading=%f"), m_vessel_heading);
 }
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)

@@ -31,7 +31,6 @@
 
 #include <wx/fileconf.h>
 #include "wxWTranslateCatalog.h"
-#include "nmea0183.h"
 
 
 #define ABOUT_AUTHOR_URL 
@@ -139,8 +138,6 @@ public:
 
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
-  NMEA0183 m_NMEA0183;
-
   DriverHandle m_N2khandle;
   double m_XTE, m_BTW;
   bool m_XTE_refreshed;
@@ -168,7 +165,6 @@ public:
     // these are stored to the config
     struct preferences {
         double max_angle;
-        wxString com_port;
 
         // Waypoint Arrival
         bool confirm_bearing_change;
