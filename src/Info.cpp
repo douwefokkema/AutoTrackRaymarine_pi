@@ -70,16 +70,16 @@ void InfoDialog::OnAuto(wxCommandEvent& event) {
 
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
- /* m_pi->SetStandby();
-  m_pi->SetPilotStandby();*/
+  m_pi->SetStandby();
+  m_pi->SetPilotStandby();
 
 
   
-      std::shared_ptr <std::vector<uint8_t>> payload(new std::vector<uint8_t> ({ 1, 0xa9, 0x5d, 0xff, 0x7f, 0xff, 0x7f, 0xfd }));
+     /* std::shared_ptr <std::vector<uint8_t>> payload(new std::vector<uint8_t> ({ 1, 0xa9, 0x5d, 0xff, 0x7f, 0xff, 0x7f, 0xfd }));
       wxLogMessage(wxT("$$$ payload , %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
   int PGN = 127250;
   WriteCommDriverN2K(m_pi->m_handleN2k, PGN,
-      255, 6, payload);
+      255, 6, payload);*/
 }
 
 void InfoDialog::EnableHeadingButtons(bool show) {

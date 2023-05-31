@@ -820,7 +820,7 @@ void AutoTrackRaymarine_pi::SetPilotAuto(){
     
      wxLogMessage(wxT("$$$AutoTrackRaymarine_pi set auto"));
     int PGN = 126208;
-    WriteCommDriverN2K(m_handleN2k, PGN, 255, 6, payload);
+    WriteCommDriverN2K(m_handleN2k, PGN, 0xcc, 3, payload);
 }
 
 void AutoTrackRaymarine_pi::SetPilotStandby()
