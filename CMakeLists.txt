@@ -147,8 +147,6 @@ SET(SRCS
       src/Info.cpp
       src/icons.cpp
       src/TexFont.cpp
-      src/NGT1Read.cpp
-      src/SerialPort.cpp
 	)
 	
 SET (HDRS
@@ -158,9 +156,6 @@ SET (HDRS
       src/AutotrackPrefsUI.h
       src/Info.h
 #      src/ODAPI.h
-      src/NGT1Read.h
-      src/actisense.h
-      src/SerialPort.h
 )	
 	
 	

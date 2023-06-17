@@ -5,13 +5,8 @@ src/AutotrackPrefsUI.cpp
 src/Info.cpp
 src/icons.cpp
 src/TexFont.cpp
-src/NGT1Read.cpp
-src/SerialPort.cpp
 src/AutoTrackRaymarine_pi.h
 src/PreferencesDialog.h
 src/AutotrackInfoUI.h
 src/AutotrackPrefsUI.h
 src/Info.h
-src/NGT1Read.h
-src/actisense.h
-src/SerialPort.h
