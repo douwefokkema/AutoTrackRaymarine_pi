@@ -4,7 +4,7 @@
 * Project:  OpenCPN
 * Purpose:  AutoTrackRaymarine plugin
 * Author:   Douwe Fokkema
-*           David Register (The serial ports enumeration, copied from OpenCPN)
+*           David Register 
 *
 ***************************************************************************
 *   Copyright (C) 2019 by Douwe Fokkema                                   *
@@ -28,7 +28,6 @@
 
 #include "Info.h"
 #include "AutotrackInfoUI.h"
-#include "SerialPort.h"
 
 
 void InfoDialog::UpdateInfo() {
@@ -65,13 +64,22 @@ void InfoDialog::UpdateInfo() {
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
-  m_pi->m_serial_comms->SetAuto();   // sent auto command to pilot
+  m_pi->SetPilotAuto();   // sent auto command to pilot
   m_pi->SetAuto();
 }
 
+
 void InfoDialog::OnStandby(wxCommandEvent& event) {
-  m_pi->m_serial_comms->SetStandby();
   m_pi->SetStandby();
+  m_pi->SetPilotStandby();
+
+
+  
+     /* std::shared_ptr <std::vector<uint8_t>> payload(new std::vector<uint8_t> ({ 1, 0xa9, 0x5d, 0xff, 0x7f, 0xff, 0x7f, 0xfd }));
+      wxLogMessage(wxT("$$$ payload , %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
+  int PGN = 127250;
+  WriteCommDriverN2K(m_pi->m_handleN2k, PGN,
+      255, 6, payload);*/
 }
 
 void InfoDialog::EnableHeadingButtons(bool show) {
@@ -101,7 +109,7 @@ void InfoDialog::EnableTrackButton(bool enable) {
 void InfoDialog::OnTracking(wxCommandEvent& event) {
   if (m_pi->m_route_active) {
     if (m_pi->m_pilot_state == STANDBY) {
-      m_pi->m_serial_comms->SetAuto();
+      m_pi->SetAuto();
     }
     m_pi->SetTracking();
   }

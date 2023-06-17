@@ -224,7 +224,7 @@ void SerialPort::writeMessage(HANDLE handle, unsigned char command, const unsign
   //  if (write(handle, bst, b - bst) != b - bst)
 }
 
-void SerialPort::SetAutopilotHeading(double heading) {
+void SerialPort::SetPilotHeading(double heading) {
   // wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
   
   // commands for NGT-1 in Canboat format
