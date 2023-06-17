@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# CI-CMake: v1.0.230.0 05/03/2023  # DD/MM/YYYY format  CI-CMake Author: Jon Gough
+# CI-CMake: v1.0.238.0 11/06/2023  # DD/MM/YYYY format  CI-CMake Author: Jon Gough
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -43,13 +43,13 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "3")
-set(VERSION_TWEAK "1")
-SET(VERSION_DATE "25/03/2023") # DD/MM/YYYY format
-SET(OCPN_MIN_VERSION "ov571")
+SET(VERSION_PATCH "4")
+set(VERSION_TWEAK "0")
+SET(VERSION_DATE "17/06/2023") # DD/MM/YYYY format
+SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "17")
-set(TP_COMMENT "  * Release for O57 using CI")
+set(TP_COMMENT "  * Release for O58 using CI")
 
 set(PARENT "opencpn")
 
@@ -214,6 +214,7 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
