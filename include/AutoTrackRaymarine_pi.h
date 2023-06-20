@@ -64,14 +64,14 @@
 //----------------------------------
 
 #define MY_API_VERSION_MAJOR 1
-#define MY_API_VERSION_MINOR 8
+#define MY_API_VERSION_MINOR 18
 
 class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
 class InfoDialog;
 
-class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_117
+class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
   //friend InfoDialog;
 private:

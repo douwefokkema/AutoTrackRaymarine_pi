@@ -70,10 +70,9 @@ void InfoDialog::OnAuto(wxCommandEvent& event) {
 
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
-  m_pi->SetStandby();
+  
   m_pi->SetPilotStandby();
-
-
+  m_pi->SetStandby();
   
      /* std::shared_ptr <std::vector<uint8_t>> payload(new std::vector<uint8_t> ({ 1, 0xa9, 0x5d, 0xff, 0x7f, 0xff, 0x7f, 0xfd }));
       wxLogMessage(wxT("$$$ payload , %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
@@ -110,6 +109,7 @@ void InfoDialog::OnTracking(wxCommandEvent& event) {
   if (m_pi->m_route_active) {
     if (m_pi->m_pilot_state == STANDBY) {
       m_pi->SetAuto();
+      m_pi->SetPilotAuto();
     }
     m_pi->SetTracking();
   }
