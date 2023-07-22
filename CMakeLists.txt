@@ -41,21 +41,15 @@ set(PACKAGE "AutoTrackRaymarine")
 set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
 set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
 
-SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "4")
-set(VERSION_TWEAK "0")
-<<<<<<< HEAD
+#SET(VERSION_MAJOR "1")
+#SET(VERSION_MINOR "1")
+#SET(VERSION_PATCH "4")
+#set(VERSION_TWEAK "0")
+
 SET(VERSION_DATE "25/06/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "18")
-=======
-SET(VERSION_DATE "17/06/2023") # DD/MM/YYYY format
-SET(OCPN_MIN_VERSION "ov58")
-set(OCPN_API_VERSION_MAJOR "1")
-set(OCPN_API_VERSION_MINOR "17")
->>>>>>> 86d9bb3771f5f6b1b90b5a110dcc3ada34526130
 set(TP_COMMENT "  * Release for O58 using CI")
 
 set(PARENT "opencpn")
