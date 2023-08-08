@@ -43,9 +43,9 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "18")
-SET(VERSION_PATCH "2")
+SET(VERSION_PATCH "4")
 set(VERSION_TWEAK "0")
-SET(VERSION_DATE "07/08/2023") # DD/MM/YYYY format
+SET(VERSION_DATE "08/08/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "18")
@@ -178,7 +178,7 @@ set(OCPNHDRS
 #)
 
 set(EXTINCLUDE
-    extinclude/ODAPI.h
+#    extinclude/ODAPI.h
     extinclude/ODJSONSchemas.h
 )
 
