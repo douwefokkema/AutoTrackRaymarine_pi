@@ -43,7 +43,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "18")
-SET(VERSION_PATCH "1")
+SET(VERSION_PATCH "2")
 set(VERSION_TWEAK "0")
 SET(VERSION_DATE "07/08/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
@@ -146,7 +146,7 @@ SET(SRCS
       src/AutotrackPrefsUI.cpp
       src/Info.cpp
       src/icons.cpp
-      src/TexFont.cpp
+#      src/TexFont.cpp
 	)
 	
 SET (HDRS
@@ -159,20 +159,20 @@ SET (HDRS
 )	
 	
 	
-#set(OCPNSRC
-#    ocpnsrc/cutil.cpp
-#    ocpnsrc/TexFont.cpp
-#)
+set(OCPNSRC
+    ocpnsrc/cutil.cpp
+    ocpnsrc/TexFont.cpp
+)
 
-#set(OCPNHDRS
-#    ocpninclude/cutil.h
-#    ocpninclude/pluginmanager.h
-#    ocpninclude/shaders.h
-#    ocpninclude/TexFont.h
-#    ocpninclude/vector2D.h
-#    ocpninclude/ocpn_plugin.h
-#    libs/ocpn-api/ocpn_plugin.h
-#)
+set(OCPNHDRS
+    ocpninclude/cutil.h
+    ocpninclude/pluginmanager.h
+    ocpninclude/shaders.h
+    ocpninclude/TexFont.h
+    ocpninclude/vector2D.h
+    ocpninclude/ocpn_plugin.h
+    libs/ocpn-api/ocpn_plugin.h
+)
 
 #set(EXTSRC
 #)
@@ -182,17 +182,17 @@ set(EXTINCLUDE
     extinclude/ODJSONSchemas.h
 )
 
-#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
-#set(LIBHDRS
-#    libs/GL/gl.h
-#    libs/GL/gl_private.h
-#    libs/GL/glext.h
-#    libs/GL/glu.h
-#    libs/wxJSON/include/json_defs.h
-#    libs/wxJSON/include/jsonreader.h
-#    libs/wxJSON/include/jsonval.h
-#    libs/wxJSON/include/jsonwriter.h)
+set(LIBHDRS
+    libs/GL/gl.h
+    libs/GL/gl_private.h
+    libs/GL/glext.h
+    libs/GL/glu.h
+    libs/wxJSON/include/json_defs.h
+    libs/wxJSON/include/jsonreader.h
+    libs/wxJSON/include/jsonval.h
+    libs/wxJSON/include/jsonwriter.h)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -209,14 +209,14 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 #
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
 
@@ -257,6 +257,8 @@ if(NOT OCPN_FLATPAK_CONFIG)
 #	target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 	
 endif(NOT OCPN_FLATPAK_CONFIG)
+
+add_definitions(-DTIXML_USE_STL)
 
 #
 # ----- If using JSON validation in plugin section below is needed ----- ##
