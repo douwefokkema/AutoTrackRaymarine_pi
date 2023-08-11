@@ -43,7 +43,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "18")
-SET(VERSION_PATCH "12")
+SET(VERSION_PATCH "13")
 set(VERSION_TWEAK "0")
 SET(VERSION_DATE "11/08/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
