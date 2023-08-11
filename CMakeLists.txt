@@ -43,9 +43,9 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution 
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "18")
-SET(VERSION_PATCH "10")
+SET(VERSION_PATCH "11")
 set(VERSION_TWEAK "0")
-SET(VERSION_DATE "08/08/2023") # DD/MM/YYYY format
+SET(VERSION_DATE "11/08/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "18")
@@ -146,7 +146,8 @@ SET(SRCS
       src/AutotrackPrefsUI.cpp
       src/Info.cpp
       src/icons.cpp
-#      src/TexFont.cpp
+      src/TexFont.cpp
+
 	)
 	
 SET (HDRS
@@ -155,22 +156,23 @@ SET (HDRS
       src/AutotrackInfoUI.h
       src/AutotrackPrefsUI.h
       src/Info.h
-#      src/ODAPI.h
+      src/ODAPI.h
+	  src/TexFont.h	  
 )	
 	
 	
 set(OCPNSRC
     ocpnsrc/cutil.cpp
-    ocpnsrc/TexFont.cpp
+#    ocpnsrc/TexFont.cpp
 )
 
 set(OCPNHDRS
     ocpninclude/cutil.h
     ocpninclude/pluginmanager.h
     ocpninclude/shaders.h
-    ocpninclude/TexFont.h
+#    ocpninclude/TexFont.h
     ocpninclude/vector2D.h
-    ocpninclude/ocpn_plugin.h
+#    ocpninclude/ocpn_plugin.h
     libs/ocpn-api/ocpn_plugin.h
 )
 
@@ -178,7 +180,7 @@ set(OCPNHDRS
 #)
 
 set(EXTINCLUDE
-#    extinclude/ODAPI.h
+    extinclude/ODAPI.h
     extinclude/ODJSONSchemas.h
 )
 
