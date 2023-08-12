@@ -147,7 +147,9 @@ SET(SRCS
       src/Info.cpp
       src/icons.cpp
       src/TexFont.cpp
-
+#	  src/jsonreader.cpp
+#     src/jsonwriter.cpp	  
+#	  src/jsonval.cpp
 	)
 	
 SET (HDRS
@@ -156,8 +158,11 @@ SET (HDRS
       src/AutotrackInfoUI.h
       src/AutotrackPrefsUI.h
       src/Info.h
-#      src/ODAPI.h
-	  src/TexFont.h	  
+#     src/ODAPI.h
+#	  src/TexFont.h
+#	  src/json_defs.h
+#	  libs\wxJSON\include\jsonreader.h
+#	  src/jsonval.h
 )	
 	
 	
@@ -194,7 +199,8 @@ set(LIBHDRS
     libs/wxJSON/include/json_defs.h
     libs/wxJSON/include/jsonreader.h
     libs/wxJSON/include/jsonval.h
-    libs/wxJSON/include/jsonwriter.h)
+    libs/wxJSON/include/jsonwriter.h
+	)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -218,9 +224,10 @@ include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 
@@ -238,7 +245,7 @@ endif(QT_ANDROID)
 
 
 # ------------------------------------------------------------------------------------------
-target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
+target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC} ${LIBHRS})
 # ------------------------------------------------------------------------------------------
 
 
