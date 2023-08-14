@@ -4,6 +4,7 @@ src/AutotrackInfoUI.cpp
 src/AutotrackPrefsUI.cpp
 src/Info.cpp
 src/icons.cpp
+src/TexFont.cpp
 src/AutoTrackRaymarine_pi.h
 src/PreferencesDialog.h
 src/AutotrackInfoUI.h

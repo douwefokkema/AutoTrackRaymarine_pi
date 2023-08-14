@@ -30,8 +30,9 @@
 #include "wx/wx.h"
 
 #include <wx/fileconf.h>
-#include "wxWTranslateCatalog.h"
 
+#include "version.h"
+#include "wxWTranslateCatalog.h"
 
 #define ABOUT_AUTHOR_URL 
 #define OPC wxS("opencpn-AutoTrackRaymarine_pi")
@@ -63,8 +64,8 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
-#define MY_API_VERSION_MAJOR 1
-#define MY_API_VERSION_MINOR 18
+//#define MY_API_VERSION_MAJOR 1
+//#define MY_API_VERSION_MINOR 18
 
 class apDC;
 class ConsoleCanvas;
@@ -108,8 +109,10 @@ public:
 
   int GetAPIVersionMajor();
   int GetAPIVersionMinor();
-  //int GetPlugInVersionPatch();
-  //wxBitmap *GetPlugInBitmap();
+  int GetPlugInVersionMajor();
+  int GetPlugInVersionMinor();
+  int GetPlugInVersionPatch();
+  wxBitmap *GetPlugInBitmap();
   wxString GetCommonName();
   wxString GetShortDescription();
   wxString GetLongDescription();

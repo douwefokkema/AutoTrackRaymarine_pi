@@ -38,14 +38,14 @@ set(COMMON_NAME "AutoTrackRaymarine")
 set(TITLE_NAME "AutoTrackRaymarine")
 set(PACKAGE_CONTACT "Douwe Fokkema")
 set(PACKAGE "AutoTrackRaymarine")
-set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
-set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
+set(SHORT_DESCRIPTION "Route following for Raymarine EV-1 Autopilots ")
+set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
 SET(VERSION_MAJOR "1")
 SET(VERSION_MINOR "18")
-SET(VERSION_PATCH "13")
+SET(VERSION_PATCH "20")
 set(VERSION_TWEAK "0")
-SET(VERSION_DATE "11/08/2023") # DD/MM/YYYY format
+SET(VERSION_DATE "13/08/2023") # DD/MM/YYYY format
 SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
 set(OCPN_API_VERSION_MINOR "18")

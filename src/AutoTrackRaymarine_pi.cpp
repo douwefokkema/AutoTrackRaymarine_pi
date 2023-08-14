@@ -53,6 +53,7 @@ extern "C" DECL_EXP opencpn_plugin* create_pi(void* ppimgr)
 
 extern "C" DECL_EXP void destroy_pi(opencpn_plugin* p) { delete p; }
 
+#include "icons.h"
 //-----------------------------------------------------------------------------
 //
 //    AutoTrackRaymarine PlugIn Implementation
@@ -103,7 +104,7 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void* ppimgr)
 
 int AutoTrackRaymarine_pi::Init(void)
 {
-    // AddLocaleCatalog(PLUGIN_CATALOG_NAME);
+ AddLocaleCatalog(PLUGIN_CATALOG_NAME);
 
     // Read Config
     wxFileConfig* pConf = GetOCPNConfigObject();
@@ -220,19 +221,16 @@ static double oldpilotheading = 0.;
 
 // wxBitmap* AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
-wxString AutoTrackRaymarine_pi::GetCommonName() { return wxT("AutotrackRaymarine_pi"); }
+wxString AutoTrackRaymarine_pi::GetCommonName() { return _T(PLUGIN_COMMON_NAME); }
+int AutoTrackRaymarine_pi::GetAPIVersionMajor() {return OCPN_API_VERSION_MAJOR; }
+int AutoTrackRaymarine_pi::GetAPIVersionMinor() { return OCPN_API_VERSION_MINOR; }
+wxString AutoTrackRaymarine_pi::GetShortDescription() { return _(PLUGIN_SHORT_DESCRIPTION); }
+wxString AutoTrackRaymarine_pi::GetLongDescription() { return _(PLUGIN_LONG_DESCRIPTION); }
+int AutoTrackRaymarine_pi::GetPlugInVersionMajor() { return PLUGIN_VERSION_MAJOR; }
+int AutoTrackRaymarine_pi::GetPlugInVersionMinor() { return PLUGIN_VERSION_MINOR; }
+int AutoTrackRaymarine_pi::GetPlugInVersionPatch() { return PLUGIN_VERSION_PATCH; }
 
-wxString AutoTrackRaymarine_pi::GetShortDescription() { return _("Route following for Raymarine EV-1 autopilots"); }
-
-int AutoTrackRaymarine_pi::GetAPIVersionMajor() { return MY_API_VERSION_MAJOR; }
-
-int AutoTrackRaymarine_pi::GetAPIVersionMinor() { return MY_API_VERSION_MINOR; }
-
-wxString AutoTrackRaymarine_pi::GetLongDescription()
-{
-    return _("Route following for Raymarine EV pilots")
-        + wxT("\n") /*+ wxT(PLUGIN_VERSION_WITH_DATE)*/;
-}
+wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return &m_panelBitmap; }
 
 // wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
@@ -285,7 +283,7 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     return true;
 }
 
- // Vessel heading, standerd NMEA2000
+ // Vessel heading, standard NMEA2000
 void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev){
     NMEA2000Id id_127250(127250);
     std::vector<uint8_t> msg = GetN2000Payload(id_127250, ev);
@@ -361,10 +359,9 @@ void AutoTrackRaymarine_pi::HandleN2K_126208(ObservedEvt ev)
     }
 }
 
-
 //case 126720: // message from EV1 (204) indicating auto or standby state
- 
-void AutoTrackRaymarine_pi::HandleN2K_126720(ObservedEvt ev){ 
+
+void AutoTrackRaymarine_pi::HandleN2K_126720(ObservedEvt ev){
     NMEA2000Id id_126720(126720);
     std::vector<uint8_t> msg = GetN2000Payload(id_126720, ev);
     int msgLen = msg.size();
@@ -385,7 +382,6 @@ void AutoTrackRaymarine_pi::HandleN2K_126720(ObservedEvt ev){
         }
     }
 }
-
 
 //  heading all the time
 void AutoTrackRaymarine_pi::HandleN2K_65359(ObservedEvt ev)
@@ -435,7 +431,7 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(
 {
     if (!m_initialized) {
         return true;
-    }
+		}
     if (m_info_dialog) {
         m_info_dialog->UpdateInfo();
     }
@@ -542,6 +538,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
     if (message_id == wxS("AutoTrackRaymarine_pi")) {
         return; // nothing yet
     } else if (message_id == wxS("AIS")) {
+
     } else if (message_id == "OCPN_RTE_ACTIVATED") {
         ResetXTE();
         if (m_pilot_state == TRACKING) {
@@ -772,7 +769,7 @@ void AutoTrackRaymarine_pi::SetPilotHeading(double heading)
     std::shared_ptr<std::vector<uint8_t>> payload(new std::vector<uint8_t>(
                 { 0x01, 0x50, 0xff, 0x00, 0xf8, 0x03, 0x01, 0x3b, 0x07, 0x03, 0x04, 0x06, 0x00, 0x00 }));
     //wxLogMessage(wxT("$$$ payload %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
-    
+
     double heading_normal = heading;
     while (heading_normal < 0)  heading_normal += 360;
     while (heading_normal >= 360)
