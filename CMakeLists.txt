@@ -3,7 +3,7 @@
 ## Copyright:   
 ## License:     GPLv3+
 ##---------------------------------------------------------------------------
-# CI-CMake: v1.0.230.0 05/03/2023  # DD/MM/YYYY format  CI-CMake Author: Jon Gough
+# CI-CMake: v1.0.253.0 07/08/2023  # DD/MM/YYYY format  CI-CMake Author: Jon Gough
 # ---------------------------------------------------------------------------
 
 ## ----- When changing this file do NOT change the order in which sections occur        ----- ##
@@ -38,18 +38,18 @@ set(COMMON_NAME "AutoTrackRaymarine")
 set(TITLE_NAME "AutoTrackRaymarine")
 set(PACKAGE_CONTACT "Douwe Fokkema")
 set(PACKAGE "AutoTrackRaymarine")
-set(SHORT_DESCRIPTION "AutoTrackRaymarine PlugIn for OpenCPN")
-set(LONG_DESCRIPTION "Route tracking and remote control for Raymarine Evolution pilots")
+set(SHORT_DESCRIPTION "Route following for Raymarine EV-1 Autopilots ")
+set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
 SET(VERSION_MAJOR "1")
-SET(VERSION_MINOR "1")
-SET(VERSION_PATCH "3")
-set(VERSION_TWEAK "1")
-SET(VERSION_DATE "25/03/2023") # DD/MM/YYYY format
-SET(OCPN_MIN_VERSION "ov571")
+SET(VERSION_MINOR "18")
+SET(VERSION_PATCH "20")
+set(VERSION_TWEAK "0")
+SET(VERSION_DATE "13/08/2023") # DD/MM/YYYY format
+SET(OCPN_MIN_VERSION "ov58")
 set(OCPN_API_VERSION_MAJOR "1")
-set(OCPN_API_VERSION_MINOR "17")
-set(TP_COMMENT "  * Release for O57 using CI")
+set(OCPN_API_VERSION_MINOR "18")
+set(TP_COMMENT "  * Release for O58 using CI")
 
 set(PARENT "opencpn")
 
@@ -147,8 +147,9 @@ SET(SRCS
       src/Info.cpp
       src/icons.cpp
       src/TexFont.cpp
-      src/NGT1Read.cpp
-      src/SerialPort.cpp
+#	  src/jsonreader.cpp
+#     src/jsonwriter.cpp	  
+#	  src/jsonval.cpp
 	)
 	
 SET (HDRS
@@ -157,27 +158,28 @@ SET (HDRS
       src/AutotrackInfoUI.h
       src/AutotrackPrefsUI.h
       src/Info.h
-#      src/ODAPI.h
-      src/NGT1Read.h
-      src/actisense.h
-      src/SerialPort.h
+#     src/ODAPI.h
+#	  src/TexFont.h
+#	  src/json_defs.h
+#	  libs\wxJSON\include\jsonreader.h
+#	  src/jsonval.h
 )	
 	
 	
-#set(OCPNSRC
-#    ocpnsrc/cutil.cpp
+set(OCPNSRC
+    ocpnsrc/cutil.cpp
 #    ocpnsrc/TexFont.cpp
-#)
+)
 
-#set(OCPNHDRS
-#    ocpninclude/cutil.h
-#    ocpninclude/pluginmanager.h
-#    ocpninclude/shaders.h
+set(OCPNHDRS
+    ocpninclude/cutil.h
+    ocpninclude/pluginmanager.h
+    ocpninclude/shaders.h
 #    ocpninclude/TexFont.h
-#    ocpninclude/vector2D.h
+    ocpninclude/vector2D.h
 #    ocpninclude/ocpn_plugin.h
-#    libs/ocpn-api/ocpn_plugin.h
-#)
+    libs/ocpn-api/ocpn_plugin.h
+)
 
 #set(EXTSRC
 #)
@@ -187,17 +189,18 @@ set(EXTINCLUDE
     extinclude/ODJSONSchemas.h
 )
 
-#set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
+set(LIBSSRC libs/wxJSON/src/jsonreader.cpp libs/wxJSON/src/jsonval.cpp libs/wxJSON/src/jsonwriter.cpp)
 
-#set(LIBHDRS
-#    libs/GL/gl.h
-#    libs/GL/gl_private.h
-#    libs/GL/glext.h
-#    libs/GL/glu.h
-#    libs/wxJSON/include/json_defs.h
-#    libs/wxJSON/include/jsonreader.h
-#    libs/wxJSON/include/jsonval.h
-#    libs/wxJSON/include/jsonwriter.h)
+set(LIBHDRS
+    libs/GL/gl.h
+    libs/GL/gl_private.h
+    libs/GL/glext.h
+    libs/GL/glu.h
+    libs/wxJSON/include/json_defs.h
+    libs/wxJSON/include/jsonreader.h
+    libs/wxJSON/include/jsonval.h
+    libs/wxJSON/include/jsonwriter.h
+	)
 
 add_definitions(-DPLUGIN_USE_SVG)
 
@@ -214,15 +217,17 @@ set(EXTINCLUDE_DIR ${EXTINCLUDE_DIR} extinclude libs/ocpn-api/)
 #
 
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/ocpninclude)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/${EXTINCLUDE_DIR})
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/GL)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/ocpn-api)
-#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
-include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON)
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/wxJSON/include)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp)
+#include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/jsoncpp/include)
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/plugingl/include)
 
@@ -240,7 +245,7 @@ endif(QT_ANDROID)
 
 
 # ------------------------------------------------------------------------------------------
-target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC})
+target_sources(${PACKAGE_NAME} PUBLIC ${SRCS} ${HDRS} ${OCPNSRC} ${EXTSRC} ${LIBSSRC} ${LIBHRS})
 # ------------------------------------------------------------------------------------------
 
 
@@ -261,6 +266,8 @@ if(NOT OCPN_FLATPAK_CONFIG)
 #	target_link_libraries(${PACKAGE_NAME} ocpn::plugingl)
 	
 endif(NOT OCPN_FLATPAK_CONFIG)
+
+add_definitions(-DTIXML_USE_STL)
 
 #
 # ----- If using JSON validation in plugin section below is needed ----- ##

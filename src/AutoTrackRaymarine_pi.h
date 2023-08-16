@@ -33,16 +33,13 @@
 
 #include "version.h"
 #include "wxWTranslateCatalog.h"
-#include "nmea0183.h"
-
-//#define     MY_API_VERSION_MAJOR    1
-//#define     MY_API_VERSION_MINOR    17
 
 #define ABOUT_AUTHOR_URL 
 #define OPC wxS("opencpn-AutoTrackRaymarine_pi")
 
 #include <list>
 #include <map>
+
 
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #ifdef OPC
@@ -59,6 +56,7 @@
 #include "ocpn_plugin.h"
 
 #ifdef __MSVC__
+//#include <string>
 #include "msvcdefs.h"
 #endif
 
@@ -66,21 +64,48 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
+//#define MY_API_VERSION_MAJOR 1
+//#define MY_API_VERSION_MINOR 18
+
 class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
-//class NGT1Input;
-class SerialPort;
-//class m_dialog;
 class InfoDialog;
 
-class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_117
+class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
   //friend InfoDialog;
+private:
+    //std::shared_ptr<ObservableListener> listener;
+
+    void HandleN2K_65360 (ObservedEvt ev); // Pilot heading
+    void HandleN2K_126208(ObservedEvt ev); // Set Set pilot heading or set auto/standby
+    void HandleN2K_126720(ObservedEvt ev); // From EV1 (204) indicating auto or standby state
+    void HandleN2K_65359 (ObservedEvt ev); // Vessel heading, proprietary
+    void HandleN2K_127250(ObservedEvt ev); // Vessel heading, standerd NMEA2000
+
+    std::shared_ptr<ObservableListener> listener_65360;  // Autopilot heading if auto
+    std::shared_ptr<ObservableListener> listener_126208; // Set pilot heading or set auto/standby
+    std::shared_ptr<ObservableListener> listener_126720; // From EV1 (204) indicating auto or standby state
+    std::shared_ptr<ObservableListener> listener_65359;  // Vessel heading
+    std::shared_ptr<ObservableListener> listener_127250; // Vessel heading
+
+    /*std::string prio127245;
+    std::string prio127257;
+    std::string prio128259;
+    std::string prio128267;
+    std::string prio129029;
+    std::string prioN2kPGNsat;
+    std::string prio130306;*/
+
+    wxString m_self;
+
+
 public:
   AutoTrackRaymarine_pi(void *ppimgr);
   int Init(void);
   bool DeInit(void);
+  DriverHandle m_handleN2k;
 
   int GetAPIVersionMajor();
   int GetAPIVersionMinor();
@@ -95,6 +120,9 @@ public:
 
   void ShowPreferencesDialog(wxWindow* parent);
 
+  //wxBitmap* GetPlugInBitmap();
+ 
+
   bool RenderOverlay(wxDC &dc, PlugIn_ViewPort *vp);
   bool RenderGLOverlay(wxGLContext *pcontext, PlugIn_ViewPort *vp);
 
@@ -104,15 +132,16 @@ public:
   void SetStandby();
   void SetAuto();
   void SetTracking();
-
-  SerialPort *m_serial_comms;
+  void SetPilotHeading(double heading);
+  void SetPilotAuto();
+  void SetPilotStandby();
+  void SetP70Tracking();
 
   static wxString StandardPath();
 
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
-  NMEA0183 m_NMEA0183;
-
+  DriverHandle m_N2khandle;
   double m_XTE, m_BTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
@@ -135,10 +164,10 @@ public:
   void ResetXTE() {
       m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
   }
+  
     // these are stored to the config
     struct preferences {
         double max_angle;
-        wxString com_port;
 
         // Waypoint Arrival
         bool confirm_bearing_change;
