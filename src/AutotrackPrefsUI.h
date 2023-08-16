@@ -40,7 +40,6 @@ class PreferencesDialogBase : public wxDialog
 		wxStaticText* m_staticText101;
 		wxSpinCtrl* m_sMaxAngle1;
 		wxStaticText* m_staticText102;
-		wxComboBox* m_comboBox1;
 		wxCheckBox* m_cbConfirmBearingChange;
 		wxCheckBox* m_cbInterceptRoute;
 		wxStdDialogButtonSizer* m_sdbSizer1;
