@@ -36,20 +36,12 @@
 #define COLS_GLYPHS 16
 #define ROWS_GLYPHS ((NUM_GLYPHS / COLS_GLYPHS)+1)
 
-#ifndef DECL_EXP
-#ifdef __MSVC__
-#  define DECL_EXP     __declspec(dllexport)
-#else
-#  define DECL_EXP
-#endif
-#endif
-
 struct TexGlyphInfo {
     int x, y, width, height;
     float advance;
 };
 
-class DECL_EXP TexFont {
+class TexFont {
 public:
     TexFont();
     ~TexFont();
@@ -57,13 +49,14 @@ public:
     void Build( wxFont &font, bool blur = false );
     void Delete();
 
-    void GetTextExtent( const char *string, int len, int *width, int *height);
     void GetTextExtent( const wxString &string, int *width, int *height);
     void RenderString( const char *string, int x=0, int y=0 );
     void RenderString( const wxString &string, int x=0, int y=0 );
-
-
+    bool IsBuilt(){ return m_built; }
+    void SetColor(wxColor &color){ m_color = color;}
+    
 private:
+    void GetTextExtent( const char *string, int *width, int *height);
     void RenderGlyph( int c );
 
     wxFont m_font;
@@ -75,6 +68,10 @@ private:
     int tex_w, tex_h;
     int m_maxglyphw;
     int m_maxglyphh;
+    bool m_built;
     
+    float m_dx;
+    float m_dy;
+    wxColor m_color;
 };
 #endif  //guard

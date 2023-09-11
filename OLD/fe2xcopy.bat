@@ -19,8 +19,13 @@ xcopy /s %source%\cmake\ .\cmake\
 rem xcopy /s %source%\cmake\in-files\
 xcopy /s %source%\.circleci\ .\.circleci\
 xcopy /s %source%\mingw\ .\mingw\
+xcopy /s %source%\msvc\ .\msvc\
 xcopy /s %source%\appveyor.yml 
-xcopy /s %source%\.travis.yml
+xcopy /s %source%\.travis.yml\
+rem extinclude
+rem ocpninclude
+rem ocpnsrc
+
 
 
 Rem xcopy.exe is definitely your friend here. It's built into Windows, so its cost is nothing.
