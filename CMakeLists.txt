@@ -55,7 +55,7 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "18")
-set(VERSION_PATCH "21")
+set(VERSION_PATCH "22")
 set(VERSION_TWEAK "0")
 set(VERSION_DATE  "23/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
