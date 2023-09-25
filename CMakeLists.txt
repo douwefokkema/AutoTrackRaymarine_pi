@@ -55,9 +55,9 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "18")
-set(VERSION_PATCH "23")
+set(VERSION_PATCH "24")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "23/09/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "25/09/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
@@ -183,7 +183,6 @@ SET(SRC ${SRCS} ${HDRS} )
 ##=============================================================
 
 #include_directories(BEFORE ${PROJECT_SOURCE_DIR}/include)
-
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/opencpn-libs/glu/include)
 include_directories(BEFORE ${PROJECT_SOURCE_DIR}/libs/serial)
 
@@ -208,11 +207,6 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/tinyxml)
     target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
 
-#    add_subdirectory(opencpn-libs/ODAPI)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::odapi)
-
-#    add_subdirectory(opencpn-libs/glu)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::glu)
 
     add_subdirectory(opencpn-libs/jsonlib)
     target_link_libraries(${PACKAGE_NAME} ocpn::jsonlib)
@@ -226,16 +220,6 @@ if(NOT OCPN_FLATPAK_CONFIG)
     add_subdirectory(opencpn-libs/nmea0183)
     target_link_libraries(${PACKAGE_NAME} ocpn::nmea0183)
 
-#    add_subdirectory(libs/jsoncpp)
-#    add_subdirectory(libs/nmea0183)
-#    add_subdirectory(libs/serial)	
-#    add_subdirectory(libs/tinyxml)
-#    add_subdirectory(libs/pluginDC)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::jsoncpp)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::nmea0183)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::serial)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::tinyxml)
-#    target_link_libraries(${PACKAGE_NAME} ocpn::pluginDC)
 endif(NOT OCPN_FLATPAK_CONFIG)
 
 add_definitions(-DTIXML_USE_STL)
