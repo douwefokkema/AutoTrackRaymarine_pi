@@ -55,9 +55,9 @@ set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "18")
-set(VERSION_PATCH "28")
+set(VERSION_PATCH "30")
 set(VERSION_TWEAK "0")
-set(VERSION_DATE  "07/10/2023")#DD/MM/YYYY format
+set(VERSION_DATE  "09/10/2023")#DD/MM/YYYY format
 set(OCPN_MIN_VERSION "ov58")
 
 set(OCPN_API_VERSION_MAJOR "1")
@@ -65,7 +65,6 @@ set(OCPN_API_VERSION_MINOR "18")
 set(TP_COMMENT "  * Release using CI")
 
 set(PARENT "opencpn")
-
 #Use to set up a local webserver with git installed.
 #Default is github.com. Now set in pluginconfigure.cmake
 #set(GIT_REPOSITORY_SERVER "github.com")
