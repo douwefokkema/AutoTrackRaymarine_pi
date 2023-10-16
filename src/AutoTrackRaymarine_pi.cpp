@@ -26,7 +26,6 @@
 
 #include "AutoTrackRaymarine_pi.h"
 #include "AutotrackInfoUI.h"
-#include "GL/gl.h"
 #include "Info.h"
 #include "PreferencesDialog.h"
 #include "icons.h"
