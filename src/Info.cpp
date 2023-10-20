@@ -32,11 +32,11 @@
 
 void InfoDialog::UpdateInfo() {
     if (m_pi->m_pilot_state == TRACKING)
-      TextStatus11->SetLabel(_("Tracking"));
+      TextStatus11->SetValue(_("Tracking"));
     if (m_pi->m_pilot_state == AUTO)
-      TextStatus11->SetLabel(_("Auto"));
+      TextStatus11->SetValue(_("Auto"));
     if (m_pi->m_pilot_state == STANDBY)
-      TextStatus11->SetLabel(_("Standby"));
+      TextStatus11->SetValue(_("Standby"));
     wxString pilot_heading;
     if (m_pi->m_pilot_heading == -1.) {
       pilot_heading = _("----");
@@ -44,7 +44,7 @@ void InfoDialog::UpdateInfo() {
     else {
       pilot_heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_pilot_heading);
     }
-    TextStatus14->SetLabel(pilot_heading);
+    TextStatus14->SetValue(pilot_heading);
     wxString heading;
     if (m_pi->m_vessel_heading == -1.) {
       heading = _("----");
@@ -52,7 +52,7 @@ void InfoDialog::UpdateInfo() {
     else {
       heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_vessel_heading);
     }
-    TextStatus12->SetLabel(heading);
+    TextStatus12->SetValue(heading);
     wxString xte;
     if (m_pi->m_XTE == 100000.) {
       xte = _("----");
@@ -60,7 +60,7 @@ void InfoDialog::UpdateInfo() {
     else {
       xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE * 1852.);
     }
-    TextStatus121->SetLabel(xte);
+    TextStatus121->SetValue(xte);
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
