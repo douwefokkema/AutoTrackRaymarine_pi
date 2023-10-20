@@ -61,26 +61,26 @@ workflows:
 ## -------------------------------------------
 ## OpenCPN 5.6.2 Plugins  Frozen - 28/05/2023
 ## ------------------------------------------
-#        - build-macos:
-#             <<: *std-filters
+        - build-macos:
+             <<: *std-filters
 ## Appveyor no longer builds for Windows.
-#        - build-msvc-2022:
-#            <<: *std-filters
-#        - build-debian-armhf-10-buster:
-#            <<: *std-filters
-#        - build-debian-armhf-10-buster-gtk3:
-#            <<: *std-filters
-#        - build-debian-arm64-10-buster:
-#            <<: *std-filters
-#        - build-debian-x86_64-10-buster:
-#            <<: *std-filters
+        - build-msvc-2022:
+            <<: *std-filters
+        - build-debian-armhf-10-buster:
+            <<: *std-filters
+        - build-debian-armhf-10-buster-gtk3:
+            <<: *std-filters
+        - build-debian-arm64-10-buster:
+            <<: *std-filters
+        - build-debian-x86_64-10-buster:
+            <<: *std-filters
 
 ## -------------------------------------
 ## UBUNTU OS  Frozen - 28/05/2023  DROP
 ## -------------------------------------
 ## KEEP needed for Raspbian OpenCPN v5.6
-#        - build-ubuntu-armhf-1804-buster:
-#            <<: *std-filters
+        - build-ubuntu-armhf-1804-buster:
+            <<: *std-filters
 ##        - build-ubuntu-x86_64-1804-bionic:
 ##            <<: *std-filters
 ##        - build-ubuntu-x86_64-1804-bionic-gtk3:
@@ -155,7 +155,7 @@ jobs:
             install-python: true
     build-macos-wx32:
         macos:
-            xcode: "12.5.1"
+            xcode: "13.4"
         resource_class: macos.x86.medium.gen2
         environment:
         - OCPN_TARGET:  macos
@@ -350,7 +350,7 @@ jobs:
 ## ---------------------
     build-macos:
         macos:
-            xcode: "12.5.1"
+            xcode: "13.4"
         resource_class: macos.x86.medium.gen2
         environment:
         - OCPN_TARGET:  macos
