@@ -288,6 +288,7 @@ void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev){
     std::vector<uint8_t> msg = GetN2000Payload(id_127250, ev);
     double p_h = ((unsigned int)msg[14] + 256 * (unsigned int)msg[15]) * 360.
         / 3.141 / 20000;
+    wxLogMessage(wxT("$$$ test 127250 received p_h = %f"), p_h);
     m_vessel_heading = p_h + m_var;
 }
 
