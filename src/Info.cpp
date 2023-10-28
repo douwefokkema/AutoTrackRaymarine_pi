@@ -49,6 +49,9 @@ void InfoDialog::UpdateInfo() {
     if (m_pi->m_vessel_heading == -1.) {
       heading = _("----");
     }
+    else if (isnan(m_pi->m_var)) {
+        heading = _("no variation");
+    }
     else {
       heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_vessel_heading);
     }
