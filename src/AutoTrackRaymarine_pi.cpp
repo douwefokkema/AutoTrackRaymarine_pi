@@ -113,6 +113,7 @@ int AutoTrackRaymarine_pi::Init(void)
     m_current_bearing = 0.;
     m_XTE = 0.;
     m_BTW = 0.;
+    m_DTW = 0.;
     m_var = 0.;
     m_XTE_P = 0.;
     m_XTE_I = 0.;
@@ -122,17 +123,10 @@ int AutoTrackRaymarine_pi::Init(void)
     SetStandby();
 
     // Mode
-    preferences& p = prefs;
+    preferences& p = m_prefs;
 
     p.max_angle = pConf->Read("MaxAngle", 30);
-
-    // options
-    p.confirm_bearing_change = (bool)pConf->Read("ConfirmBearingChange", 0L);
-    p.intercept_route = (bool)pConf->Read("InterceptRoute", 1L);
-
-    // Boundary
-    p.boundary_guid = pConf->Read("Boundary", "");
-    p.boundary_width = pConf->Read("BoundaryWidth", 30);
+    p.sensitivity = pConf->Read("Sensitivity", 100);
 
     ShowInfoDialog();
     m_XTE_refreshed = false;
@@ -269,13 +263,10 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     }
     delete m_info_dialog;
 
-    preferences& p = prefs;
-
+    preferences& p = m_prefs;
     pConf->Write("MaxAngle", p.max_angle);
+    pConf->Write("Sensitivity", p.sensitivity);
 
-    // Waypoint Arrival
-    pConf->Write("ConfirmBearingChange", p.confirm_bearing_change);
-    pConf->Write("InterceptRoute", p.intercept_route);
     m_Timer.Stop();
     m_Timer.Disconnect(wxEVT_TIMER,
         wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
@@ -340,10 +331,10 @@ void AutoTrackRaymarine_pi::HandleN2K_126208(ObservedEvt ev)
 
     if (msgLen == 31) { //    messages that originate from a keystroke auto
                         //     / standly
-        wxLogMessage(wxT("AutoTrackRaymarine_pi: length 31, f23=%0x, f24=%0x, "
-                         "f25=%0x, f26=%0x, f27=%0x, f28=%0x, f29=%0x, len=%i"),
-            msg[23], msg[24], msg[25], msg[26], msg[27], msg[28], msg[29],
-            msgLen);
+        //wxLogMessage(wxT("AutoTrackRaymarine_pi: length 31, f23=%0x, f24=%0x, "
+        //                 "f25=%0x, f26=%0x, f27=%0x, f28=%0x, f29=%0x, len=%i"),
+        //    msg[23], msg[24], msg[25], msg[26], msg[27], msg[28], msg[29],
+        //    msgLen);
         if (msg[25] == 0x00 && m_pilot_state != STANDBY) { // +2 done
             SetStandby();
             m_pilot_heading = -1.; // undefined
@@ -521,7 +512,7 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info)
     m_XTE = leg_info.Xte;
     if (isnan(m_XTE)) {
         m_XTE = 0.;
-        wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
+        //wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
     }
     if (m_XTE > -0.000001 && m_XTE < 0.)
         m_XTE = 0.;
@@ -530,6 +521,9 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info)
     m_route_active = true; // when SetActiveLegInfo is called a route must be active
     if (!isnan(leg_info.Btw)) {
         m_BTW = leg_info.Btw;
+    }
+    if (!isnan(leg_info.Dtw)) {
+        m_DTW = leg_info.Dtw;
     }
 }
 
@@ -554,7 +548,9 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_XTE = 100000.; // undefined
         wxCommandEvent event;
         if (m_info_dialog) {
-            m_info_dialog->OnStandby(event);
+            if (m_pilot_state == TRACKING) {
+                m_info_dialog->OnStandby(event);
+            }
             m_info_dialog->EnableTrackButton(false);
         }
     }
@@ -590,6 +586,7 @@ void AutoTrackRaymarine_pi::SetTracking()
 void AutoTrackRaymarine_pi::Compute()
 {
     double dist;
+    double DTW = m_DTW * 1852.;
     double XTE_for_correction;
     if (isnan(m_BTW))
         return;
@@ -599,9 +596,8 @@ void AutoTrackRaymarine_pi::Compute()
         return;
     }
     if (!m_route_active) return;
-    dist = 50; // in meters
+    dist = 50.; // in meters
     double dist_nm = dist / 1852.;
-
     // integration of XTE, but prevent increase of m_XTE_I when XTE is large
     if (m_XTE > -0.25 * dist_nm && m_XTE < 0.25 * dist_nm) {
         m_XTE_I += m_XTE;
@@ -623,17 +619,26 @@ void AutoTrackRaymarine_pi::Compute()
     }
 
     XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
+    XTE_for_correction *= m_prefs.sensitivity / 100.;
 
     //wxLogMessage(wxT(" XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR *    m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
      // XTE_for_correction, 5 * m_XTE, I_FACTOR * m_XTE_I, D_FACTOR *
      // m_XTE_D);
-
+    if (DTW < 50.) {
+        XTE_for_correction *= DTW / 50.;
+    }
+    if (DTW < 0.) {
+        XTE_for_correction = 0.;
+    }
     double gamma,
         new_bearing; // angle for correction of heading relative to BTW
     if (dist > 1.) {
         gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;
     }
-    double max_angle = prefs.max_angle;
+    else {
+        gamma = 0.;
+    }
+    double max_angle = m_prefs.max_angle;
     // wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f,
     // dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist,
     // max_angle, XTE_for_correction);

@@ -18,9 +18,7 @@
 #include <wx/settings.h>
 #include <wx/spinctrl.h>
 #include <wx/sizer.h>
-#include <wx/combobox.h>
 #include <wx/statbox.h>
-#include <wx/checkbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 
@@ -39,9 +37,8 @@ class PreferencesDialogBase : public wxDialog
 	protected:
 		wxStaticText* m_staticText101;
 		wxSpinCtrl* m_sMaxAngle1;
-		wxStaticText* m_staticText102;
-		wxCheckBox* m_cbConfirmBearingChange;
-		wxCheckBox* m_cbInterceptRoute;
+		wxStaticText* m_staticText1011;
+		wxSpinCtrl* m_sensitivity;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;

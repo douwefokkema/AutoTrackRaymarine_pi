@@ -142,7 +142,7 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  double m_XTE, m_BTW;
+  double m_XTE, m_BTW, m_DTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var;
@@ -168,16 +168,8 @@ public:
     // these are stored to the config
     struct preferences {
         double max_angle;
-
-        // Waypoint Arrival
-        bool confirm_bearing_change;
-        bool intercept_route;
-
-        // Boundary
-        wxString boundary_guid;
-        int boundary_width;
-
-    } prefs;
+        double sensitivity;
+    } m_prefs;
     
     PreferencesDialog *m_PreferencesDialog;
     InfoDialog *m_info_dialog;
