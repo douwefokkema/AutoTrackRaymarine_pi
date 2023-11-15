@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: AutoTrackRaymarine_pi 0.3.1.21\n"
+"Project-Id-Version: AutoTrackRaymarine_pi 1.18.31.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-12-06 20:18-0500\n"
+"POT-Creation-Date: 2023-10-19 20:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,12 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/AutoTrackRaymarine_pi.cpp:132 src/Info.cpp:36
+#: src/AutoTrackRaymarine_pi.cpp:153 src/Info.cpp:35
 msgid "Tracking"
+msgstr ""
+
+#: src/AutoTrackRaymarine_pi.cpp:157
+msgid "AutoTrackRaymarine"
 msgstr ""
 
 #: src/AutotrackPrefsUI.cpp:31
@@ -29,50 +33,34 @@ msgstr ""
 msgid "Max Error Angle"
 msgstr ""
 
-#: src/AutotrackPrefsUI.cpp:53
-msgid "Com port NGT-1"
-msgstr ""
-
-#: src/AutotrackPrefsUI.cpp:57 src/AutotrackPrefsUI.cpp:58
-msgid "COM1"
-msgstr ""
-
-#: src/AutotrackPrefsUI.cpp:59
-msgid "COM2"
-msgstr ""
-
-#: src/AutotrackPrefsUI.cpp:60
-msgid "COM3"
-msgstr ""
-
-#: src/AutotrackPrefsUI.cpp:80
+#: src/AutotrackPrefsUI.cpp:73
 msgid "Options"
 msgstr ""
 
-#: src/AutotrackPrefsUI.cpp:87
+#: src/AutotrackPrefsUI.cpp:80
 msgid ""
 "Confirm Bearing Change\n"
 "On Waypoint Arrival"
 msgstr ""
 
-#: src/AutotrackPrefsUI.cpp:90
+#: src/AutotrackPrefsUI.cpp:83
 msgid ""
 "Intercept Route\n"
 "On Current Course"
 msgstr ""
 
-#: src/AutotrackPrefsUI.h:56
+#: src/AutotrackPrefsUI.h:55
 msgid "Autopilot Route Preferences"
 msgstr ""
 
-#: src/Info.cpp:38
+#: src/Info.cpp:37
 msgid "Auto"
 msgstr ""
 
-#: src/Info.cpp:40
+#: src/Info.cpp:39
 msgid "Standby"
 msgstr ""
 
-#: src/Info.cpp:43 src/Info.cpp:51 src/Info.cpp:59
+#: src/Info.cpp:42 src/Info.cpp:50 src/Info.cpp:58
 msgid "----"
 msgstr ""
