@@ -45,17 +45,20 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	sbSizer5->Add( fgSizer191, 1, wxEXPAND, 5 );
 
-	wxFlexGridSizer* fgSizer192;
-	fgSizer192 = new wxFlexGridSizer( 0, 2, 0, 0 );
-	fgSizer192->SetFlexibleDirection( wxBOTH );
-	fgSizer192->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+	wxFlexGridSizer* fgSizer1911;
+	fgSizer1911 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1911->SetFlexibleDirection( wxBOTH );
+	fgSizer1911->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	
+	m_staticText1011 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Sensitivity         "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1011->Wrap( -1 );
+	fgSizer1911->Add( m_staticText1011, 0, wxALL, 5 );
 
-	
+	m_sensitivity = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 90, 39 );
+	fgSizer1911->Add( m_sensitivity, 0, wxALL, 5 );
 
 
-	sbSizer5->Add( fgSizer192, 1, wxEXPAND, 5 );
+	sbSizer5->Add( fgSizer1911, 1, wxEXPAND, 5 );
 
 
 	fgSizer162->Add( sbSizer5, 1, wxEXPAND, 5 );
@@ -70,18 +73,12 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer181->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
 	wxStaticBoxSizer* sbSizer10;
-	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, _("Options") ), wxVERTICAL );
+	sbSizer10 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxEmptyString ), wxVERTICAL );
 
 	wxFlexGridSizer* fgSizer45;
 	fgSizer45 = new wxFlexGridSizer( 0, 1, 0, 0 );
 	fgSizer45->SetFlexibleDirection( wxBOTH );
 	fgSizer45->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-
-	m_cbConfirmBearingChange = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Confirm Bearing Change\nOn Waypoint Arrival"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer45->Add( m_cbConfirmBearingChange, 0, wxALL, 5 );
-
-	m_cbInterceptRoute = new wxCheckBox( sbSizer10->GetStaticBox(), wxID_ANY, _("Intercept Route\nOn Current Course"), wxDefaultPosition, wxDefaultSize, 0 );
-	fgSizer45->Add( m_cbInterceptRoute, 0, wxALL, 5 );
 
 
 	sbSizer10->Add( fgSizer45, 1, wxEXPAND, 5 );

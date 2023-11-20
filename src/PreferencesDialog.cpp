@@ -32,14 +32,10 @@ int                       g_nCOMPortCheck = 32;
 bool PreferencesDialog::Show( bool show )
 {
     if(show) {
-
         // load preferences
-        AutoTrackRaymarine_pi::preferences &p = m_pi.prefs;
+        AutoTrackRaymarine_pi::preferences &p = m_pi.m_prefs;
         m_sMaxAngle1->SetValue(p.max_angle);
-
-        // Waypoint Arrival
-        m_cbConfirmBearingChange->SetValue(p.confirm_bearing_change);
-        m_cbInterceptRoute->SetValue(p.intercept_route);
+        m_sensitivity->SetValue(p.sensitivity);
     }
     return PreferencesDialogBase::Show(show);
 }
@@ -54,11 +50,10 @@ void PreferencesDialog::OnCancel( wxCommandEvent& event )
 
 void PreferencesDialog::OnOk( wxCommandEvent& event )
 {
-    AutoTrackRaymarine_pi::preferences &p = m_pi.prefs;
+    AutoTrackRaymarine_pi::preferences &p = m_pi.m_prefs;
     p.max_angle = m_sMaxAngle1->GetValue();
+    p.sensitivity = m_sensitivity->GetValue();
     // Waypoint Arrival
-    p.confirm_bearing_change = m_cbConfirmBearingChange->GetValue();
-    p.intercept_route = m_cbInterceptRoute->GetValue();
     Hide();
 }
 
