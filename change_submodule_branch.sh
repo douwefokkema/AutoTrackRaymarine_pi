@@ -16,7 +16,7 @@ if [ "$#" -eq "2" ]; then
     echo "Using $2 instead of https://github.com/OpenCPN/opencpn-libs"
     REPO=$2
 else
-    echo "Using default repository: https://github.com/OpenCPN/opencpn-libs"
+    echo "Using devault repository: https://github.com/OpenCPN/opencpn-libs"
    REPO="https://github.com/OpenCPN/opencpn-libs"
 fi
 
