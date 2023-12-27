@@ -233,7 +233,10 @@ if(DEFINED ENV{OCPN_TARGET})
     else()
         set(PACKAGING_NAME "${PKG_NVR}-${PKG_TARGET}-${PKG_TARGET_VERSION}${PKG_BUILD_GTK}-$ENV{OCPN_TARGET}")
         set(PACKAGING_NAME_XML "${PKG_NVR}-${PKG_TARGET}-${ARCH}-${PKG_TARGET_VERSION}${PKG_BUILD_GTK}-$ENV{OCPN_TARGET}")
-    endif()
+        if(APPLE AND CMAKE_OSX_ARCHITECTURES)
+            set(PACKAGING_NAME_XML "${PKG_NVR}-${PKG_TARGET}-${COMPOUND_ARCH_DASH}-${PKG_TARGET_VERSION}${PKG_BUILD_GTK}-$ENV{OCPN_TARGET}")
+        endif()
+endif()
 else()
     if(OCPN_FLATPAK_CONFIG OR OCPN_FLATPAK_BUILD OR MINGW OR MSVC)
         set(PACKAGING_NAME "${PKG_NVR}-${PKG_TARGET}-${ARCH}-${PKG_TARGET_VERSION}${PKG_BUILD_GTK}")
@@ -455,9 +458,12 @@ IF(QT_ANDROID)
     SET(CMAKE_CXX_FLAGS "-pthread -fPIC ")
 
     ## Compiler flags
-    string(APPEND CMAKE_CXX_FLAGS " -Wno-inconsistent-missing-override -Wno-potentially-evaluated-expression")
-    string(APPEND CMAKE_CXX_FLAGS " -Wno-overloaded-virtual -Wno-unused-command-line-argument")
-    string(APPEND CMAKE_CXX_FLAGS " -Wno-unknown-pragmas -Wno-macro-redefined")
+    add_compile_options("-Wno-inconsistent-missing-override"
+    "-Wno-potentially-evaluated-expression"
+    "-Wno-overloaded-virtual"
+    "-Wno-unused-command-line-argument"
+    "-Wno-unknown-pragmas"
+      )
 
     message(STATUS "${CMLOC}Adding libgorp.o shared library")
     set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-soname,libgorp.so ")
@@ -474,8 +480,6 @@ IF(QT_ANDROID)
         MESSAGE(STATUS "${CMLOC}Adding definition -DARMHF")
         ADD_DEFINITIONS(-DARMHF)
     endif()
-
-    add_definitions("-fvisibility=default")
 
 ENDIF(QT_ANDROID)
 
