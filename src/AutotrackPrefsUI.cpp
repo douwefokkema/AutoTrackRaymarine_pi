@@ -54,7 +54,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	m_staticText1011->Wrap( -1 );
 	fgSizer1911->Add( m_staticText1011, 0, wxALL, 5 );
 
-	m_sensitivity = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 90, 39 );
+	m_sensitivity = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 0, 199, 39 );
 	fgSizer1911->Add( m_sensitivity, 0, wxALL, 5 );
 
 
