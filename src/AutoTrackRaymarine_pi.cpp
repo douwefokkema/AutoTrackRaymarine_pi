@@ -507,8 +507,8 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix)
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info)
 {
-    //wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"),
-     //   leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
+    wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"),
+        leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
     m_XTE = leg_info.Xte;
     if (isnan(m_XTE)) {
         m_XTE = 0.;
@@ -536,15 +536,19 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
 
     } else if (message_id == "OCPN_RTE_ACTIVATED") {
         ResetXTE();
+        wxLogMessage(wxT("$$$OCPN_RTE_ACTIVATED"));
         if (m_pilot_state == TRACKING) {
             SetStandby();
+            wxLogMessage(wxT("$$$OCPN_RTE_ACTIVATED-standby"));
         }
         m_route_active = true;
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
+        wxLogMessage(wxT("$$$OCPN_WPT_ARRIVEDy"));
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
         || message_id == "OCPN_RTE_ENDED") {
         m_route_active = false;
+        wxLogMessage(wxT("$$$OCPN_RTE_ENDED"));
         m_XTE = 100000.; // undefined
         wxCommandEvent event;
         if (m_info_dialog) {
@@ -563,6 +567,7 @@ void AutoTrackRaymarine_pi::SetStandby()
         m_info_dialog->EnableHeadingButtons(false);
         m_info_dialog->EnableTrackButton(true);
     }
+    wxLogMessage(wxT("$$$ set standby"));
 }
 
 void AutoTrackRaymarine_pi::SetAuto()
@@ -571,6 +576,7 @@ void AutoTrackRaymarine_pi::SetAuto()
     if (m_info_dialog) {
         m_info_dialog->EnableHeadingButtons(true);
     }
+    wxLogMessage(wxT("$$$ set auto"));
 }
 
 void AutoTrackRaymarine_pi::SetTracking()
@@ -581,6 +587,7 @@ void AutoTrackRaymarine_pi::SetTracking()
     }
     ResetXTE(); // reset local XTE calculations
     ZeroXTE(); // zero XTE on OpenCPN
+    wxLogMessage(wxT("$$$ set tracking"));
 }
 
 void AutoTrackRaymarine_pi::Compute()
@@ -639,11 +646,10 @@ void AutoTrackRaymarine_pi::Compute()
         gamma = 0.;
     }
     double max_angle = m_prefs.max_angle;
-    // wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f,
-    // dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist,
-    // max_angle, XTE_for_correction);
     new_bearing = m_BTW + gamma; // bearing of next wp
-
+    new_bearing = m_BTW + gamma; // bearing of next wp
+    wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f, new_bearing= %f"), gamma, m_BTW, dist, max_angle, XTE_for_correction, new_bearing);
+    
     if (gamma > max_angle) {
         new_bearing = m_BTW + max_angle;
     } else if (gamma < -max_angle) {
@@ -683,6 +689,7 @@ void AutoTrackRaymarine_pi::Compute()
         m_current_bearing -= 360.;
     while (m_current_bearing < 0.)
         m_current_bearing += 360.;
+    wxLogMessage(wxT("$$$ m_current_bearing=%f"), m_current_bearing);
     SetPilotHeading(
         m_current_bearing - m_var); // the commands used expect magnetic heading
     m_pilot_heading = m_current_bearing; // This should not be needed, pilot heading
@@ -755,8 +762,7 @@ void AutoTrackRaymarine_pi::SendHSC(double course)
 
 void AutoTrackRaymarine_pi::SetPilotHeading(double heading)
 {
-    // wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"),
-    // heading);
+    wxLogMessage(wxT("$$$AutoTrackRaymarine_pi SetAutopilotHeading = %f"), heading);
 
     // commands for NGT-1 in Canboat format
     //std::string standby_command

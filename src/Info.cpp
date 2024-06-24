@@ -120,16 +120,20 @@ void InfoDialog::OnTracking(wxCommandEvent& event) {
 
 void InfoDialog::OnMinusTen(wxCommandEvent& event) {
 m_pi->ChangePilotHeading(-10);
+wxLogMessage(wxT("$$$ OnMinusTen"));
 }
 
 void InfoDialog::OnPlusTen(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(10);
+  wxLogMessage(wxT("$$$ OnPlusTen"));
 }
 
 void InfoDialog::OnMinusOne(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(-1);
+  wxLogMessage(wxT("$$$ OnMinusOne"));
 }
 
 void InfoDialog::OnPlusOne(wxCommandEvent& event) {
   m_pi->ChangePilotHeading(1);
+  wxLogMessage(wxT("$$$ OnPlusOne"));
 }
