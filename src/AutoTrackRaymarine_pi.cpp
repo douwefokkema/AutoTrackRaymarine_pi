@@ -110,7 +110,6 @@ int AutoTrackRaymarine_pi::Init(void)
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
     m_heading_set = false;
-    m_current_bearing = 0.;
     m_XTE = 0.;
     m_BTW = 0.;
     m_DTW = 0.;
@@ -118,6 +117,9 @@ int AutoTrackRaymarine_pi::Init(void)
     m_XTE_P = 0.;
     m_XTE_I = 0.;
     m_XTE_D = 0.;
+    m_turning = 0;
+    m_waypoint_passed = false;
+    m_DTW_increasing = false;
     m_pilot_heading = -1.; // target heading of pilot in auto mode, -1 means undefined
     m_vessel_heading = -1.;
     SetStandby();
@@ -208,11 +210,9 @@ int AutoTrackRaymarine_pi::Init(void)
 
     return (WANTS_OVERLAY_CALLBACK | WANTS_OPENGL_OVERLAY_CALLBACK
         | WANTS_CURSOR_LATLON | WANTS_NMEA_SENTENCES | WANTS_NMEA_EVENTS
-        | WANTS_AIS_SENTENCES | WANTS_PLUGIN_MESSAGING | WANTS_PREFERENCES
+        |  WANTS_PLUGIN_MESSAGING | WANTS_PREFERENCES
         | WANTS_CONFIG);
 }
-
-static double oldpilotheading = 0.;
 
 // wxBitmap* AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
@@ -280,7 +280,7 @@ void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev){
     NMEA2000Id id_127250(127250);
     std::vector<uint8_t> msg = GetN2000Payload(id_127250, ev);
     double p_h = ((unsigned int)msg[14] + 256 * (unsigned int)msg[15]) * 360.
-        / 3.141 / 20000;
+        / PI / 20000;
     m_vessel_heading = p_h + m_var;
 }
 
@@ -293,12 +293,9 @@ void AutoTrackRaymarine_pi::HandleN2K_65360(ObservedEvt ev)
     if (m_pilot_state == STANDBY) {
         SetAuto();
     }
-    p_h = ((unsigned int)msg[18] + 256 * (unsigned int)msg[19]) * 360. / 3.141
+    p_h = ((unsigned int)msg[18] + 256 * (unsigned int)msg[19]) * 360. / PI
         / 20000;
     m_pilot_heading = p_h + m_var; // received heading is magnetic
-    if (oldpilotheading != m_pilot_heading) {
-        oldpilotheading = m_pilot_heading;
-    }
 }
 
 // case 126208: // if length is 28: command to set to standby or auto
@@ -381,7 +378,7 @@ void AutoTrackRaymarine_pi::HandleN2K_65359(ObservedEvt ev)
     NMEA2000Id id_65359(65359);
     std::vector<uint8_t> msg = GetN2000Payload(id_65359, ev);
     m_vessel_heading = (((unsigned int)msg[18] + 256 * (unsigned int)msg[19])
-        * 360. / 3.141 / 20000) + m_var;
+        * 360. / PI / 20000) + m_var;
 }
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
@@ -503,27 +500,58 @@ wxString AutoTrackRaymarine_pi::StandardPath()
 void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix)
 {
     m_var = pfix.Var;
+    m_SOG = pfix.Sog;
 }
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info)
 {
     wxLogMessage(wxString("AutoTrackRaymarine_pi: $$$SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"),
         leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
+    double turn_angle, turning_distance;
+    if (!isnan(leg_info.Dtw)) {
+      m_prev_DTW = m_DTW;
+      m_DTW = leg_info.Dtw;
+      wxLogMessage(wxT("$$$$ m_DTW=%f"), m_DTW);
+    }
+    if (m_DTW > m_prev_DTW) {
+      m_DTW_increasing = true;
+    }
+    else {
+      m_DTW_increasing = false;
+    }
     m_XTE = leg_info.Xte;
     if (isnan(m_XTE)) {
         m_XTE = 0.;
-        //wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
+        wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
     }
     if (m_XTE > -0.000001 && m_XTE < 0.)
         m_XTE = 0.;
     m_XTE_refreshed = true;
-    //wxLogMessage(wxString("XTE refreshed"));
     m_route_active = true; // when SetActiveLegInfo is called a route must be active
     if (!isnan(leg_info.Btw)) {
         m_BTW = leg_info.Btw;
     }
-    if (!isnan(leg_info.Dtw)) {
-        m_DTW = leg_info.Dtw;
+    if (m_waypoint_passed) {
+      m_prev_XTE_D = 0.;  // no differential factor in correction when starting again
+      turn_angle = m_BTW - m_pilot_heading;
+      double BTW_correction = 0.;
+      if (m_DTW > 0.03) {
+        BTW_correction = rad2deg(asin(m_arrival_radius * sin(deg2rad(turn_angle)) / m_DTW));
+      }
+      wxLogMessage(wxT("$$$$ turn_angle=%f, BTW_correction=%f"), turn_angle, BTW_correction);
+      turn_angle += BTW_correction;
+      if (turn_angle > 180) turn_angle -= 360;
+      if (turn_angle <= -180) turn_angle += 360;
+      wxLogMessage(wxT("$$$$ turn_angle2=%f"), turn_angle);
+      // calculate length of circle segment of turn in NM
+      turning_distance = deg2rad(turn_angle) * m_arrival_radius * tan(deg2rad(90 - turn_angle / 2));
+      if (turning_distance < 0.) turning_distance = -turning_distance;
+      // number of seconds for the turn
+      m_turning = (int)(turning_distance * 3600. / m_SOG);
+      if (m_turning == 0) m_turning = 1;
+      m_turn_angle_per_step = turn_angle / m_turning;
+      wxLogMessage(wxT("$$$turning_distance=%f, m_SOG=%f, turn_steps=%i, perstep=%f"), turning_distance, m_SOG, m_turning, m_turn_angle_per_step);
+      m_waypoint_passed = false;
     }
 }
 
@@ -544,7 +572,17 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_route_active = true;
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
-        wxLogMessage(wxT("$$$OCPN_WPT_ARRIVEDy"));
+        // start turning with a "nice" turn
+        if(m_pilot_state == TRACKING) m_waypoint_passed = true;
+        // but if we passed the wp already we will turn immediately
+        if (m_DTW_increasing) {
+            m_waypoint_passed = false;
+            wxLogMessage(wxT("$$$m_DTW_increasing"));
+        }
+        else {
+            m_arrival_radius = m_DTW;
+        }
+        wxLogMessage(wxT("$$$OCPN_WPT_ARRIVED, arrivalradius=%f, m_waypoint_passed=%i"),m_arrival_radius, m_waypoint_passed);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
         || message_id == "OCPN_RTE_ENDED") {
         m_route_active = false;
@@ -581,6 +619,10 @@ void AutoTrackRaymarine_pi::SetAuto()
 
 void AutoTrackRaymarine_pi::SetTracking()
 {
+    if (!m_route_active){
+        wxLogMessage(wxT("$$$ trying to start tracking w/o active route"));
+        return;
+    }
     m_pilot_state = TRACKING;
     if (m_info_dialog) {
         m_info_dialog->EnableHeadingButtons(true);
@@ -597,6 +639,8 @@ void AutoTrackRaymarine_pi::Compute()
     double XTE_for_correction;
     if (isnan(m_BTW))
         return;
+    if (isnan(m_var))
+        return;
     if (isnan(m_XTE) || m_XTE == 100000.)
         return;
     if (m_pilot_state != TRACKING ) {
@@ -605,98 +649,84 @@ void AutoTrackRaymarine_pi::Compute()
     if (!m_route_active) return;
     dist = 50.; // in meters
     double dist_nm = dist / 1852.;
-    // integration of XTE, but prevent increase of m_XTE_I when XTE is large
-    if (m_XTE > -0.25 * dist_nm && m_XTE < 0.25 * dist_nm) {
-        m_XTE_I += m_XTE;
-    } else if (m_XTE > -0.5 * dist_nm && m_XTE < 0.5 * dist_nm) {
-        m_XTE_I += 0.5 * m_XTE;
-    } else if (m_XTE > -dist_nm && m_XTE < dist_nm) {
-        m_XTE_I += 0.2 * m_XTE;
-    } else {
-    }; // do nothing for now
-
-    m_XTE_D = m_XTE - m_XTE_P; // difference
-    m_XTE_P = m_XTE; // proportional used as previous xte next timw
-
-    if (m_XTE_I > 0.5 * dist_nm / I_FACTOR) { // in NM
-        m_XTE_I = 0.5 * dist_nm / I_FACTOR;
-    }
-    if (m_XTE_I < -0.5 * dist_nm / I_FACTOR) { // in NM
-        m_XTE_I = -0.5 * dist_nm / I_FACTOR;
-    }
-
-    XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
-    XTE_for_correction *= m_prefs.sensitivity / 100.;
-
-    //wxLogMessage(wxT(" XTE_for_correction=%f, 5 * m_XTE=%f,  I_FACTOR *    m_XTE_I=%f, D_FACTOR * m_XTE_D=%f"),
-     // XTE_for_correction, 5 * m_XTE, I_FACTOR * m_XTE_I, D_FACTOR *
-     // m_XTE_D);
-    if (DTW < 50.) {
-        XTE_for_correction *= DTW / 50.;
-    }
-    if (DTW < 0.) {
-        XTE_for_correction = 0.;
-    }
-    double gamma,
-        new_bearing; // angle for correction of heading relative to BTW
-    if (dist > 1.) {
-        gamma = atan(XTE_for_correction * 1852. / dist) / (2. * 3.1416) * 360.;
+    double new_bearing;
+    new_bearing = m_pilot_heading;
+    
+    if (m_turning > 0){
+        new_bearing += m_turn_angle_per_step;
+        wxLogMessage(wxT("$$$ turning step=%i, new_bearing=%f"), m_turning, new_bearing);
+        m_turning--;
     }
     else {
-        gamma = 0.;
-    }
-    double max_angle = m_prefs.max_angle;
-    new_bearing = m_BTW + gamma; // bearing of next wp
-    new_bearing = m_BTW + gamma; // bearing of next wp
-    wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f, new_bearing= %f"), gamma, m_BTW, dist, max_angle, XTE_for_correction, new_bearing);
-    
-    if (gamma > max_angle) {
-        new_bearing = m_BTW + max_angle;
-    } else if (gamma < -max_angle) {
-        new_bearing = m_BTW - max_angle;
-    }
-    // don't turn too fast....
+        // integration of XTE, but prevent increase of m_XTE_I when XTE is large
+        if (m_XTE > -0.25 * dist_nm && m_XTE < 0.25 * dist_nm) {
+            m_XTE_I += m_XTE;
+        }
+        else if (m_XTE > -0.5 * dist_nm && m_XTE < 0.5 * dist_nm) {
+            m_XTE_I += 0.5 * m_XTE;
+        }
+        else if (m_XTE > -dist_nm && m_XTE < dist_nm) {
+            m_XTE_I += 0.2 * m_XTE;
+        }
+        else {
+        }; // do nothing for now
 
-    if (!m_heading_set) { // after reset accept any turn
-        m_current_bearing = new_bearing;
-        m_heading_set = true;
-    } else {
-        while (new_bearing >= 360.)
-            new_bearing -= 360.;
-        while (new_bearing < 0.)
-            new_bearing += 360.;
-        double turnrate = TURNRATE;
+        m_XTE_D = m_XTE - m_XTE_P; // difference
+        m_XTE_P = m_XTE; // Previous XTE
+        // don't use single jumps in XTE for difference
+        if (m_prev_XTE_D == 0.){
+          m_prev_XTE_D = m_XTE_D;
+          wxLogMessage(wxT("$$$ m_XTE_D made 0, was m_XTE_D=%f"), m_XTE_D);
+          m_XTE_D = 0.;
+        }
 
-        // turn left or right?
-        double turn = new_bearing - m_current_bearing;
+        if (m_XTE_I > 0.5 * dist_nm / I_FACTOR) { // in NM
+            m_XTE_I = 0.5 * dist_nm / I_FACTOR;
+        }
+        if (m_XTE_I < -0.5 * dist_nm / I_FACTOR) { // in NM
+            m_XTE_I = -0.5 * dist_nm / I_FACTOR;
+        }
+        XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
+        XTE_for_correction *= m_prefs.sensitivity / 100.;
+        if (DTW < 50.) {
+            XTE_for_correction *= DTW / 50.;
+        }
+        if (DTW < 0.) {
+            XTE_for_correction = 0.;
+        }
+        double gamma;
+             // angle for correction of heading relative to BTW
+        if (dist > 1.) {
+            gamma = rad2deg(atan(XTE_for_correction * 1852. / dist));
+        }
+        else {
+            gamma = 0.;
+        }
+        double max_angle = m_prefs.max_angle;
+        new_bearing = m_BTW + gamma; // bearing of next wp
+        wxLogMessage(wxT("AutoTrackRaymarine initial gamma=%f, btw=%f, dist=%f, max_angle= %f, XTE_for_correction=%f, new_bearing= %f"), gamma, m_BTW, dist, max_angle, XTE_for_correction, new_bearing);
 
-        if (turn < -180.)
-            turn += 360;
-        if (turn > 80. || turn < -80.)
-            turnrate = 2 * TURNRATE;
-        if (turn < -turnrate || (turn > 180. && turn < 360 - turnrate)) {
-            // turn left
-            m_current_bearing -= turnrate;
-        } else if (turn > turnrate && turn <= 180.) {
-            // turn right
-            m_current_bearing += turnrate;
-        } else {
-            // go almost straight, correction < TURNRATE
-            m_current_bearing = new_bearing;
+        if (gamma > max_angle) {
+            new_bearing = m_BTW + max_angle;
+        }
+        else if (gamma < -max_angle) {
+            new_bearing = m_BTW - max_angle;
         }
     }
-    while (m_current_bearing >= 360.)
-        m_current_bearing -= 360.;
-    while (m_current_bearing < 0.)
-        m_current_bearing += 360.;
-    wxLogMessage(wxT("$$$ m_current_bearing=%f"), m_current_bearing);
+    m_heading_set = true;
+    while (new_bearing >= 360.)
+        new_bearing -= 360.;
+    while (new_bearing < 0.)
+        new_bearing += 360.;
+    wxLogMessage(wxT("$$$ new_bearing=%f"), new_bearing);
     SetPilotHeading(
-        m_current_bearing - m_var); // the commands used expect magnetic heading
-    m_pilot_heading = m_current_bearing; // This should not be needed, pilot heading
+        new_bearing - m_var); // the commands used expect magnetic heading
+    m_pilot_heading = new_bearing; // This should not be needed, pilot heading
                              // will come from pilot. For testing only.
-    SendHSC(m_current_bearing);
+    SendHSC(new_bearing);
 }
 
+// Add "degrees" to the current pilot heading
 void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees)
 {
     if (m_pilot_state == STANDBY) {
@@ -712,9 +742,8 @@ void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees)
     if (new_pilot_heading < 0.)
         new_pilot_heading += 360.;
     SetPilotHeading(
-        new_pilot_heading - m_var); // send magnitic heading to Raymarine
-    m_pilot_heading
-        = new_pilot_heading; // this should not be needed, pilot heading
+        new_pilot_heading - m_var); // send magnetic heading to Raymarine
+    m_pilot_heading = new_pilot_heading; // this should not be needed, pilot heading
                              // will come from pilot. For testing only.
     SendHSC(new_pilot_heading);
 }

@@ -40,7 +40,6 @@
 #include <list>
 #include <map>
 
-
 #ifndef WXINTL_NO_GETTEXT_MACRO
 #ifdef OPC
 #ifdef _
@@ -51,6 +50,16 @@
 #else 
 #define _(s) wxGetTranslation((s))
 #endif // WXINTL_NO_GETTEXT_MACRO
+
+#ifndef PI
+#define PI (3.1415926535897931160E0)
+#endif
+#ifndef deg2rad
+#define deg2rad(x) ((x)*2 * PI / 360.0)
+#endif
+#ifndef rad2deg
+#define rad2deg(x) ((x)*360.0 / (2 * PI))
+#endif
 
 
 #include "ocpn_plugin.h"
@@ -142,16 +151,21 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  double m_XTE, m_BTW, m_DTW;
+  double m_XTE, m_BTW, m_DTW, m_prev_DTW, m_arrival_radius, m_turn_angle_per_step;
   bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var;
+  double m_SOG;
   bool m_initialized;
   bool m_route_active;
-  double m_pilot_heading;  // target heading of pilot in auto mode
+  bool m_waypoint_passed;
+  uint16_t m_turning;
+  bool m_DTW_increasing;
+  double m_pilot_heading;  // true heading of pilot (in auto mode)
   double m_vessel_heading;        // current heading of vessel according to pilot
   
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
+  double m_prev_XTE_D;
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
   uint16_t m_pilot_state; // 0 standby, 1 auto, 2 tracking
 #define STANDBY 0
@@ -162,7 +176,8 @@ public:
 
 public:
   void ResetXTE() {
-      m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
+      m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false; m_turning = 0;
+      m_prev_XTE_D = 0.;
   }
   
     // these are stored to the config
@@ -194,7 +209,6 @@ private:
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;
-    double m_current_bearing;
 };
 
 #endif
