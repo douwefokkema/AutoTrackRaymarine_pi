@@ -563,6 +563,8 @@ void AutoTrackRaymarine_pi::SetStandby()
         m_info_dialog->EnableHeadingButtons(false);
         m_info_dialog->EnableTrackButton(true);
     }
+    // red, for this to function, TextStatus11 should be made public in AutotrackInfoUI.h
+    if (m_info_dialog)m_info_dialog->TextStatus11->SetBackgroundColour(wxColour(254, 0, 0));
 }
 
 void AutoTrackRaymarine_pi::SetAuto()
@@ -571,16 +573,24 @@ void AutoTrackRaymarine_pi::SetAuto()
     if (m_info_dialog) {
         m_info_dialog->EnableHeadingButtons(true);
     }
+    // blue
+    if (m_info_dialog)m_info_dialog->TextStatus11->SetBackgroundColour(wxColour(0, 128, 255));
 }
 
 void AutoTrackRaymarine_pi::SetTracking()
 {
+    if (!m_route_active) {
+        wxLogMessage(wxT("Error, trying to start tracking w/o active route"));
+        return;
+    }
     m_pilot_state = TRACKING;
     if (m_info_dialog) {
         m_info_dialog->EnableHeadingButtons(true);
     }
     ResetXTE(); // reset local XTE calculations
     ZeroXTE(); // zero XTE on OpenCPN
+    // blue
+    if (m_info_dialog)m_info_dialog->TextStatus11->SetBackgroundColour(wxColour(0, 255, 64));
 }
 
 void AutoTrackRaymarine_pi::Compute()

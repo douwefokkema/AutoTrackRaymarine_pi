@@ -19,7 +19,7 @@
         <property name="internationalize">0</property>
         <property name="name">autotrack_info</property>
         <property name="namespace"></property>
-        <property name="path">D:\Radar\AutoTrackRaymarine_pi\src</property>
+        <property name="path">C:\Radar\AutoTrackRaymarine_pi\src</property>
         <property name="precompiled_header"></property>
         <property name="relative_path">1</property>
         <property name="skip_lua_events">1</property>
@@ -147,7 +147,7 @@
                                 <property name="aui_row"></property>
                                 <property name="auth_needed">0</property>
                                 <property name="best_size"></property>
-                                <property name="bg">255,0,0</property>
+                                <property name="bg">0,128,255</property>
                                 <property name="bitmap"></property>
                                 <property name="caption"></property>
                                 <property name="caption_visible">1</property>
@@ -221,7 +221,7 @@
                                 <property name="aui_row"></property>
                                 <property name="auth_needed">0</property>
                                 <property name="best_size"></property>
-                                <property name="bg">0,255,0</property>
+                                <property name="bg">255,0,0</property>
                                 <property name="bitmap"></property>
                                 <property name="caption"></property>
                                 <property name="caption_visible">1</property>
@@ -295,7 +295,7 @@
                                 <property name="aui_row"></property>
                                 <property name="auth_needed">0</property>
                                 <property name="best_size"></property>
-                                <property name="bg">wxSYS_COLOUR_ACTIVECAPTION</property>
+                                <property name="bg">0,255,64</property>
                                 <property name="bitmap"></property>
                                 <property name="caption"></property>
                                 <property name="caption_visible">1</property>
@@ -504,7 +504,7 @@
                                 <property name="aui_position"></property>
                                 <property name="aui_row"></property>
                                 <property name="best_size"></property>
-                                <property name="bg">255,255,225</property>
+                                <property name="bg">wxSYS_COLOUR_INACTIVECAPTION</property>
                                 <property name="caption"></property>
                                 <property name="caption_visible">1</property>
                                 <property name="center_pane">0</property>

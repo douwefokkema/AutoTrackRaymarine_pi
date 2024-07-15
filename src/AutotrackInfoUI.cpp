@@ -27,21 +27,21 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	buttonAuto = new wxButton( this, wxID_ANY, wxT("Auto"), wxDefaultPosition, wxSize( -1,-1 ), 0|wxBORDER_DEFAULT );
 	buttonAuto->SetFont( wxFont( 12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ) );
 	buttonAuto->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
-	buttonAuto->SetBackgroundColour( wxColour( 255, 0, 0 ) );
+	buttonAuto->SetBackgroundColour( wxColour( 0, 128, 255 ) );
 
 	gSizer7->Add( buttonAuto, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
 
 	buttonStandby = new wxButton( this, wxID_ANY, wxT("Standby"), wxDefaultPosition, wxSize( -1,-1 ), 0 );
 	buttonStandby->SetFont( wxFont( 12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ) );
 	buttonStandby->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
-	buttonStandby->SetBackgroundColour( wxColour( 0, 255, 0 ) );
+	buttonStandby->SetBackgroundColour( wxColour( 255, 0, 0 ) );
 
 	gSizer7->Add( buttonStandby, 0, wxALIGN_CENTER_HORIZONTAL|wxTOP, 5 );
 
 	buttonTrack = new wxButton( this, wxID_ANY, wxT("Tracking"), wxDefaultPosition, wxSize( -1,-1 ), 0|wxBORDER_DEFAULT );
 	buttonTrack->SetFont( wxFont( 12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ) );
 	buttonTrack->SetForegroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_BTNTEXT ) );
-	buttonTrack->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_ACTIVECAPTION ) );
+	buttonTrack->SetBackgroundColour( wxColour( 0, 255, 64 ) );
 
 	gSizer7->Add( buttonTrack, 0, wxALL, 5 );
 
@@ -80,7 +80,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 	#endif
 	TextStatus11->SetFont( wxFont( 10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Arial") ) );
 	TextStatus11->SetForegroundColour( wxColour( 0, 0, 128 ) );
-	TextStatus11->SetBackgroundColour( wxColour( 255, 255, 225 ) );
+	TextStatus11->SetBackgroundColour( wxSystemSettings::GetColour( wxSYS_COLOUR_INACTIVECAPTION ) );
 
 	gSizer4->Add( TextStatus11, 0, wxALL, 5 );
 
