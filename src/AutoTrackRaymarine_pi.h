@@ -142,13 +142,14 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
+  int m_wp_arrived;
   double m_XTE, m_BTW, m_DTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var;
   bool m_initialized;
   bool m_route_active;
-  double m_pilot_heading;  // target heading of pilot in auto mode
+  double m_pilot_heading;         // target heading of pilot in auto mode
   double m_vessel_heading;        // current heading of vessel according to pilot
   
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
@@ -194,7 +195,6 @@ private:
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;
-    double m_current_bearing;
 };
 
 #endif

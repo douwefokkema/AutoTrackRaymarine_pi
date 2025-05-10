@@ -29,7 +29,6 @@
 #include "Info.h"
 #include "AutotrackInfoUI.h"
 
-
 void InfoDialog::UpdateInfo() {
     if (m_pi->m_pilot_state == TRACKING)
       TextStatus11->SetValue(_("Tracking"));
@@ -38,7 +37,7 @@ void InfoDialog::UpdateInfo() {
     if (m_pi->m_pilot_state == STANDBY)
       TextStatus11->SetValue(_("Standby"));
     wxString pilot_heading;
-    if (m_pi->m_pilot_heading == -1.) {
+    if (m_pi->m_pilot_heading == -1. || isnan(m_pi->m_pilot_heading)) {
       pilot_heading = _("----");
     }
     else {
@@ -46,14 +45,18 @@ void InfoDialog::UpdateInfo() {
     }
     TextStatus14->SetValue(pilot_heading);
     wxString heading;
-    if (m_pi->m_vessel_heading == -1.) {
+    if (isnan(m_pi->m_vessel_heading)) {
       heading = _("----");
     }
     else if (isnan(m_pi->m_var)) {
         heading = _("no variation");
+        TextStatus12->SetForegroundColour(wxColour(255, 255, 255));
+        TextStatus12->SetBackgroundColour(wxColour(0, 0, 0));
     }
     else {
       heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_vessel_heading);
+      TextStatus12->SetForegroundColour(wxColour(0, 0, 0));
+      TextStatus12->SetBackgroundColour(wxColour(255, 255, 255));
     }
     TextStatus12->SetValue(heading);
     wxString xte;
