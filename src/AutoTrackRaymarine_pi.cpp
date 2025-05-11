@@ -540,7 +540,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_route_active = true;
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
-        wxLogMessage(wxT("$$$ OCPN Waypoint Arrived"));
+        //wxLogMessage(wxT("$$$ OCPN Waypoint Arrived"));
         m_wp_arrived = 2;
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
         || message_id == "OCPN_RTE_ENDED") {
@@ -634,8 +634,8 @@ void AutoTrackRaymarine_pi::Compute()
     XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
-    wxLogMessage(wxT("$$$XTE_for_cor=%f, m_XTE=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
-      XTE_for_correction, m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D, DTW);
+    /*wxLogMessage(wxT("$$$XTE_for_cor=%f, m_XTE=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
+      XTE_for_correction, m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D, DTW);*/
     if (DTW < 50.) {
         XTE_for_correction *= DTW / 50.;
     }
@@ -663,14 +663,14 @@ void AutoTrackRaymarine_pi::Compute()
         new_heading = m_BTW - max_angle;
     }
     MOD_ANGLE(new_heading);
-    wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, gamma=%f"), new_heading, m_BTW, gamma);
+    //wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, gamma=%f"), new_heading, m_BTW, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
     double turn;
     if (!m_heading_set) { // after reset accept any turn
         intermediate_heading = new_heading;
-        wxLogMessage(wxT("$$$ m_heading_set = true"));
+        //wxLogMessage(wxT("$$$ m_heading_set = true"));
         m_heading_set = true;
     }
     else {
@@ -707,7 +707,7 @@ void AutoTrackRaymarine_pi::Compute()
         }
     }
     MOD_ANGLE(intermediate_heading);
-    wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, intermediate_heading=%f, turn=%f"), new_heading, m_BTW, intermediate_heading, turn);
+    /*wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, intermediate_heading=%f, turn=%f"), new_heading, m_BTW, intermediate_heading, turn);*/
     double mag_intermediate_heading = intermediate_heading - m_var;
     MOD_ANGLE(mag_intermediate_heading);
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading
@@ -840,7 +840,7 @@ void AutoTrackRaymarine_pi::SetP70Tracking()
 {  // not tested, not used yet
     std::shared_ptr<std::vector<uint8_t>> payload(new std::vector<uint8_t>(
         { 0x3b, 0x9f, 0xf0, 0x81, 0x84, 0x46, 0x27, 0x9d, 0x4a, 0x00, 0x00, 0x02, 0x08, 0x4e }));
-    wxLogMessage(wxT("AutoTrackRaymarine_pi set :Tracking"));
+    //wxLogMessage(wxT("AutoTrackRaymarine_pi set :Tracking"));
     int PGN = 126208;
     WriteCommDriverN2K(m_handleN2k, PGN, 0xcc, 6, payload);
 }
