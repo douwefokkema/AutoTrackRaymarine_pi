@@ -6,6 +6,6 @@ set "WXWIN=%wxWidgets_ROOT_DIR%"
 
 if %1%==c cmake -A Win32 -G "Visual Studio 17 2022" -DCMAKE_GENERATOR_PLATFORM=Win32 ..
 
-cmake --build . --config Release
-copy C:\radar\AutoTrackRaymarine_pi\build\Release\autotrackraymarine_pi.dll C:\Users\"Douwe Fokkema"\AppData\Local\opencpn\plugins
+cmake --build . --config RelWithDebInfo
+copy C:\radar\AutoTrackRaymarine_pi\build\RelWithDebInfo\autotrackraymarine_pi.dll C:\Users\"Douwe Fokkema"\AppData\Local\opencpn\plugins
 

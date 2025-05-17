@@ -71,6 +71,12 @@ class apDC;
 class ConsoleCanvas;
 class PreferencesDialog;
 class InfoDialog;
+class ErrorDialog;
+
+#define WATCHDOG_TIMEOUT                                                       \
+    (10) // After 10s assume GPS and heading data is invalid
+#define NOT_TIMED_OUT(t, timeout) (!TIMED_OUT(t, timeout))
+#define TIMED_OUT(t, timeout) (t >= timeout)
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
@@ -116,7 +122,11 @@ public:
   wxString GetCommonName();
   wxString GetShortDescription();
   wxString GetLongDescription();
-  wxBitmap m_panelBitmap;  
+  wxBitmap m_panelBitmap;
+  bool m_pilot_seen;
+  time_t m_pilot_seen_timeout;
+  bool m_variation_seen;
+  long m_var_timeout;
 
   void ShowPreferencesDialog(wxWindow* parent);
 
@@ -136,6 +146,11 @@ public:
   void SetPilotAuto();
   void SetPilotStandby();
   void SetP70Tracking();
+  void ShowErrorDialog();
+  void HideErrorDialog();
+  void SetPilotSeen(bool seen);
+  void SetRouteActivated(bool active);
+  void DisplayErrorText(wxString xx);
 
   static wxString StandardPath();
 
@@ -173,7 +188,9 @@ public:
     } m_prefs;
     
     PreferencesDialog *m_PreferencesDialog;
+    ErrorDialog* m_ErrorDialog;
     InfoDialog *m_info_dialog;
+    
     void OnToolbarToolCallback(int id);
 
     // Icons
@@ -185,8 +202,7 @@ public:
 protected:   
     wxPoint m_cursor_position;
     PlugIn_Position_Fix_Ex m_lastfix;
-    void OnTimer(wxTimerEvent &);
-    wxTimer m_Timer;
+   
 
 private:
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);

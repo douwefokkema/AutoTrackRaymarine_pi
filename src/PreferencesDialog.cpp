@@ -27,9 +27,9 @@
 
 #include "PreferencesDialog.h"
 
-int                       g_nCOMPortCheck = 32;
 
 bool PreferencesDialog::Show( bool show )
+
 {
     if(show) {
         // load preferences

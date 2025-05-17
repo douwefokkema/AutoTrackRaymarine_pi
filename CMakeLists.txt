@@ -147,8 +147,10 @@ SET(SRCS
       src/PreferencesDialog.cpp
       src/AutotrackInfoUI.cpp
       src/AutotrackPrefsUI.cpp
+      src/AutoTrackErrorUI.cpp
       src/Info.cpp
       src/icons.cpp
+      src/ErrorDialog.cpp
 	)
 	
 SET (HDRS
@@ -156,8 +158,10 @@ SET (HDRS
       src/PreferencesDialog.h
       src/AutotrackInfoUI.h
       src/AutotrackPrefsUI.h
+      src/AutoTrackErrorUI.h
       src/Info.h
       src/icons.h
+      src/ErrorDialog.h
 )	
 
 

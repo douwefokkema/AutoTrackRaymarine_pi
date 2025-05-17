@@ -2,11 +2,15 @@ src/AutoTrackRaymarine_pi.cpp
 src/PreferencesDialog.cpp
 src/AutotrackInfoUI.cpp
 src/AutotrackPrefsUI.cpp
+src/AutoTrackErrorUI.cpp
 src/Info.cpp
 src/icons.cpp
+src/ErrorDialog.cpp
 src/AutoTrackRaymarine_pi.h
 src/PreferencesDialog.h
 src/AutotrackInfoUI.h
 src/AutotrackPrefsUI.h
+src/AutoTrackErrorUI.h
 src/Info.h
 src/icons.h
+src/ErrorDialog.h

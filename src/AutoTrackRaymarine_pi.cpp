@@ -28,6 +28,7 @@
 #include "AutotrackInfoUI.h"
 #include "Info.h"
 #include "PreferencesDialog.h"
+#include "ErrorDialog.h"
 #include "icons.h"
 
 #include <wx/stdpaths.h>
@@ -76,7 +77,6 @@ AutoTrackRaymarine_pi::AutoTrackRaymarine_pi(void* ppimgr)
     path = fn.GetFullPath();
 
     wxInitAllImageHandlers();
-
     wxLogDebug(wxString("Using icon path: ") + path);
     if (!wxImage::CanRead(path)) {
         wxLogDebug("Initiating image handlers.");
@@ -120,14 +120,15 @@ int AutoTrackRaymarine_pi::Init(void)
     m_XTE_D = 0.;
     m_pilot_heading = -1.; // target heading of pilot in auto mode
     m_vessel_heading = nan("");
+    m_pilot_seen = false;
+    m_variation_seen = false;
     SetStandby();
 
     // Mode
     preferences& p = m_prefs;
-
     p.max_angle = pConf->Read("MaxAngle", 30);
     p.sensitivity = pConf->Read("Sensitivity", 100);
-
+    //ShowErrorDialog();
     ShowInfoDialog();
     m_XTE_refreshed = false;
     m_route_active = false;
@@ -135,9 +136,7 @@ int AutoTrackRaymarine_pi::Init(void)
     m_vessel_heading = nan(""); // current heading of vessel according to pilot, undefined
     m_XTE = 100000.; // undefined
 
-    m_Timer.Connect(wxEVT_TIMER,
-        wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
-    m_Timer.Start(1000);
+    
 
     //    This PlugIn needs a toolbar icon
 
@@ -227,6 +226,11 @@ wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return &m_panelBitmap; }
 
 // wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return m_pdeficon; }
 
+void AutoTrackRaymarine_pi::SetPilotSeen(bool seen) {
+    m_pilot_seen = seen;
+};
+
+
 void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id)
 {
     if (!m_initialized) {
@@ -265,9 +269,7 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     pConf->Write("MaxAngle", p.max_angle);
     pConf->Write("Sensitivity", p.sensitivity);
 
-    m_Timer.Stop();
-    m_Timer.Disconnect(wxEVT_TIMER,
-        wxTimerEventHandler(AutoTrackRaymarine_pi::OnTimer), NULL, this);
+    
 
     m_initialized = false;
     return true;
@@ -357,6 +359,7 @@ void AutoTrackRaymarine_pi::HandleN2K_126720(ObservedEvt ev){
     if (msgLen != 27) {
         return;
     }
+    SetPilotSeen(true);
     /*wxLogMessage(wxT("%0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x, %0x,%0x, %0x, %0x, %0x \n"),
       msg[0], msg[1], msg[2], msg[3], msg[4], msg[5], msg[6], msg[7], msg[8],
       msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16],
@@ -380,6 +383,7 @@ void AutoTrackRaymarine_pi::HandleN2K_65359(ObservedEvt ev)
     m_vessel_heading = (((unsigned int)msg[18] + 256 * (unsigned int)msg[19])
         * 360. / 3.141 / 20000) + m_var;
     MOD_ANGLE(m_vessel_heading);
+    SetPilotSeen(true);
 }
 
 void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
@@ -393,16 +397,16 @@ void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
     m_PreferencesDialog = NULL;
 }
 
-void AutoTrackRaymarine_pi::OnTimer(wxTimerEvent&)
-{
-    wxWindow* canvas = GetCanvasByIndex(0);
-    if (canvas) {
-        canvas->Refresh(false);
-    }
-}
+
+
 
 bool AutoTrackRaymarine_pi::RenderOverlay(wxDC& dc, PlugIn_ViewPort* vp)
 {
+    long now = wxGetUTCTime();
+    if (!m_variation_seen) {
+        ShowErrorDialog();
+        DisplayErrorText(_("No variation\n Activate WMM plugin"));
+    }
     if (!m_initialized) {
         return true;
     }
@@ -416,9 +420,20 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC& dc, PlugIn_ViewPort* vp)
     return true;
 }
 
+void AutoTrackRaymarine_pi::DisplayErrorText(wxString xx)
+{
+    if(m_ErrorDialog) m_ErrorDialog->DisplayText1(xx);
+}
+
 bool AutoTrackRaymarine_pi::RenderGLOverlay(
     wxGLContext* pcontext, PlugIn_ViewPort* vp)
-{
+{    
+    if (!m_variation_seen) {
+        ShowErrorDialog();
+        DisplayErrorText(_("no variation\n Activate WMM plugin"));
+    }
+    
+    
     if (!m_initialized) {
         return true;
 		}
@@ -458,6 +473,23 @@ void AutoTrackRaymarine_pi::ShowPreferences()
         m_PreferencesDialog->SetIcon(icon);
     }
     m_PreferencesDialog->Show();
+}
+
+void AutoTrackRaymarine_pi::ShowErrorDialog()
+{
+    if (!m_ErrorDialog) {
+        m_ErrorDialog
+            = new ErrorDialog(GetOCPNCanvasWindow(), *this);
+    }
+    m_ErrorDialog->Show();
+}
+
+void AutoTrackRaymarine_pi::HideErrorDialog()
+{
+    if (!m_ErrorDialog) {
+        return;
+    }
+    m_ErrorDialog->Hide();
 }
 
 wxString AutoTrackRaymarine_pi::StandardPath()
@@ -501,6 +533,18 @@ wxString AutoTrackRaymarine_pi::StandardPath()
 void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix)
 {
     m_var = pfix.Var;
+    wxLogMessage(wxT("$$$ variation = %f"), m_var);
+    if (!isnan(m_var)) {
+        if (!m_variation_seen) {
+            wxLogMessage(wxT("$$$ variation seen, hide dialogue"));
+            HideErrorDialog();
+        }
+        m_variation_seen = true;
+        wxLogMessage(wxT("$$$ variation seen"));
+    }
+    else {
+        wxLogMessage(wxT("$$$ variation not seen"));
+    }
 }
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info)
@@ -540,7 +584,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_route_active = true;
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
-        //wxLogMessage(wxT("$$$ OCPN Waypoint Arrived"));
+        wxLogMessage(wxT("$$$ OCPN Waypoint Arrived"));
         m_wp_arrived = 2;
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
         || message_id == "OCPN_RTE_ENDED") {
@@ -634,7 +678,7 @@ void AutoTrackRaymarine_pi::Compute()
     XTE_for_correction = m_XTE + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
-    /*wxLogMessage(wxT("$$$XTE_for_cor=%f, m_XTE=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
+    /*wxLogMessage(wxT("XTE_for_cor=%f, m_XTE=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
       XTE_for_correction, m_XTE, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D, DTW);*/
     if (DTW < 50.) {
         XTE_for_correction *= DTW / 50.;
@@ -663,14 +707,14 @@ void AutoTrackRaymarine_pi::Compute()
         new_heading = m_BTW - max_angle;
     }
     MOD_ANGLE(new_heading);
-    //wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, gamma=%f"), new_heading, m_BTW, gamma);
+    //wxLogMessage(_(" new_heading= %f, m_BTW=%f, gamma=%f"), new_heading, m_BTW, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
     double turn;
     if (!m_heading_set) { // after reset accept any turn
         intermediate_heading = new_heading;
-        //wxLogMessage(wxT("$$$ m_heading_set = true"));
+        //wxLogMessage(wxT(" m_heading_set = true"));
         m_heading_set = true;
     }
     else {
@@ -707,7 +751,7 @@ void AutoTrackRaymarine_pi::Compute()
         }
     }
     MOD_ANGLE(intermediate_heading);
-    /*wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, intermediate_heading=%f, turn=%f"), new_heading, m_BTW, intermediate_heading, turn);*/
+    /*wxLogMessage(_(" new_heading= %f, m_BTW=%f, intermediate_heading=%f, turn=%f"), new_heading, m_BTW, intermediate_heading, turn);*/
     double mag_intermediate_heading = intermediate_heading - m_var;
     MOD_ANGLE(mag_intermediate_heading);
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading
@@ -797,7 +841,7 @@ void AutoTrackRaymarine_pi::SetPilotHeading(double heading)
 
     std::shared_ptr<std::vector<uint8_t>> payload(new std::vector<uint8_t>(
                 { 0x01, 0x50, 0xff, 0x00, 0xf8, 0x03, 0x01, 0x3b, 0x07, 0x03, 0x04, 0x06, 0x00, 0x00 }));
-    //wxLogMessage(wxT("$$$ payload %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
+    //wxLogMessage(wxT(" payload %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
 
     double heading_normal = heading;
     while (heading_normal < 0)  heading_normal += 360;

@@ -28,6 +28,7 @@
 
 #include "Info.h"
 #include "AutotrackInfoUI.h"
+#include "AutotrackRaymarine_pi.h"
 
 void InfoDialog::UpdateInfo() {
     if (m_pi->m_pilot_state == TRACKING)
@@ -70,18 +71,27 @@ void InfoDialog::UpdateInfo() {
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
+    if (!m_pi->m_pilot_seen) {
+        wxLogMessage(wxT("$$$Pilot not seen"));
+        m_pi->ShowErrorDialog();
+        m_pi->DisplayErrorText("Pilot not seen");
+    }
   m_pi->SetPilotAuto();   // sent auto command to pilot
   m_pi->SetAuto();
 }
 
 
 void InfoDialog::OnStandby(wxCommandEvent& event) {
+    if (!m_pi->m_pilot_seen) {
+        m_pi->ShowErrorDialog();
+        m_pi->DisplayErrorText("Pilot not seen");
+    }
   
   m_pi->SetPilotStandby();
   m_pi->SetStandby();
   
      /* std::shared_ptr <std::vector<uint8_t>> payload(new std::vector<uint8_t> ({ 1, 0xa9, 0x5d, 0xff, 0x7f, 0xff, 0x7f, 0xfd }));
-      wxLogMessage(wxT("$$$ payload , %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
+      wxLogMessage(wxT("payload , %0x, %0x, %0x"), payload->at(0), payload->at(1), payload->at(2));
   int PGN = 127250;
   WriteCommDriverN2K(m_pi->m_handleN2k, PGN,
       255, 6, payload);*/
@@ -103,7 +113,7 @@ void InfoDialog::EnableHeadingButtons(bool show) {
 }
 
 void InfoDialog::EnableTrackButton(bool enable) {
-  if (enable && m_pi->m_route_active) {
+  if (enable /*&& m_pi->m_route_active*/) {
     buttonTrack->Enable();
   }
   else {
@@ -113,11 +123,20 @@ void InfoDialog::EnableTrackButton(bool enable) {
 
 void InfoDialog::OnTracking(wxCommandEvent& event) {
   if (m_pi->m_route_active) {
+      if (!m_pi->m_pilot_seen) {
+          m_pi->ShowErrorDialog();
+          m_pi->DisplayErrorText(_("Pilot not seen"));
+      }
+
     if (m_pi->m_pilot_state == STANDBY) {
       m_pi->SetAuto();
       m_pi->SetPilotAuto();
     }
     m_pi->SetTracking();
+  }
+  else if (m_pi->m_variation_seen && !m_pi->m_route_active){
+      m_pi->ShowErrorDialog();
+      m_pi->DisplayErrorText(_("No route active"));
   }
 }
 
