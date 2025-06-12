@@ -39,10 +39,10 @@
 
 double heading_resolve(double degrees, double offset = 0)
 {
-    while (degrees < offset - 180)
-        degrees += 360;
-    while (degrees >= offset + 180)
-        degrees -= 360;
+    while (degrees < offset - 180.)
+        degrees += 360.;
+    while (degrees >= offset + 180.)
+        degrees -= 360.;
     return degrees;
 }
 
@@ -131,8 +131,8 @@ int AutoTrackRaymarine_pi::Init(void)
 
     // Mode
     preferences& p = m_prefs;
-    p.max_angle = pConf->Read("MaxAngle", 30);
-    p.sensitivity = pConf->Read("Sensitivity", 100);
+    p.max_angle = pConf->Read("MaxAngle", 30.);
+    p.sensitivity = pConf->Read("Sensitivity", 100.);
     ShowInfoDialog();
     m_XTE_refreshed = false;
     m_route_active = false;
@@ -462,6 +462,15 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
         m_info_dialog->SetPosition(pos);
         m_info_dialog->EnableHeadingButtons(false);
         m_info_dialog->EnableTrackButton(false);
+        
+        int major = GetPlugInVersionMajor();
+        int minor = GetPlugInVersionMinor();
+        wxLogMessage(
+            wxT("AutoTrackRaymarine_pi: ShowInfoDialog major=%i, minor=%i"),
+            major, minor);
+        wxString label;
+        label.Printf(_("AutoTrackRaymarine v%i.%i"), major, minor);
+        m_info_dialog->SetLabel(label);
         wxSize sz = m_info_dialog->GetSize();
         m_info_dialog->Show();
     }
@@ -735,7 +744,7 @@ void AutoTrackRaymarine_pi::Compute()
         if (turn > 180.) {
             turn -= 360.;
         }
-        if (turn < -180) {
+        if (turn < -180.) {
             turn += 360.;
         }
         if (turn > 80. || turn < -80.) {
