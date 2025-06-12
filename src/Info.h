@@ -51,6 +51,9 @@ public:
   void OnPlusOne(wxCommandEvent & event);
   void EnableHeadingButtons(bool enable);
   void EnableTrackButton(bool enable);
+  void SetLabel(wxString label) {
+  m_dialog::SetTitle(label);      
+  }
 
 private:
   /*void OnCancel(wxCommandEvent& event);
