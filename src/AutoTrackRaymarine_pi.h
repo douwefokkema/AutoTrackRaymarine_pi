@@ -174,7 +174,7 @@ public:
 #define AUTO 1
 #define TRACKING 2
 #define I_FACTOR 0.0075   // was 0.3, instable occillations
-#define D_FACTOR 2.   // was 5. 26-05-2025
+#define D_FACTOR 5.   // back to 5 13-06-2025
 
 public:
     void ResetXTE(); 

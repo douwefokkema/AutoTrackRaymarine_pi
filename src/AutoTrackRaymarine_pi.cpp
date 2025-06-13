@@ -465,11 +465,9 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
         
         int major = GetPlugInVersionMajor();
         int minor = GetPlugInVersionMinor();
-        wxLogMessage(
-            wxT("AutoTrackRaymarine_pi: ShowInfoDialog major=%i, minor=%i"),
-            major, minor);
+        int patch = GetPlugInVersionPatch();
         wxString label;
-        label.Printf(_("AutoTrackRaymarine v%i.%i"), major, minor);
+        label.Printf(_("AutoTrackRaymarine v%i.%i.%i"), major, minor, patch);
         m_info_dialog->SetLabel(label);
         wxSize sz = m_info_dialog->GetSize();
         m_info_dialog->Show();
