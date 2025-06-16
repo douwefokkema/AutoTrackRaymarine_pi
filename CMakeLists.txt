@@ -97,8 +97,8 @@ set(ALPHA "alpha") #Standard Repos
 set(CLOUDSMITH_BASE_REPOSITORY "autotrackraymarine")   #lowercase, without the pi
 
 # Set the following to use OpenCPN cloudsmith repositories instead of own repositories
-set(CLOUDSMITH_USER "opencpn")
-#set(CLOUDSMITH_USER "douwe-fokkema")
+#set(CLOUDSMITH_USER "opencpn")
+set(CLOUDSMITH_USER "douwe-fokkema")
 
 set(XML_INFO_URL "https://opencpn-manuals.github.io/main/autotrackraymarine/index.html")
 set(XML_SUMMARY ${SHORT_DESCRIPTION})
