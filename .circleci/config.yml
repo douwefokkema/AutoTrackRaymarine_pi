@@ -82,7 +82,7 @@ commands:
                     condition: <<parameters.install_python>>
                     steps:
                     - run: sudo apt install -y python3-pip
-                    - run: python3 -m pip install cloudsmith-cli
+                    - run: python3 -m pip install --upgrade cloudsmith-cli
                 - when:
                     condition: <<parameters.deploy_use_orb>>
                     steps:
