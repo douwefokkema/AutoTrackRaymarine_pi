@@ -76,7 +76,6 @@ class ErrorDialog;
 #ifndef PI
 #define PI (3.1415926535897931160E0)
 #endif
-#define WPARRIVED 2;
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
@@ -157,11 +156,13 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  int m_wp_arrived;
+  bool m_wp_arrived;
+  int m_arrival, m_wp_loop, m_wp_loop_max;
+  double m_arrival_radius;
   double m_XTE, m_BTW, m_DTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
-  double m_var;
+  double m_var, m_sog;
   bool m_initialized;
   bool m_route_active;
   double m_pilot_heading;         // target heading of pilot in auto mode
