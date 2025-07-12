@@ -55,6 +55,9 @@
 
 #include "ocpn_plugin.h"
 
+#include "nmea0183.h"
+
+
 #ifdef __MSVC__
 //#include <string>
 #include "msvcdefs.h"
@@ -111,6 +114,9 @@ public:
   int Init(void);
   bool DeInit(void);
   DriverHandle m_handleN2k;
+  NMEA0183 m_NMEA0183;
+  double m_origin_to_dest;
+  wxString m_next_wp;
 
   int GetAPIVersionMajor();
   int GetAPIVersionMinor();
@@ -148,7 +154,6 @@ public:
   void ShowErrorDialog();
   void HideErrorDialog();
   void SetPilotSeen(bool seen);
-  void SetRouteActivated(bool active);
   void DisplayErrorText(wxString xx);
 
   static wxString StandardPath();
@@ -156,7 +161,6 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  bool m_wp_arrived;
   int m_arrival, m_wp_loop, m_wp_loop_max;
   double m_arrival_radius;
   double m_XTE, m_BTW, m_DTW;
