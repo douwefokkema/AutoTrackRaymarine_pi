@@ -122,6 +122,7 @@ int AutoTrackRaymarine_pi::Init(void)
     m_XTE_I = 0.;
     m_XTE_D = 0.;
     m_arrival_radius = 50.; //meters default value
+    m_leg_length = 100; // default value
     m_wp_loop = 0;
     m_wp_loop_max = 0;
     m_pilot_heading = -1.; // target heading of pilot in auto mode
@@ -571,7 +572,6 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
   }
   if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
-  wxLogMessage(wxString("$$$ m_XTE refreshed=%f"), m_XTE);
   m_route_active =
       true;  // when SetActiveLegInfo is called a route must be active
   if (!isnan(leg_info.Btw)) {
@@ -589,15 +589,12 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
   if (leg_info.arrival) {
     m_arrival = -1;
   }
-  wxLogMessage(_("$$$ next wp name = %s, m_BTW=%f, arrival=%i, m_arrival=%i"), m_next_wp,
-               m_BTW, leg_info.arrival, m_arrival);
+  wxLogMessage(_("$$$ next wp name = %s, m_BTW=%f, m_DTW=%f, arrival=%i, m_arrival=%i"), m_next_wp,
+               m_BTW, m_DTW, leg_info.arrival, m_arrival);
 
   // calculate bearing origin to destination
   double delta = 360. * asin(m_XTE / m_DTW) / (2. * PI);
-  m_origin_to_dest = m_BTW - delta;
-
-  wxLogMessage(_("$$$OriginToDestination=%f, BTW=%f"),
-               m_origin_to_dest, m_BTW);
+  //m_origin_to_dest = m_BTW - delta;
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
@@ -627,7 +624,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
         
-      m_arrival_radius = m_DTW * 1852. * 1.5; // somewhat larger for nicer curves at the wp $$$
+      m_arrival_radius = m_DTW * 1852.;  // in meters
       wxLogMessage(wxT("$$$ OCPN Waypoint Arrived radius=%f"),
                    m_arrival_radius);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
@@ -701,26 +698,37 @@ void AutoTrackRaymarine_pi::Compute()
     }
     if (!m_route_active) return;
     dist = 50.; // in meters
+    if (m_leg_length < 50) {
+      dist = m_leg_length;
+    }
+    if (dist < 10.) {
+      dist = 10.;
+    }
     double dist_nm = dist / 1852.;
 
     double xte = m_XTE;
     if (m_arrival == 1) {
-      m_wp_loop_max = (int) (m_arrival_radius / (m_sog * 1852. / 3600.));
+      m_leg_length = m_DTW * 1852;  // in meters
+        // estimate of total curve length m_arrival_radius * 1.8
+      m_wp_loop_max = (int) (m_arrival_radius * 1.8 / (m_sog * 1852. / 3600.));
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
-      wxLogMessage(_("$$$ m_wp_loop_max=%i, m_arrival_radius=%f, m_sog=%f"),
-          m_wp_loop_max, m_arrival_radius, m_sog);
+      wxLogMessage(_("$$$ m_wp_loop_max=%i, m_arrival_radius=%f, m_sog=%f, m_leg_length=%f"),
+                   m_wp_loop_max, m_arrival_radius, m_sog, m_leg_length);
     }
-    double factor = 0.; 
+    double factor;
+    factor = 1.;
+
     if (m_wp_loop) {
+        // this loop is active during the turn at the waypoint
       factor = ((double)(m_wp_loop_max - m_wp_loop)) / (double)m_wp_loop_max;
-      dist = m_arrival_radius + (dist - m_arrival_radius) * factor;
-      wxLogMessage(_("$$$  m_max=%i, m_wp_loop=%i, factor=%f, dist=%f"),
-                   m_wp_loop_max, m_wp_loop, factor, dist);
-      dist_nm = dist / 1852.;
+      dist = m_arrival_radius * 1.2;
+      wxLogMessage(_("$$$  m_max=%i, m_wp_loop=%i, dist=%f, factor=%f"),
+                   m_wp_loop_max, m_wp_loop, dist, factor);
       m_wp_loop--;
     }
 
+    dist_nm = dist / 1852.;
     // integration of XTE, but prevent increase of m_XTE_I when XTE is large
     if (xte > -0.25 * dist_nm && xte < 0.25 * dist_nm) {
         m_XTE_I += xte;
@@ -746,9 +754,7 @@ void AutoTrackRaymarine_pi::Compute()
 
     wxLogMessage(wxT("XTE_for_cor=%f, xte=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
       XTE_for_correction, xte, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D, DTW);
-    if (DTW < 50.) {
-        XTE_for_correction *= DTW / 50.;  // *** ???
-    }
+    
     if (DTW < 0.) {
         XTE_for_correction = 0.;
     }
@@ -761,12 +767,14 @@ void AutoTrackRaymarine_pi::Compute()
         gamma = 0.;
     }
     double max_angle = m_prefs.max_angle;
-     wxLogMessage(wxT("$$$AutoTrackRaymarine initial gamma=%f, btw=%f, \
-     dist=%f, max_angle= %f, XTE_for_correction=%f"), gamma, m_BTW, dist, 
-     max_angle, XTE_for_correction);
     new_heading = m_BTW + gamma; // bearing of next wp
-
+    wxLogMessage(wxT("$$$AutoTrackRaymarine initial gamma=%f, btw=%f, \
+     dist=%f, max_angle= %f, XTE_for_correction=%f"),
+                 gamma, m_BTW, dist, max_angle, XTE_for_correction);
     if (gamma > max_angle) {
+      wxLogMessage(wxT("$$$AutoTrackRaymarine limited gamma=%f, btw=%f, \
+     dist=%f, max_angle= %f, XTE_for_correction=%f"),
+                   gamma, m_BTW, dist, max_angle, XTE_for_correction);
         new_heading = m_BTW + max_angle;
     }
     else if (gamma < -max_angle) {

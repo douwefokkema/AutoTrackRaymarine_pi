@@ -163,7 +163,7 @@ public:
   DriverHandle m_N2khandle;
   int m_arrival, m_wp_loop, m_wp_loop_max;
   double m_arrival_radius;
-  double m_XTE, m_BTW, m_DTW;
+  double m_XTE, m_BTW, m_DTW, m_leg_length;
   bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var, m_sog;
