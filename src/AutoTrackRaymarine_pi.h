@@ -171,6 +171,7 @@ public:
   bool m_route_active;
   double m_pilot_heading;         // target heading of pilot in auto mode
   double m_vessel_heading;        // current heading of vessel according to pilot
+  double m_delayed_heading;       // delayed heading for simulation only
   
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 

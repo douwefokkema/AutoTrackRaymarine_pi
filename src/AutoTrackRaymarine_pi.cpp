@@ -34,7 +34,7 @@
 #include <wx/stdpaths.h>
 
 
-#define TURNRATE 20. // turnrate per second
+#define TURNRATE 30. // turnrate per second
 
 // Trying to build now with CI 4nd try
 
@@ -133,6 +133,7 @@ int AutoTrackRaymarine_pi::Init(void)
     m_info_dialog = NULL;
     m_ErrorDialog = NULL;
     SetStandby();
+    m_delayed_heading = -1.;
 
     // Mode
     preferences& p = m_prefs;
@@ -593,7 +594,8 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
 
   // calculate bearing origin to destination
   double delta = 360. * asin(m_XTE / m_DTW) / (2. * PI);
-  //m_origin_to_dest = m_BTW - delta;
+  m_origin_to_dest = m_BTW - delta;
+  MOD_ANGLE(m_origin_to_dest);
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
@@ -623,7 +625,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
         
-      m_arrival_radius = m_DTW * 1852. * 1.2;  // in meters
+      m_arrival_radius = m_DTW * 1852.;  // in meters
       wxLogMessage(wxT("$$$ OCPN Waypoint Arrived radius=%f"),
                    m_arrival_radius);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
@@ -697,22 +699,15 @@ void AutoTrackRaymarine_pi::Compute()
     }
     if (!m_route_active) return;
     dist = 50.; // in meters
-    if (m_leg_length < 50) {
-      dist = m_leg_length;
-    }
-    if (dist < 20.) {
-      dist = 20.;
-    }
     double dist_nm = dist / 1852.;
 
     double xte = m_XTE;
 
     if (m_arrival == 1) {
       m_leg_length = m_DTW * 1852;  // in meters
-        // estimate of total curve length m_arrival_radius * 1.8
-      m_wp_loop_max = (int) (m_arrival_radius * 1.8 / (m_sog * 1852. / 3600.));
-      if (m_wp_loop_max > 72) {
-        m_wp_loop_max = 72;
+      m_wp_loop_max = (int) (m_arrival_radius / (m_sog * 1852. / 3600.));
+      if (m_wp_loop_max > 36) {
+        m_wp_loop_max = 36;
       }
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
@@ -725,11 +720,7 @@ void AutoTrackRaymarine_pi::Compute()
     if (m_wp_loop) {
       // this loop is active during the turn at the waypoint
       factor = ((double)(m_wp_loop_max - m_wp_loop)) / (double)m_wp_loop_max;
-      dist = m_arrival_radius;
-      if (m_arrival_radius > 50.) {
-        dist = m_arrival_radius + (50. - m_arrival_radius) * factor;
-      }
-      xte = xte * 0.5 * (1. + factor);
+      xte = xte * 0.5 * (1. + factor);  // temporary lower xte to turn faster at wp
       wxLogMessage(_("$$$  m_max=%i, m_wp_loop=%i, dist=%f, factor=%f, m_XTE=%f, xte=%f"),
                    m_wp_loop_max, m_wp_loop, dist, factor, m_XTE, xte);
       m_wp_loop--;
@@ -774,21 +765,24 @@ void AutoTrackRaymarine_pi::Compute()
         gamma = 0.;
     }
     double max_angle = m_prefs.max_angle;
-    new_heading = m_BTW + gamma; // bearing of next wp
-    wxLogMessage(wxT("$$$AutoTrackRaymarine initial gamma=%f, btw=%f, \
-     dist=%f, max_angle= %f, XTE_for_correction=%f"),
-                 gamma, m_BTW, dist, max_angle, XTE_for_correction);
+    new_heading = m_origin_to_dest + gamma;  // bearing of next wp
+    wxLogMessage(wxT("$$$AutoTrackRaymarine initial gamma= %f, btw= %f, \
+     dist=%f, max_angle= %f, XTE_for_correction= %f, m_origin_to_dest= %f"),
+                 gamma, m_BTW, dist, max_angle, XTE_for_correction, m_origin_to_dest);
     if (gamma > max_angle) {
       wxLogMessage(wxT("$$$AutoTrackRaymarine limited gamma=%f, btw=%f, \
      dist=%f, max_angle= %f, XTE_for_correction=%f"),
                    gamma, m_BTW, dist, max_angle, XTE_for_correction);
-        new_heading = m_BTW + max_angle;
+       // new_heading = m_BTW + max_angle;
+      new_heading = m_origin_to_dest + max_angle;
     }
     else if (gamma < -max_angle) {
-        new_heading = m_BTW - max_angle;
+      new_heading = m_origin_to_dest - max_angle;
     }
     MOD_ANGLE(new_heading);
-    wxLogMessage(_(" new_heading= %f, m_BTW=%f, gamma=%f"), new_heading, m_BTW, gamma);
+    wxLogMessage(
+        _(" new_heading= %f, m_BTW=%f, m_origin_to_dest= %f, gamma=%f"),
+        new_heading, m_BTW, m_origin_to_dest, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
@@ -840,7 +834,10 @@ void AutoTrackRaymarine_pi::Compute()
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading
     m_pilot_heading = intermediate_heading; // This should not be needed, pilot heading
                              // will come from pilot. For testing only.
-    SendHSC(intermediate_heading);
+    if (m_delayed_heading != -1.) {
+      SendHSC(m_delayed_heading);  // send heading 1 circle delayed, to improve simualation
+    }
+    m_delayed_heading = intermediate_heading;
 }
 
 void AutoTrackRaymarine_pi::ChangePilotHeading(int degrees)
