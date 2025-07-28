@@ -145,6 +145,7 @@ int AutoTrackRaymarine_pi::Init(void)
     m_pilot_heading = -1.; // undefined, heading to steer of pilot, true degrees
     m_vessel_heading = nan(""); // current heading of vessel according to pilot, undefined
     m_XTE = 100000.; // undefined
+    m_origin_to_dest = -1.;
 
     //    This PlugIn needs a toolbar icon
 
@@ -580,22 +581,28 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
   if (!isnan(leg_info.Dtw)) {
     m_DTW = leg_info.Dtw;
   }
-
   m_next_wp = leg_info.wp_name;
-  
   if (m_arrival == -1) {
     m_arrival = 1;
   }
   if (leg_info.arrival) {
     m_arrival = -1;
   }
-  wxLogMessage(_("$$$ next wp name = %s, m_BTW=%f, m_DTW=%f, arrival=%i, m_arrival=%i"), m_next_wp,
-               m_BTW, m_DTW, leg_info.arrival, m_arrival);
-
   // calculate bearing origin to destination
   double delta = 360. * asin(m_XTE / m_DTW) / (2. * PI);
+  double prev_origin_to_dest = m_origin_to_dest;
   m_origin_to_dest = m_BTW - delta;
   MOD_ANGLE(m_origin_to_dest);
+  if (prev_origin_to_dest != -1.) {
+    m_heading_change = m_origin_to_dest - prev_origin_to_dest;
+    MOD_ANGLE(m_heading_change);
+  } else {
+    m_heading_change = 0.;
+  }
+  wxLogMessage(
+      _("$$$ next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f"),
+               m_next_wp, m_BTW, m_DTW, leg_info.arrival, m_arrival,
+               m_origin_to_dest, m_heading_change);
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
@@ -644,6 +651,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
 
 void AutoTrackRaymarine_pi::ResetXTE() {
     m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
+    m_origin_to_dest = -1;
 }
 
 void AutoTrackRaymarine_pi::SetStandby()
@@ -709,10 +717,13 @@ void AutoTrackRaymarine_pi::Compute()
       if (m_wp_loop_max > 36) {
         m_wp_loop_max = 36;
       }
+      // large angles more steps
+      int steps = ((int)m_heading_change) / 40 + 1;
+      m_wp_loop_max *= steps;
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
-      wxLogMessage(_("$$$ m_wp_loop_max=%i, m_arrival_radius=%f, m_sog=%f, m_leg_length=%f"),
-                   m_wp_loop_max, m_arrival_radius, m_sog, m_leg_length);
+      wxLogMessage(_("$$$ m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_leg_length= %f, steps= %i"),
+                   m_wp_loop_max, m_arrival_radius, m_sog, m_leg_length, steps);
     }
     double factor;
     factor = 1.;
@@ -737,6 +748,10 @@ void AutoTrackRaymarine_pi::Compute()
     }
 
     m_XTE_D = factor * (xte - m_XTE_P); // difference, but lower at wp
+    double differential;
+    differential = D_FACTOR * m_XTE_D;
+    if (differential > .001) differential = 0.001;
+    if (differential < -.001) differential = -0.001;
     m_XTE_P = xte; // proportional used as previous xte next time
 
     if (m_XTE_I > 0.5 * dist_nm / I_FACTOR) { // in NM
@@ -747,11 +762,12 @@ void AutoTrackRaymarine_pi::Compute()
     }
 
     // ******************* here the correction is set ****************
-    XTE_for_correction = xte + I_FACTOR * m_XTE_I + D_FACTOR * m_XTE_D;
+    XTE_for_correction = xte + I_FACTOR * m_XTE_I + differential;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
     wxLogMessage(wxT("XTE_for_cor=%f, xte=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
-      XTE_for_correction, xte, I_FACTOR * m_XTE_I, D_FACTOR * m_XTE_D, DTW);
+                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential,
+                 DTW);
     
     if (DTW < 0.) {
         XTE_for_correction = 0.;
