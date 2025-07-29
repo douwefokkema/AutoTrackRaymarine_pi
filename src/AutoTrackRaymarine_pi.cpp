@@ -34,7 +34,7 @@
 #include <wx/stdpaths.h>
 
 
-#define TURNRATE 30. // turnrate per second
+#define TURNRATE 20. // turnrate per second
 
 // Trying to build now with CI 4nd try
 
@@ -122,7 +122,6 @@ int AutoTrackRaymarine_pi::Init(void)
     m_XTE_I = 0.;
     m_XTE_D = 0.;
     m_arrival_radius = 50.; //meters default value
-    m_leg_length = 100; // default value
     m_wp_loop = 0;
     m_wp_loop_max = 0;
     m_pilot_heading = -1.; // target heading of pilot in auto mode
@@ -566,12 +565,12 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
   // wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called
   // xte=%f, BTW= %f, DTW= %f, name= %s"),
   //    leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
-  m_XTE = leg_info.Xte;
+  m_XTE = leg_info.Xte * 1852.;  // all in meters
   if (isnan(m_XTE)) {
     m_XTE = 0.;
     // wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
   }
-  if (m_XTE > -0.000001 && m_XTE < 0.) m_XTE = 0.;
+  if (m_XTE > -0.001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
   m_route_active =
       true;  // when SetActiveLegInfo is called a route must be active
@@ -579,7 +578,7 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
     m_BTW = leg_info.Btw;
   }
   if (!isnan(leg_info.Dtw)) {
-    m_DTW = leg_info.Dtw;
+    m_DTW = leg_info.Dtw * 1852.;  // all in meters
   }
   m_next_wp = leg_info.wp_name;
   if (m_arrival == -1) {
@@ -600,9 +599,9 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
     m_heading_change = 0.;
   }
   wxLogMessage(
-      _("$$$ next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f"),
+      _("$$$ next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f, m_XTE= %f"),
                m_next_wp, m_BTW, m_DTW, leg_info.arrival, m_arrival,
-               m_origin_to_dest, m_heading_change);
+               m_origin_to_dest, m_heading_change, m_XTE);
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
@@ -632,7 +631,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
         
-      m_arrival_radius = m_DTW * 1852.;  // in meters
+      m_arrival_radius = m_DTW;  // in meters
       wxLogMessage(wxT("$$$ OCPN Waypoint Arrived radius=%f"),
                    m_arrival_radius);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
@@ -651,7 +650,7 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
 
 void AutoTrackRaymarine_pi::ResetXTE() {
     m_XTE = 0.;  m_XTE_P = 0.;  m_XTE_I = 0.; m_XTE_D = 0.; m_heading_set = false;
-    m_origin_to_dest = -1;
+    m_origin_to_dest = -1.;
 }
 
 void AutoTrackRaymarine_pi::SetStandby()
@@ -696,7 +695,7 @@ void AutoTrackRaymarine_pi::SetTracking()
 void AutoTrackRaymarine_pi::Compute()
 {
     double dist;
-    double DTW = m_DTW * 1852.;
+    double DTW = m_DTW;
     double XTE_for_correction;
     if (isnan(m_BTW))
         return;
@@ -707,78 +706,81 @@ void AutoTrackRaymarine_pi::Compute()
     }
     if (!m_route_active) return;
     dist = 50.; // in meters
-    double dist_nm = dist / 1852.;
 
     double xte = m_XTE;
 
-    if (m_arrival == 1) {
-      m_leg_length = m_DTW * 1852;  // in meters
+    if (m_arrival == 1 && abs(m_sog) > 0.1) {
       m_wp_loop_max = (int) (m_arrival_radius / (m_sog * 1852. / 3600.));
       if (m_wp_loop_max > 36) {
         m_wp_loop_max = 36;
       }
       // large angles more steps
-      int steps = ((int)m_heading_change) / 40 + 1;
-      m_wp_loop_max *= steps;
+      double heading_change = abs(m_heading_change);
+      if (heading_change > 180.) heading_change -= 360.;
+      heading_change = abs(heading_change);
+      if (heading_change > 40.) m_wp_loop_max *= 2;
+      else if (heading_change > 20.) m_wp_loop_max *= 1.5;
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
-      wxLogMessage(_("$$$ m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_leg_length= %f, steps= %i"),
-                   m_wp_loop_max, m_arrival_radius, m_sog, m_leg_length, steps);
+      wxLogMessage(_("$$$ m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);
     }
+    if (m_arrival == 1) m_arrival = 0;
     double factor;
     factor = 1.;
+    double differential;
 
     if (m_wp_loop) {
       // this loop is active during the turn at the waypoint
       factor = ((double)(m_wp_loop_max - m_wp_loop)) / (double)m_wp_loop_max;
       xte = xte * 0.5 * (1. + factor);  // temporary lower xte to turn faster at wp
-      wxLogMessage(_("$$$  m_max=%i, m_wp_loop=%i, dist=%f, factor=%f, m_XTE=%f, xte=%f"),
-                   m_wp_loop_max, m_wp_loop, dist, factor, m_XTE, xte);
+      wxLogMessage(_("$$$  m_max= %i, m_wp_loop= %i, factor=%f, m_XTE=%f, xte=%f"),
+                   m_wp_loop_max, m_wp_loop, factor, m_XTE, xte);
+      m_XTE_D = xte - m_XTE_P;  // difference, but lower at wp
+      differential = D_FACTOR * m_XTE_D;
+      if (m_wp_loop == m_wp_loop_max) {
+        differential = 0.;
+      }
       m_wp_loop--;
-    }
-
-    dist_nm = dist / 1852.;
-    // integration of XTE, but prevent increase of m_XTE_I when XTE is large
-    if (xte > -0.25 * dist_nm && xte < 0.25 * dist_nm) {
+    } else {
+      m_XTE_D = xte - m_XTE_P;
+      differential = D_FACTOR * m_XTE_D;
+      // integration of XTE, but prevent too much increase of m_XTE_I when XTE is large
+      // don't integrate when in wp loop
+      if (xte > -0.25 * dist && xte < 0.25 * dist) {
         m_XTE_I += xte;
-    } else if (xte > -0.5 * dist_nm && xte < 0.5 * dist_nm) {
+      } else if (xte > -0.5 * dist && xte < 0.5 * dist) {
         m_XTE_I += 0.5 * xte;
-    } else if (xte > -dist_nm && xte < dist_nm) {
+      } else if (xte > -dist && xte < dist) {
         m_XTE_I += 0.2 * xte;
+      }
+      // limit max size of m_XTE_I
+      if (m_XTE_I > 0.5 * dist / I_FACTOR) {  // in NM
+        m_XTE_I = 0.5 * dist / I_FACTOR;
+      }
+      if (m_XTE_I < -0.5 * dist / I_FACTOR) {  // in NM
+        m_XTE_I = -0.5 * dist / I_FACTOR;
+      }
     }
-
-    m_XTE_D = factor * (xte - m_XTE_P); // difference, but lower at wp
-    double differential;
-    differential = D_FACTOR * m_XTE_D;
-    if (differential > .001) differential = 0.001;
-    if (differential < -.001) differential = -0.001;
-    m_XTE_P = xte; // proportional used as previous xte next time
-
-    if (m_XTE_I > 0.5 * dist_nm / I_FACTOR) { // in NM
-        m_XTE_I = 0.5 * dist_nm / I_FACTOR;
-    }
-    if (m_XTE_I < -0.5 * dist_nm / I_FACTOR) { // in NM
-        m_XTE_I = -0.5 * dist_nm / I_FACTOR;
-    }
-
-    // ******************* here the correction is set ****************
+    m_XTE_P = xte;  // proportional used as previous xte next time
+   
     XTE_for_correction = xte + I_FACTOR * m_XTE_I + differential;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
-    wxLogMessage(wxT("XTE_for_cor=%f, xte=%f, I_FACTOR*m_XTE_I=%f, D_FACTOR*m_XTE_D=%f, DTW=%f"),
-                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential,
-                 DTW);
-    
+    wxLogMessage(wxT("XTE_for_cor= %f, xte= %f, I_FACTOR*m_XTE_I= %f, D_FACTOR*m_XTE_D= %f, DTW= %f"),
+                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential, DTW);
     if (DTW < 0.) {
         XTE_for_correction = 0.;
     }
     double gamma,
         new_heading; // angle for correction of heading relative to BTW
     if (dist > 1.) {
-        gamma = atan(XTE_for_correction * 1852. / dist) / (2. * PI) * 360.;
+        gamma = atan(XTE_for_correction / dist) / (2. * PI) * 360.;
     }
     else {
         gamma = 0.;
+    }
+    if (m_origin_to_dest == -1.) {
+      m_origin_to_dest = m_BTW;
     }
     double max_angle = m_prefs.max_angle;
     new_heading = m_origin_to_dest + gamma;  // bearing of next wp
@@ -786,8 +788,8 @@ void AutoTrackRaymarine_pi::Compute()
      dist=%f, max_angle= %f, XTE_for_correction= %f, m_origin_to_dest= %f"),
                  gamma, m_BTW, dist, max_angle, XTE_for_correction, m_origin_to_dest);
     if (gamma > max_angle) {
-      wxLogMessage(wxT("$$$AutoTrackRaymarine limited gamma=%f, btw=%f, \
-     dist=%f, max_angle= %f, XTE_for_correction=%f"),
+      wxLogMessage(wxT("$$$AutoTrackRaymarine limited gamma= %f, btw= %f, \
+     dist= %f, max_angle= %f, XTE_for_correction= %f"),
                    gamma, m_BTW, dist, max_angle, XTE_for_correction);
        // new_heading = m_BTW + max_angle;
       new_heading = m_origin_to_dest + max_angle;
@@ -797,14 +799,13 @@ void AutoTrackRaymarine_pi::Compute()
     }
     MOD_ANGLE(new_heading);
     wxLogMessage(
-        _(" new_heading= %f, m_BTW=%f, m_origin_to_dest= %f, gamma=%f"),
+        _(" new_heading= %f, m_BTW=%f, m_origin_to_dest= %f, gamma= %f"),
         new_heading, m_BTW, m_origin_to_dest, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
     double turn = 0.;
     if (!m_heading_set) { // after reset accept any turn
-        //wxLogMessage(_(" m_heading_set = false, new_heading= %f, m_BTW=%f"), new_heading, m_BTW);
         new_heading = m_BTW;
         intermediate_heading = new_heading;
         //wxLogMessage(wxT(" m_heading_set = true"));
@@ -844,7 +845,7 @@ void AutoTrackRaymarine_pi::Compute()
         }
     }
     MOD_ANGLE(intermediate_heading);
-    wxLogMessage(_("$$$ new_heading= %f, m_BTW=%f, intermediate_heading=%f, turn=%f"), new_heading, m_BTW, intermediate_heading, turn);
+    wxLogMessage(_("$$$ new_heading= %f, m_BTW= %f, intermediate_heading= %f, turn= %f"), new_heading, m_BTW, intermediate_heading, turn);
     double mag_intermediate_heading = intermediate_heading - m_var;
     MOD_ANGLE(mag_intermediate_heading);
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading

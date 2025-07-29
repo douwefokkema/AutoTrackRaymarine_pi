@@ -65,7 +65,7 @@ void InfoDialog::UpdateInfo() {
       xte = _("----");
     }
     else {
-      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE * 1852.);
+      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE);
     }
     TextStatus121->SetValue(xte);
 }

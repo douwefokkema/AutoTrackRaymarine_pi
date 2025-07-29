@@ -161,9 +161,10 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  int m_arrival, m_wp_loop, m_wp_loop_max;
+  int m_arrival;
+  uint16_t m_wp_loop, m_wp_loop_max;
   double m_arrival_radius;
-  double m_XTE, m_BTW, m_DTW, m_leg_length;
+  double m_XTE, m_BTW, m_DTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
   double m_var, m_sog;
@@ -173,7 +174,6 @@ public:
   double m_vessel_heading;        // current heading of vessel according to pilot
   double m_delayed_heading;       // delayed heading for simulation only
   double m_heading_change;
-  
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
   uint16_t m_pilot_state; // 0 standby, 1 auto, 2 tracking
