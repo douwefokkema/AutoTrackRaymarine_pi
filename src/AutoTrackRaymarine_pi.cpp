@@ -754,10 +754,10 @@ void AutoTrackRaymarine_pi::Compute()
         m_XTE_I += 0.2 * xte;
       }
       // limit max size of m_XTE_I
-      if (m_XTE_I > 0.5 * dist / I_FACTOR) {  // in NM
+      if (m_XTE_I > 0.5 * dist / I_FACTOR) {  // in meters
         m_XTE_I = 0.5 * dist / I_FACTOR;
       }
-      if (m_XTE_I < -0.5 * dist / I_FACTOR) {  // in NM
+      if (m_XTE_I < -0.5 * dist / I_FACTOR) {  // in meters
         m_XTE_I = -0.5 * dist / I_FACTOR;
       }
     }
