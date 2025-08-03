@@ -346,11 +346,11 @@ void AutoTrackRaymarine_pi::HandleN2K_126208(ObservedEvt ev)
         //                 "f25=%0x, f26=%0x, f27=%0x, f28=%0x, f29=%0x, len=%i"),
         //    msg[23], msg[24], msg[25], msg[26], msg[27], msg[28], msg[29],
         //    msgLen);
-        if (msg[25] == 0x00 && m_pilot_state != STANDBY) { // +2 done
+        if (msg[25] == 0x00 && m_pilot_state != STANDBY) {
             SetStandby();
             m_pilot_heading = -1.; // undefined
         }
-        if (msg[25] == 0x40) { // AUTO     // +2 done
+        if (msg[25] == 0x40) { // AUTO
             if (m_pilot_state == STANDBY) {
                 SetAuto();
             } else {
@@ -377,10 +377,10 @@ void AutoTrackRaymarine_pi::HandleN2K_126720(ObservedEvt ev){
       msg[9], msg[10], msg[11], msg[12], msg[13], msg[14], msg[15], msg[16],
       msg[17], msg[18], msg[19], msg[20], msg[21], msg[22], msg[23], msg[24]);*/
 
-    if (msg[21] == 0x40 && m_pilot_state != STANDBY) {  // +2 done
+    if (msg[21] == 0x40 && m_pilot_state != STANDBY) {
         SetStandby();
     }
-    if (msg[21] == 0x42) { // AUTO    // +2 done
+    if (msg[21] == 0x42) { // AUTO
         if (m_pilot_state == STANDBY) {
             SetAuto();
         }
@@ -969,9 +969,9 @@ void AutoTrackRaymarine_pi::SetPilotAuto(){
 
 void AutoTrackRaymarine_pi::SetPilotStandby()
 {
-    std::string standby_command
-        = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,"
-          "05,ff,ff"; // set standby
+    //std::string standby_command
+    //    = "Z,3,126208,7,204,17,01,63,ff,00,f8,04,01,3b,07,03,04,04,00,00,"
+    //      "05,ff,ff"; // set standby
     std::shared_ptr<std::vector<uint8_t>> payload(
         new std::vector<uint8_t>({ 01, 0x63, 0xff, 0x00, 0xf8, 0x04, 0x01, 0x3b, 0x07, 0x03, 0x04, 0x04, 0x00, 0x00, 0x05, 0xff, 0xff }));
     // length = 17
