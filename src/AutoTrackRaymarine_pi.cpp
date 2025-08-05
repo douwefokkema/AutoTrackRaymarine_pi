@@ -706,23 +706,15 @@ void AutoTrackRaymarine_pi::Compute()
     }
     if (!m_route_active) return;
     dist = 50.; // in meters
-
     double xte = m_XTE;
-
-    if (m_arrival == 1 && abs(m_sog) > 0.1) {
+    if (m_arrival == 1 && m_sog > 0.1) {
       m_wp_loop_max = (int) (m_arrival_radius / (m_sog * 1852. / 3600.));
       if (m_wp_loop_max > 36) {
         m_wp_loop_max = 36;
       }
-      // large angles more steps
-      double heading_change = abs(m_heading_change);
-      if (heading_change > 180.) heading_change -= 360.;
-      heading_change = abs(heading_change);
-      if (heading_change > 40.) m_wp_loop_max *= 2;
-      else if (heading_change > 20.) m_wp_loop_max *= 1.5;
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
-      wxLogMessage(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);
+      /*wxLogMessage(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);*/
     }
     if (m_arrival == 1) m_arrival = 0;
     double factor;
