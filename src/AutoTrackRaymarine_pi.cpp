@@ -775,24 +775,24 @@ void AutoTrackRaymarine_pi::Compute()
       m_origin_to_dest = m_BTW;
     }
     double max_angle = m_prefs.max_angle;
-    new_heading = m_origin_to_dest + gamma;  // bearing of next wp
+    new_heading = m_BTW + gamma;  // bearing of next wp
     /*wxLogMessage(wxT("AutoTrackRaymarine initial gamma= %f, btw= %f, \
-     dist=%f, max_angle= %f, XTE_for_correction= %f, m_origin_to_dest= %f"),
-                 gamma, m_BTW, dist, max_angle, XTE_for_correction, m_origin_to_dest);*/
+     dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f"),
+                 gamma, m_BTW, dist, max_angle, XTE_for_correction, m_BTW);*/
     if (gamma > max_angle) {
       /*wxLogMessage(wxT("AutoTrackRaymarine limited gamma= %f, btw= %f, \
      dist= %f, max_angle= %f, XTE_for_correction= %f"),
                    gamma, m_BTW, dist, max_angle, XTE_for_correction);*/
        // new_heading = m_BTW + max_angle;
-      new_heading = m_origin_to_dest + max_angle;
+      new_heading = m_BTW + max_angle;
     }
     else if (gamma < -max_angle) {
-      new_heading = m_origin_to_dest - max_angle;
+      new_heading = m_BTW - max_angle;
     }
     MOD_ANGLE(new_heading);
     /*wxLogMessage(
-        _(" new_heading= %f, m_BTW=%f, m_origin_to_dest= %f, gamma= %f"),
-        new_heading, m_BTW, m_origin_to_dest, gamma);*/
+        _(" new_heading= %f, m_BTW=%f, m_BTW= %f, gamma= %f"),
+        new_heading, m_BTW, m_BTW, gamma);*/
     // don't turn too fast....
 
     double intermediate_heading;
