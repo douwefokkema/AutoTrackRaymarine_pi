@@ -80,6 +80,16 @@ class ErrorDialog;
 #define PI (3.1415926535897931160E0)
 #endif
 
+#define LOGLEVEL_VERBOSE 1
+#define IF_LOG_AT_LEVEL(x) if ((g_verbose & (x)) != 0)
+
+#define IF_LOG_AT(x, y)       \
+  do {                        \
+    IF_LOG_AT_LEVEL(x) { y; } \
+  } while (0)
+#define LOG_INFO wxLogMessage
+#define LOG_VERBOSE IF_LOG_AT_LEVEL(LOGLEVEL_VERBOSE) wxLogMessage
+
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
   //friend InfoDialog;
@@ -123,6 +133,7 @@ public:
   int GetPlugInVersionMajor();
   int GetPlugInVersionMinor();
   int GetPlugInVersionPatch();
+  int GetPlugInVersionTweak();
   wxBitmap *GetPlugInBitmap();
   wxString GetCommonName();
   wxString GetShortDescription();

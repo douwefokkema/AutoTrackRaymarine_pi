@@ -36,7 +36,7 @@
 
 #define TURNRATE 20. // turnrate per second
 
-// Trying to build now with CI 4nd try
+int g_verbose;
 
 double heading_resolve(double degrees, double offset = 0)
 {
@@ -113,6 +113,7 @@ int AutoTrackRaymarine_pi::Init(void)
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
 
     m_heading_set = false;
+    g_verbose = 0;
     m_arrival = 0;
     m_XTE = 0.;
     m_BTW = 0.;
@@ -136,6 +137,7 @@ int AutoTrackRaymarine_pi::Init(void)
 
     // Mode
     preferences& p = m_prefs;
+    pConf->Read(wxT("VerboseLog"), &g_verbose, 0);
     p.max_angle = pConf->Read("MaxAngle", 30.);
     p.sensitivity = pConf->Read("Sensitivity", 100.);
     ShowInfoDialog();
@@ -200,18 +202,20 @@ int AutoTrackRaymarine_pi::Init(void)
         const auto& attributes = GetAttributes(handle);
         if (attributes.find("protocol") == attributes.end())
             continue;
-        wxLogMessage(wxT("handle proto %s"), attributes.at("protocol"));
+        LOG_VERBOSE(wxT("handle proto %s"), attributes.at("protocol"));
         if (attributes.at("protocol") == "nmea2000") {
             m_handleN2k = handle;
             found_handle = true;
             break;
         }
     }
-    if (!found_handle) wxLogMessage(wxT("nmea2000 handle not found"));
+    if (!found_handle) LOG_VERBOSE(wxT("nmea2000 handle not found"));
     std::vector<int> pgn_list = { 127250, 126208 };
     CommDriverResult xx = RegisterTXPGNs(m_handleN2k, pgn_list);
 
-    wxLogMessage(wxT("AutoTrackRaymarine version %i.%i.%i"), GetPlugInVersionMajor(), GetPlugInVersionMinor(), GetPlugInVersionPatch());
+    LOG_INFO(wxT("AutoTrackRaymarine version %i.%i.%i.%i"),
+                GetPlugInVersionMajor(), GetPlugInVersionMinor(),
+                GetPlugInVersionPatch(), GetPlugInVersionTweak());
 
     return (WANTS_OVERLAY_CALLBACK | WANTS_OPENGL_OVERLAY_CALLBACK
         | WANTS_CURSOR_LATLON | WANTS_NMEA_SENTENCES | WANTS_NMEA_EVENTS
@@ -229,6 +233,7 @@ wxString AutoTrackRaymarine_pi::GetLongDescription() { return _(PLUGIN_LONG_DESC
 int AutoTrackRaymarine_pi::GetPlugInVersionMajor() { return PLUGIN_VERSION_MAJOR; }
 int AutoTrackRaymarine_pi::GetPlugInVersionMinor() { return PLUGIN_VERSION_MINOR; }
 int AutoTrackRaymarine_pi::GetPlugInVersionPatch() { return PLUGIN_VERSION_PATCH; }
+int AutoTrackRaymarine_pi::GetPlugInVersionTweak() { return PLUGIN_VERSION_TWEAK; }
 
 wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return &m_panelBitmap; }
 
@@ -266,6 +271,7 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     // save config
     wxFileConfig* pConf = GetOCPNConfigObject();
     pConf->SetPath(_T("/Settings/AutoTrackRaymarine"));
+    pConf->Write(wxT("VerboseLog"), g_verbose);
 
     if (m_info_dialog) {
         wxPoint p = m_info_dialog->GetPosition();
@@ -472,8 +478,9 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
         int major = GetPlugInVersionMajor();
         int minor = GetPlugInVersionMinor();
         int patch = GetPlugInVersionPatch();
+        int tweak = GetPlugInVersionTweak();
         wxString label;
-        label.Printf(_("AutoTrackRaymarine v%i.%i.%i"), major, minor, patch);
+        label.Printf(_("AutoTrackRaymarine v%i.%i.%i.%i"), major, minor, patch, tweak);
         m_info_dialog->SetLabel(label);
         wxSize sz = m_info_dialog->GetSize();
         m_info_dialog->Show();
@@ -562,13 +569,12 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix) {
 }
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
-  //wxLogMessage(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called
-  // xte=%f, BTW= %f, DTW= %f, name= %s"),
-  //    leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
+  LOG_VERBOSE(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"),
+      leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
   m_XTE = leg_info.Xte * 1852.;  // all in meters
   if (isnan(m_XTE)) {
     m_XTE = 0.;
-    //wxLogMessage(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
+    LOG_VERBOSE(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
   }
   if (m_XTE > -0.001 && m_XTE < 0.) m_XTE = 0.;
   m_XTE_refreshed = true;
@@ -598,16 +604,16 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
   } else {
     m_heading_change = 0.;
   }
-  /*wxLogMessage(
+  LOG_VERBOSE(
       _(" next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f, m_XTE= %f"),
                m_next_wp, m_BTW, m_DTW, leg_info.arrival, m_arrival,
-               m_origin_to_dest, m_heading_change, m_XTE);*/
+               m_origin_to_dest, m_heading_change, m_XTE);
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
 //  m_NMEA0183 << sentence;
 //  if (m_NMEA0183.PreParse()) {
-//    //wxLogMessage(_("receoved %s"), sentence);
+//    //wxLogMessage(_("received %s"), sentence);
 //    if (m_NMEA0183.LastSentenceIDReceived == _T("APB") && m_NMEA0183.Parse()) {
 //      //wxLogMessage(_("receoved2"));
 //    }
@@ -632,8 +638,8 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
     } else if (message_id == "OCPN_WPT_ARRIVED") {
         
       m_arrival_radius = m_DTW;  // in meters
-      /*wxLogMessage(wxT(" OCPN Waypoint Arrived radius=%f"),
-                   m_arrival_radius);*/
+      LOG_VERBOSE(wxT(" OCPN Waypoint Arrived radius=%f"),
+                   m_arrival_radius);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
         || message_id == "OCPN_RTE_ENDED") {
         m_route_active = false;
@@ -677,7 +683,7 @@ void AutoTrackRaymarine_pi::SetAuto()
 void AutoTrackRaymarine_pi::SetTracking()
 {
     if (!m_route_active) {
-        wxLogMessage(wxT("Error, trying to start tracking w/o active route"));
+        LOG_INFO(wxT("Error, trying to start tracking w/o active route"));
         return;
     }
     m_pilot_state = TRACKING;
@@ -686,7 +692,7 @@ void AutoTrackRaymarine_pi::SetTracking()
     }
     
     ResetXTE(); // reset local XTE calculations
-    /*wxLogMessage(wxString(" zero XTE on O, m_XTE=%f"), m_XTE);*/
+    LOG_VERBOSE(wxString(" zero XTE on O, m_XTE=%f"), m_XTE);
     ZeroXTE(); // zero XTE on OpenCPN
     // blue
     if (m_info_dialog)m_info_dialog->TextStatus11->SetBackgroundColour(wxColour(0, 255, 64));
@@ -712,9 +718,17 @@ void AutoTrackRaymarine_pi::Compute()
       if (m_wp_loop_max > 36) {
         m_wp_loop_max = 36;
       }
+
+      double heading_change = abs(m_heading_change);
+      if (heading_change > 180.) heading_change -= 360.;
+      heading_change = abs(heading_change);
+      if (heading_change < 10.)
+        m_wp_loop_max = 7;
+      else if (heading_change < 20.)
+        m_wp_loop_max = 15;
       m_wp_loop = m_wp_loop_max;
       m_arrival = 0;
-      /*wxLogMessage(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);*/
+      LOG_VERBOSE(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);
     }
     if (m_arrival == 1) m_arrival = 0;
     double factor;
@@ -725,8 +739,8 @@ void AutoTrackRaymarine_pi::Compute()
       // this loop is active during the turn at the waypoint
       factor = ((double)(m_wp_loop_max - m_wp_loop)) / (double)m_wp_loop_max;
       xte = xte * 0.5 * (1. + factor);  // temporary lower xte to turn faster at wp
-      /*wxLogMessage(_("  m_max= %i, m_wp_loop= %i, factor=%f, m_XTE=%f, xte=%f"),
-                   m_wp_loop_max, m_wp_loop, factor, m_XTE, xte);*/
+      LOG_VERBOSE(_("  m_max= %i, m_wp_loop= %i, factor=%f, m_XTE=%f, xte=%f"),
+                   m_wp_loop_max, m_wp_loop, factor, m_XTE, xte);
       m_XTE_D = xte - m_XTE_P;  // difference, but lower at wp
       differential = D_FACTOR * m_XTE_D;
       if (m_wp_loop == m_wp_loop_max) {
@@ -758,8 +772,8 @@ void AutoTrackRaymarine_pi::Compute()
     XTE_for_correction = xte + I_FACTOR * m_XTE_I + differential;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
-    /*wxLogMessage(wxT("XTE_for_cor= %f, xte= %f, I_FACTOR*m_XTE_I= %f, D_FACTOR*m_XTE_D= %f, DTW= %f"),
-                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential, DTW);*/
+    LOG_VERBOSE(wxT("XTE_for_cor= %f, xte= %f, I_FACTOR*m_XTE_I= %f, D_FACTOR*m_XTE_D= %f, DTW= %f"),
+                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential, DTW);
     if (DTW < 0.) {
         XTE_for_correction = 0.;
     }
@@ -776,13 +790,13 @@ void AutoTrackRaymarine_pi::Compute()
     }
     double max_angle = m_prefs.max_angle;
     new_heading = m_BTW + gamma;  // bearing of next wp
-    /*wxLogMessage(wxT("AutoTrackRaymarine initial gamma= %f, btw= %f, \
-     dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f"),
-                 gamma, m_BTW, dist, max_angle, XTE_for_correction, m_BTW);*/
+    LOG_VERBOSE(wxT("AutoTrackRaymarine initial gamma= %f, btw= %f, \
+     dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f, m_DTW= %f"),
+                 gamma, m_BTW, dist, max_angle, XTE_for_correction, m_BTW, m_DTW);
     if (gamma > max_angle) {
-      /*wxLogMessage(wxT("AutoTrackRaymarine limited gamma= %f, btw= %f, \
+      LOG_VERBOSE(wxT("AutoTrackRaymarine limited gamma= %f, btw= %f, \
      dist= %f, max_angle= %f, XTE_for_correction= %f"),
-                   gamma, m_BTW, dist, max_angle, XTE_for_correction);*/
+                   gamma, m_BTW, dist, max_angle, XTE_for_correction);
        // new_heading = m_BTW + max_angle;
       new_heading = m_BTW + max_angle;
     }
@@ -790,9 +804,9 @@ void AutoTrackRaymarine_pi::Compute()
       new_heading = m_BTW - max_angle;
     }
     MOD_ANGLE(new_heading);
-    /*wxLogMessage(
+    LOG_VERBOSE(
         _(" new_heading= %f, m_BTW=%f, m_BTW= %f, gamma= %f"),
-        new_heading, m_BTW, m_BTW, gamma);*/
+        new_heading, m_BTW, m_BTW, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
@@ -800,7 +814,7 @@ void AutoTrackRaymarine_pi::Compute()
     if (!m_heading_set) { // after reset accept any turn
         new_heading = m_BTW;
         intermediate_heading = new_heading;
-        //wxLogMessage(wxT(" m_heading_set = true"));
+        LOG_VERBOSE(wxT(" m_heading_set = true"));
         m_heading_set = true;
     }
     else {
@@ -837,7 +851,7 @@ void AutoTrackRaymarine_pi::Compute()
         }
     }
     MOD_ANGLE(intermediate_heading);
-    /*wxLogMessage(_(" new_heading= %f, m_BTW= %f, intermediate_heading= %f, turn= %f"), new_heading, m_BTW, intermediate_heading, turn);*/
+    LOG_VERBOSE(_(" new_heading= %f, m_BTW= %f, intermediate_heading= %f, turn= %f"), new_heading, m_BTW, intermediate_heading, turn);
     double mag_intermediate_heading = intermediate_heading - m_var;
     MOD_ANGLE(mag_intermediate_heading);
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading
@@ -911,8 +925,8 @@ void AutoTrackRaymarine_pi::SendHSC(double course)
 
 void AutoTrackRaymarine_pi::SetPilotHeading(double heading)
 {
-    /* wxLogMessage(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"),
-     heading);*/
+     LOG_VERBOSE(wxT("AutoTrackRaymarine_pi SetAutopilotHeading = %f"),
+     heading);
 
     // commands for NGT-1 in Canboat format
     //std::string standby_command
@@ -975,7 +989,7 @@ void AutoTrackRaymarine_pi::SetP70Tracking()
 {  // not tested, not used yet
     std::shared_ptr<std::vector<uint8_t>> payload(new std::vector<uint8_t>(
         { 0x3b, 0x9f, 0xf0, 0x81, 0x84, 0x46, 0x27, 0x9d, 0x4a, 0x00, 0x00, 0x02, 0x08, 0x4e }));
-    //wxLogMessage(wxT("AutoTrackRaymarine_pi set :Tracking"));
+    LOG_VERBOSE(wxT("AutoTrackRaymarine_pi set :Tracking"));
     int PGN = 126208;
     WriteCommDriverN2K(m_handleN2k, PGN, 0xcc, 6, payload);
 }

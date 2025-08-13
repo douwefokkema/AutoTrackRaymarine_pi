@@ -72,7 +72,7 @@ void InfoDialog::UpdateInfo() {
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
     if (!m_pi->m_pilot_seen) {
-        //wxLogMessage(wxT("Pilot not seen"));
+        LOG_INFO(wxT("Pilot not seen"));
         m_pi->ShowErrorDialog();
         m_pi->DisplayErrorText("Pilot not seen");
     }
