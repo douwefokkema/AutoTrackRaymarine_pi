@@ -172,7 +172,7 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  int m_arrival;
+  bool m_arrival;
   uint16_t m_wp_loop, m_wp_loop_max;
   double m_arrival_radius;
   double m_XTE, m_BTW, m_DTW;
@@ -193,6 +193,8 @@ public:
 #define TRACKING 2
 #define I_FACTOR 0.0075   // was 0.3, instable occillations
 #define D_FACTOR 5.   // back to 5 13-06-2025
+
+  wxCriticalSection m_exclusive;
 
 public:
     void ResetXTE(); 

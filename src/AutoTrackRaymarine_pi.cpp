@@ -114,7 +114,7 @@ int AutoTrackRaymarine_pi::Init(void)
 
     m_heading_set = false;
     g_verbose = 0;
-    m_arrival = 0;
+    m_arrival = false;
     m_XTE = 0.;
     m_BTW = 0.;
     m_DTW = 0.;
@@ -430,10 +430,6 @@ bool AutoTrackRaymarine_pi::RenderOverlay(wxDC& dc, PlugIn_ViewPort* vp)
     if (m_info_dialog) {
         m_info_dialog->UpdateInfo();
     }
-    if (m_XTE_refreshed) {
-        m_XTE_refreshed = false;
-        Compute();
-    }
     return true;
 }
 
@@ -455,10 +451,6 @@ bool AutoTrackRaymarine_pi::RenderGLOverlay(
     
     if (m_info_dialog) {
         m_info_dialog->UpdateInfo();
-    }
-    if (m_XTE_refreshed) {
-        m_XTE_refreshed = false;
-        Compute();
     }
     return true;
 }
@@ -587,12 +579,10 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
     m_DTW = leg_info.Dtw * 1852.;  // all in meters
   }
   m_next_wp = leg_info.wp_name;
-  if (m_arrival == -1) {
-    m_arrival = 1;
-  }
-  if (leg_info.arrival) {
-    m_arrival = -1;
-  }
+  
+  /*if (leg_info.arrival) {
+    m_arrival = true;
+  }*/
   // calculate bearing origin to destination
   double delta = 360. * asin(m_XTE / m_DTW) / (2. * PI);
   double prev_origin_to_dest = m_origin_to_dest;
@@ -608,6 +598,7 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
       _(" next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f, m_XTE= %f"),
                m_next_wp, m_BTW, m_DTW, leg_info.arrival, m_arrival,
                m_origin_to_dest, m_heading_change, m_XTE);
+  Compute();
 }
 
 //void AutoTrackRaymarine_pi::SetNMEASentence(wxString& sentence) {
@@ -636,8 +627,8 @@ void AutoTrackRaymarine_pi::SetPluginMessage(
         m_route_active = true;
         m_info_dialog->EnableTrackButton(true);
     } else if (message_id == "OCPN_WPT_ARRIVED") {
-        
       m_arrival_radius = m_DTW;  // in meters
+      m_arrival = true;
       LOG_VERBOSE(wxT(" OCPN Waypoint Arrived radius=%f"),
                    m_arrival_radius);
     } else if (message_id == "OCPN_RTE_DEACTIVATED"
@@ -694,14 +685,17 @@ void AutoTrackRaymarine_pi::SetTracking()
     ResetXTE(); // reset local XTE calculations
     LOG_VERBOSE(wxString(" zero XTE on O, m_XTE=%f"), m_XTE);
     ZeroXTE(); // zero XTE on OpenCPN
+    m_wp_loop_max = 10;
+    m_wp_loop = m_wp_loop_max;
     // blue
     if (m_info_dialog)m_info_dialog->TextStatus11->SetBackgroundColour(wxColour(0, 255, 64));
 }
 
-void AutoTrackRaymarine_pi::Compute()
-{
-    double dist;
-    double DTW = m_DTW;
+void AutoTrackRaymarine_pi::Compute() {
+  wxCriticalSectionLocker lock(m_exclusive);
+  LOG_VERBOSE(_("$$$ Compute called wp= %s"), m_next_wp);
+  double dist;
+  double DTW = m_DTW;
     double XTE_for_correction;
     if (isnan(m_BTW))
         return;
@@ -713,12 +707,11 @@ void AutoTrackRaymarine_pi::Compute()
     if (!m_route_active) return;
     dist = 50.; // in meters
     double xte = m_XTE;
-    if (m_arrival == 1 && m_sog > 0.1) {
+    if (m_arrival && m_sog > 0.1) {
       m_wp_loop_max = (int) (m_arrival_radius / (m_sog * 1852. / 3600.));
       if (m_wp_loop_max > 36) {
         m_wp_loop_max = 36;
       }
-
       double heading_change = abs(m_heading_change);
       if (heading_change > 180.) heading_change -= 360.;
       heading_change = abs(heading_change);
@@ -727,10 +720,9 @@ void AutoTrackRaymarine_pi::Compute()
       else if (heading_change < 20.)
         m_wp_loop_max = 15;
       m_wp_loop = m_wp_loop_max;
-      m_arrival = 0;
       LOG_VERBOSE(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);
     }
-    if (m_arrival == 1) m_arrival = 0;
+    m_arrival = false;
     double factor;
     factor = 1.;
     double differential;
@@ -743,7 +735,7 @@ void AutoTrackRaymarine_pi::Compute()
                    m_wp_loop_max, m_wp_loop, factor, m_XTE, xte);
       m_XTE_D = xte - m_XTE_P;  // difference, but lower at wp
       differential = D_FACTOR * m_XTE_D;
-      if (m_wp_loop == m_wp_loop_max) {
+      if (m_wp_loop >= m_wp_loop_max - 1) {
         differential = 0.;
       }
       m_wp_loop--;
