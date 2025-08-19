@@ -18,6 +18,7 @@
 #include <wx/settings.h>
 #include <wx/spinctrl.h>
 #include <wx/sizer.h>
+#include <wx/checkbox.h>
 #include <wx/statbox.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -39,6 +40,8 @@ class PreferencesDialogBase : public wxDialog
 		wxSpinCtrl* m_sMaxAngle1;
 		wxStaticText* m_staticText1011;
 		wxSpinCtrl* m_sensitivity;
+		wxStaticText* m_staticText10111;
+		wxCheckBox* m_checkBox1;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
@@ -49,7 +52,7 @@ class PreferencesDialogBase : public wxDialog
 
 	public:
 
-		PreferencesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Autopilot Route Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
+		PreferencesDialogBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("AutoTrackRaymarine Preferences"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxTAB_TRAVERSAL );
 
 		~PreferencesDialogBase();
 

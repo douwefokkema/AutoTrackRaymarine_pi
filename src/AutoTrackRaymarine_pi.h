@@ -67,8 +67,9 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
-//#define MY_API_VERSION_MAJOR 1
-//#define MY_API_VERSION_MINOR 18
+
+
+extern int g_verbose;
 
 class apDC;
 class ConsoleCanvas;
@@ -89,6 +90,7 @@ class ErrorDialog;
   } while (0)
 #define LOG_INFO wxLogMessage
 #define LOG_VERBOSE IF_LOG_AT_LEVEL(LOGLEVEL_VERBOSE) wxLogMessage
+
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
@@ -188,6 +190,7 @@ public:
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
   uint16_t m_pilot_state; // 0 standby, 1 auto, 2 tracking
+  int m_context_menu_show_id;
 #define STANDBY 0
 #define AUTO 1
 #define TRACKING 2
@@ -202,7 +205,7 @@ public:
     // these are stored to the config
     struct preferences {
         double max_angle;
-        double sensitivity;
+      double sensitivity;
     } m_prefs;
     
     PreferencesDialog *m_PreferencesDialog;
@@ -226,6 +229,7 @@ private:
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
     void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
+    void OnContextMenuItemCallback(int id);
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;

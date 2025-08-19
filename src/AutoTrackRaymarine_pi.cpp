@@ -138,6 +138,7 @@ int AutoTrackRaymarine_pi::Init(void)
     // Mode
     preferences& p = m_prefs;
     pConf->Read(wxT("VerboseLog"), &g_verbose, 0);
+    if (g_verbose > 1) g_verbose = 1;
     p.max_angle = pConf->Read("MaxAngle", 30.);
     p.sensitivity = pConf->Read("Sensitivity", 100.);
     ShowInfoDialog();
@@ -162,6 +163,19 @@ int AutoTrackRaymarine_pi::Init(void)
 #endif
 
     SetStandby();
+    wxMenu dummy_menu;
+
+    wxMenuItem* mi1 =
+        new wxMenuItem(&dummy_menu, -1, _("Show AutoTrackRaymarine Preferences"));
+
+#ifdef __WXMSW__
+    wxFont* qFont = OCPNGetFont(_("Menu"), 10);
+    mi1->SetFont(*qFont);
+#endif
+
+    m_context_menu_show_id = AddCanvasContextMenuItem(mi1, this);
+    SetCanvasContextMenuItemViz(m_context_menu_show_id, true);
+
     m_initialized = true;
 
     // initialize NavMsg listeners
@@ -242,6 +256,12 @@ wxBitmap *AutoTrackRaymarine_pi::GetPlugInBitmap() { return &m_panelBitmap; }
 void AutoTrackRaymarine_pi::SetPilotSeen(bool seen) {
     m_pilot_seen = seen;
 };
+
+void AutoTrackRaymarine_pi::OnContextMenuItemCallback(int id) {
+  if (id == m_context_menu_show_id) {
+    ShowPreferencesDialog(GetOCPNCanvasWindow());
+  }
+}
 
 
 void AutoTrackRaymarine_pi::OnToolbarToolCallback(int id)
@@ -404,19 +424,11 @@ void AutoTrackRaymarine_pi::HandleN2K_65359(ObservedEvt ev)
     SetPilotSeen(true);
 }
 
-void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent)
-{
+void AutoTrackRaymarine_pi::ShowPreferencesDialog(wxWindow* parent){
     if (NULL == m_PreferencesDialog)
-        m_PreferencesDialog = new PreferencesDialog(parent, *this);
-
-    m_PreferencesDialog->ShowModal();
-
-    delete m_PreferencesDialog;
-    m_PreferencesDialog = NULL;
+      m_PreferencesDialog = new PreferencesDialog(GetOCPNCanvasWindow(), *this);
+    m_PreferencesDialog->Show(true);
 }
-
-
-
 
 bool AutoTrackRaymarine_pi::RenderOverlay(wxDC& dc, PlugIn_ViewPort* vp)
 {
@@ -789,7 +801,6 @@ void AutoTrackRaymarine_pi::Compute() {
       LOG_VERBOSE(wxT("AutoTrackRaymarine limited gamma= %f, btw= %f, \
      dist= %f, max_angle= %f, XTE_for_correction= %f"),
                    gamma, m_BTW, dist, max_angle, XTE_for_correction);
-       // new_heading = m_BTW + max_angle;
       new_heading = m_BTW + max_angle;
     }
     else if (gamma < -max_angle) {
