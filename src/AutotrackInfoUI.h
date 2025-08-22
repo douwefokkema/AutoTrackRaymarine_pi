@@ -33,12 +33,15 @@ class m_dialog : public wxDialog
 {
 	private:
 
+    public:
+          wxTextCtrl* TextStatus11;
+
 	protected:
 		wxStaticLine* StaticLine1;
 		wxButton* buttonAuto;
 		wxButton* buttonStandby;
 		wxButton* buttonTrack;
-		
+		wxTextCtrl* pilot_state;
 		
 		wxTextCtrl* heading;
 		wxTextCtrl* TextStatus12;
@@ -51,7 +54,6 @@ class m_dialog : public wxDialog
 		wxButton* buttonDecTen;
 		wxButton* buttonIncTen;
 		wxButton* buttonIncOne;
-        wxTextCtrl* pilot_state;
 
 		// Virtual event handlers, override them in your derived class
 		virtual void OnActiveApp( wxActivateEvent& event ) { event.Skip(); }
@@ -66,7 +68,6 @@ class m_dialog : public wxDialog
 
 	public:
 		wxStaticLine* StaticLine3;
-        wxTextCtrl* TextStatus11;
 
 		m_dialog( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT("Autopilot and Track Control"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( -1,-1 ), long style = wxCAPTION|wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX|wxRESIZE_BORDER, const wxString& name = wxT("Raymarine Autopilot") );
 

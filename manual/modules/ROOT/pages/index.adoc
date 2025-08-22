@@ -10,8 +10,8 @@ Developer: Douwe Fokkema
 
 == Purpose
 
-Works with Raymarine Evolution auto pilots.
-Provides automatic following of routes defined in OpenCPN and will also function as a remote control for a Raymarine Evolution autopilot.
+Provides automatic following of routes defined in OpenCPN through a Raymarine Evo autopilot and will also function as a remote control 
+for that autopilot.
 
 == Installation
 Installation is done through the Plugin Manager of OpenCPN. In OpenCPN, go to Options->Plugins and click Update Plugin Catalog: Master.
@@ -20,13 +20,13 @@ Locate AutoTrackRaymarine and select it. Click Install.
 To use the plugin you need an NMEA2000 connection to the Raymarine
  network. To connect to a NMEA2000 network, use any of the interfaces supported by OpenCPN.
 The current version will run on all platforms supported by OpenCPN. AutoTrackRaymarine works fine
- with OpenCPN version 5.8.4 and later. OpenCPN version 5.12.2 is preferred, in that version some issues in the Route Manager have been solved.
+ with OpenCPN version 5.8.4 and later. OpenCPN version 5.12.2 or later is preferred, in that version some issues in the Route Manager have been solved.
 
 
 == Operation from the Raymarine Control Head (P70)
 
 * Make your route in OpenCPN.
-* Activate the route in OpenCPN. Cast off.
+* Activate the route in OpenCPN. Check that the active waypoint is the one you want to pass first.
 * Put the ship on course.
 * Press Auto on the Raymarine P70 pilot head.
 * Pilot takes over as usual.
@@ -39,6 +39,7 @@ destination, and follows the route with a margin (XTE) normally less than 2 mete
 * Auto button when pilot is in auto activates the tracking again.
 * When you press auto again when the plugin is tracking a route, XTE will be made zero. You will then head from the current position
 straight for the active waypoint.
+* A good quality GPS position is essential for the operation of this plugin.
 
 == Operation from OpenCPN Plugin Interface
 
@@ -53,7 +54,7 @@ Alternatively AutoTrackRaymarine may be controlled from the plugin window on the
 
 == Turning at the waypoints
 
-AutoTrackRaymarine will start the turn at a waypoint 1 second after passing the Arrival Radius of that waypoint.
+AutoTrackRaymarine will start the turn at a waypoint 1 second after passing the "Arrival Radius" of that waypoint.
 It will start turning relatively fast, where after it will seek the track towards the next (active) waypoint.
 This means that the behavior of AutoTrackRaymarine is influenced by the value of the Arrival Radius.
 Values of 0.03 or 0.04 nm are normally fine if waypoints aren't too close together, some 0.5 nm at least.
@@ -69,14 +70,18 @@ Don't forget to save and import in OpenCPN afterwards.
 
 == Preferences
 
-image::prefs.jpg[Preferences window]
+image::prefs.png[Preferences window]
 
-To access AutoTrackRaymarine preferences go to the Plugin Manager in OpenCPN (options->Plugins), select AutoTrackRaymarine and click Preferences.
-In Preferences you can set the Max Error Angle, that is the maximum correction that AutoTrackRaymarine will apply to the course to the next waypoint to
-get back on the track. Setting this value too low makes it difficult to keep on track in case of cross currents. Setting Max Error Angle
+To access AutoTrackRaymarine preferences access the context menu of OpenCPN. You find the context menu by clicking the right hand mouse button anywhere on the screen. 
+There you select "AutoTrackRaymarine preferences" Alternatively the preferences window can be opened from the Plugin Manager. Go to the Plugin Manager
+ in OpenCPN (options->Plugins), select AutoTrackRaymarine and click Preferences.
+In Preferences you can set the Max Correction Angle, that is the maximum correction that AutoTrackRaymarine will apply to the course to the next waypoint to
+get back on the route segment. Setting this value too low makes it difficult to keep on track in case of cross currents. Setting Max Correction Angle
 to 30 or 40 degrees should normally be fine.
-With Sensitivity you can adjust the amount of action AutoTrackRaymarine applies to bring you back on the track.
+With Sensitivity you can adjust the amount of correction AutoTrackRaymarine applies to bring you back on the track.
 Not enough action, increase to 100% or even higher. Unstable, rapid zigzagging, decrease to 70 or even 40%. Fast boats need lower values of Sensitivity.
+By tagging "Logging On" you can activate the logging of this plugin. Use this in case of abormal behavior or errors. The resulting opencpn.log file can be 
+used by the makers of the plugin to analyse an issue. But don't turn logging on when not needed, the logfile can get very big.
 
 == Background
 
@@ -88,8 +93,7 @@ waypoints it may overshoot a little. With large compass errors or strong
 cross currents, it may take a minute or so to settle down on the track.
 
 Warning: this plugin may take full control of your autopilot. In case of
-system or software errors be ready to switch the autopilot off (never
-happened).
+system or software errors be ready to switch the autopilot off.
 
 == Remote Control
 

@@ -324,8 +324,7 @@ void AutoTrackRaymarine_pi::HandleN2K_127250(ObservedEvt ev){
 }
 
 // 65360 Autopilot heading. From pilot. Transmitted only when pilot is Auto.
-void AutoTrackRaymarine_pi::HandleN2K_65360(ObservedEvt ev)
-{ // Vessel heading, standerd NMEA2000
+void AutoTrackRaymarine_pi::HandleN2K_65360(ObservedEvt ev){ 
     NMEA2000Id id_65360(65360);
     double p_h;
     std::vector<uint8_t> msg = GetN2000Payload(id_65360, ev);
@@ -753,6 +752,8 @@ void AutoTrackRaymarine_pi::Compute() {
       m_wp_loop--;
     } else {
       m_XTE_D = xte - m_XTE_P;
+      if (m_XTE_D > .5) m_XTE_D = .5;
+      if (m_XTE_D < -.5) m_XTE_D = -.5; // larger differences caused by arrivals or GPS errors
       differential = D_FACTOR * m_XTE_D;
       // integration of XTE, but prevent too much increase of m_XTE_I when XTE is large
       // don't integrate when in wp loop
@@ -794,7 +795,7 @@ void AutoTrackRaymarine_pi::Compute() {
     }
     double max_angle = m_prefs.max_angle;
     new_heading = m_BTW + gamma;  // bearing of next wp
-    LOG_VERBOSE(wxT("AutoTrackRaymarine initial gamma= %f, btw= %f, \
+    LOG_VERBOSE(wxT("gamma= %f, btw= %f, \
      dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f, m_DTW= %f"),
                  gamma, m_BTW, dist, max_angle, XTE_for_correction, m_BTW, m_DTW);
     if (gamma > max_angle) {
@@ -808,8 +809,8 @@ void AutoTrackRaymarine_pi::Compute() {
     }
     MOD_ANGLE(new_heading);
     LOG_VERBOSE(
-        _(" new_heading= %f, m_BTW=%f, m_BTW= %f, gamma= %f"),
-        new_heading, m_BTW, m_BTW, gamma);
+        _(" new_heading= %f, m_BTW=%f, gamma= %f"),
+        new_heading, m_BTW, gamma);
     // don't turn too fast....
 
     double intermediate_heading;
@@ -854,7 +855,9 @@ void AutoTrackRaymarine_pi::Compute() {
         }
     }
     MOD_ANGLE(intermediate_heading);
-    LOG_VERBOSE(_(" new_heading= %f, m_BTW= %f, intermediate_heading= %f, turn= %f"), new_heading, m_BTW, intermediate_heading, turn);
+    LOG_VERBOSE(
+        _(" new_heading= %f, m_BTW= %f, intermediate_heading= %f, turn= %f, m_vessel_heading= %f"),
+        new_heading, m_BTW, intermediate_heading, turn, m_vessel_heading);
     double mag_intermediate_heading = intermediate_heading - m_var;
     MOD_ANGLE(mag_intermediate_heading);
     SetPilotHeading(mag_intermediate_heading); // the commands used expect magnetic heading

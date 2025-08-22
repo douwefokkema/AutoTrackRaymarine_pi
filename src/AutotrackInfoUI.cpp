@@ -84,7 +84,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( TextStatus11, 0, wxALL, 5 );
 
-	heading = new wxTextCtrl( this, wxID_ANY, wxT("Heading"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
+	heading = new wxTextCtrl( this, wxID_ANY, wxT("Vessel Heading"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !heading->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -114,7 +114,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( TextStatus12, 0, wxALL, 5 );
 
-	track = new wxTextCtrl( this, wxID_ANY, wxT("Track"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
+	track = new wxTextCtrl( this, wxID_ANY, wxT("Pilot Heading"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !track->HasFlag( wxTE_MULTILINE ) )
 	{
@@ -144,7 +144,7 @@ m_dialog::m_dialog( wxWindow* parent, wxWindowID id, const wxString& title, cons
 
 	gSizer4->Add( TextStatus14, 0, wxALL, 5 );
 
-	XTE = new wxTextCtrl( this, wxID_ANY, wxT("XTE"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
+	XTE = new wxTextCtrl( this, wxID_ANY, wxT("XTE meters"), wxDefaultPosition, wxSize( -1,-1 ), wxTE_READONLY|wxTE_CENTER );
 	#ifdef __WXGTK__
 	if ( !XTE->HasFlag( wxTE_MULTILINE ) )
 	{
