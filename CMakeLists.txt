@@ -68,10 +68,10 @@ set(PACKAGE "AutoTrackRaymarine")
 set(SHORT_DESCRIPTION "Route following for Raymarine EV-1 Autopilots ")
 set(LONG_DESCRIPTION "Route tracking and remote control for Evolution pilots")
 
-set(VERSION_MAJOR "1")
-set(VERSION_MINOR "21")
-set(VERSION_PATCH "6")
-set(VERSION_TWEAK "2")
+set(VERSION_MAJOR "2")
+set(VERSION_MINOR "1")
+set(VERSION_PATCH "0")
+set(VERSION_TWEAK "0")
 set(VERSION_DATE  "04/08/2025")#DD/MM/YYYY format
 
 set(OCPN_MIN_VERSION "ov58")

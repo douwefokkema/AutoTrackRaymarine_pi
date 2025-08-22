@@ -227,7 +227,7 @@ int AutoTrackRaymarine_pi::Init(void)
     std::vector<int> pgn_list = { 127250, 126208 };
     CommDriverResult xx = RegisterTXPGNs(m_handleN2k, pgn_list);
 
-    LOG_INFO(wxT("AutoTrackRaymarine version %i.%i.%i.%i"),
+    LOG_INFO(wxT("AutoTrackRaymarine version %i.%i.%i-%i"),
                 GetPlugInVersionMajor(), GetPlugInVersionMinor(),
                 GetPlugInVersionPatch(), GetPlugInVersionTweak());
 
@@ -483,7 +483,7 @@ void AutoTrackRaymarine_pi::ShowInfoDialog()
         int patch = GetPlugInVersionPatch();
         int tweak = GetPlugInVersionTweak();
         wxString label;
-        label.Printf(_("AutoTrackRaymarine v%i.%i.%i.%i"), major, minor, patch, tweak);
+        label.Printf(_("AutoTrackRaymarine v%i.%i.%i-%i"), major, minor, patch, tweak);
         m_info_dialog->SetLabel(label);
         wxSize sz = m_info_dialog->GetSize();
         m_info_dialog->Show();
