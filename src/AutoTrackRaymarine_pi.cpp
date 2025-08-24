@@ -572,14 +572,12 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix) {
 }
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
-  LOG_VERBOSE(wxString("AutoTrackRaymarine_pi: SetActiveLegInfo called xte=%f, BTW= %f, DTW= %f, name= %s"),
-      leg_info.Xte, leg_info.Btw, leg_info.Dtw, leg_info.wp_name);
   m_XTE = leg_info.Xte * 1852.;  // all in meters
   if (isnan(m_XTE)) {
     m_XTE = 0.;
     LOG_VERBOSE(wxString("AutoTrackRaymarine_pi: m_XTE is NaN"));
   }
-  if (m_XTE > -0.001 && m_XTE < 0.) m_XTE = 0.;
+  if (m_XTE > -0.001 && m_XTE < 0.001) m_XTE = 0.;
   m_XTE_refreshed = true;
   m_route_active =
       true;  // when SetActiveLegInfo is called a route must be active
@@ -606,9 +604,9 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
     m_heading_change = 0.;
   }
   LOG_VERBOSE(
-      _(" next wp = %s, m_BTW= %f, m_DTW= %f, arrival= %i, m_arrival= %i, to_dest= %f, change= %f, m_XTE= %f"),
-               m_next_wp, m_BTW, m_DTW, leg_info.arrival, m_arrival,
-               m_origin_to_dest, m_heading_change, m_XTE);
+      _("nextwp= %s, m_BTW= %f, m_DTW= %f, m_XTE= %f, arrv= %i, todest= %f, hchange= %f, sensi= %f, maxangle= %f"),
+              m_next_wp, m_BTW, m_DTW, m_XTE, leg_info.arrival, m_origin_to_dest,
+              m_heading_change, m_prefs.sensitivity, m_prefs.max_angle);
   Compute();
 }
 
@@ -617,7 +615,7 @@ void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
 //  if (m_NMEA0183.PreParse()) {
 //    //wxLogMessage(_("received %s"), sentence);
 //    if (m_NMEA0183.LastSentenceIDReceived == _T("APB") && m_NMEA0183.Parse()) {
-//      //wxLogMessage(_("receoved2"));
+//      //wxLogMessage(_("received2"));
 //    }
 //  }
 //}
@@ -704,7 +702,6 @@ void AutoTrackRaymarine_pi::SetTracking()
 
 void AutoTrackRaymarine_pi::Compute() {
   wxCriticalSectionLocker lock(m_exclusive);
-  LOG_VERBOSE(_("$$$ Compute called wp= %s"), m_next_wp);
   double dist;
   double DTW = m_DTW;
     double XTE_for_correction;
@@ -731,7 +728,7 @@ void AutoTrackRaymarine_pi::Compute() {
       else if (heading_change < 20.)
         m_wp_loop_max = 15;
       m_wp_loop = m_wp_loop_max;
-      LOG_VERBOSE(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, m_heading_change= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, m_heading_change, heading_change);
+      LOG_VERBOSE(_(" m_wp_loop_max= %i, m_arrival_radius= %f, m_sog= %f, heading_change= %f"), m_wp_loop_max, m_arrival_radius, m_sog, heading_change);
     }
     m_arrival = false;
     double factor;
@@ -795,8 +792,7 @@ void AutoTrackRaymarine_pi::Compute() {
     }
     double max_angle = m_prefs.max_angle;
     new_heading = m_BTW + gamma;  // bearing of next wp
-    LOG_VERBOSE(wxT("gamma= %f, btw= %f, \
-     dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f, m_DTW= %f"),
+    LOG_VERBOSE(wxT("gamma= %f, btw= %f, dist=%f, max_angle= %f, XTE_for_correction= %f, m_BTW= %f, m_DTW= %f"),
                  gamma, m_BTW, dist, max_angle, XTE_for_correction, m_BTW, m_DTW);
     if (gamma > max_angle) {
       LOG_VERBOSE(wxT("AutoTrackRaymarine limited gamma= %f, btw= %f, \

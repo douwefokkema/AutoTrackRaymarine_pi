@@ -32,7 +32,7 @@
 #include "AutoTrackRaymarine_pi.h"
 #include "AutotrackInfoUI.h"
 
-#define MOD_ANGLE(angle) if (angle < -0.) angle += 360.; if (angle >= 360.) angle -= 360.;
+#define MOD_ANGLE(angle) if (angle < 0.01 && angle > -0.01) angle = 0.; if (angle < -0.) angle += 360.; if (angle >= 360.) angle -= 360.;
 
 class InfoDialog : public m_dialog
 {

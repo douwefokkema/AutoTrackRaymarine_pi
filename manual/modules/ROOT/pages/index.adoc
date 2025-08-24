@@ -72,16 +72,22 @@ Don't forget to save and import in OpenCPN afterwards.
 
 image::prefs.png[Preferences window]
 
-To access AutoTrackRaymarine preferences access the context menu of OpenCPN. You find the context menu by clicking the right hand mouse button anywhere on the screen. 
-There you select "AutoTrackRaymarine preferences" Alternatively the preferences window can be opened from the Plugin Manager. Go to the Plugin Manager
- in OpenCPN (options->Plugins), select AutoTrackRaymarine and click Preferences.
-In Preferences you can set the Max Correction Angle, that is the maximum correction that AutoTrackRaymarine will apply to the course to the next waypoint to
+To access AutoTrackRaymarine preferences, access the context menu of OpenCPN. You find the context menu by clicking the right hand mouse button anywhere on the screen. 
+There you select "AutoTrackRaymarine preferences". Alternatively the preferences window can be opened from the Plugin Manager. Go to the Plugin Manager
+ in OpenCPN (Options->Plugins), select AutoTrackRaymarine and click Preferences.
+ 
+In Preferences you can set the Max Correction Angle, that is the maximum correction that AutoTrackRaymarine will apply to the bearing 
+to the next waypoint (BTW) to
 get back on the route segment. Setting this value too low makes it difficult to keep on track in case of cross currents. Setting Max Correction Angle
-to 30 or 40 degrees should normally be fine.
-With Sensitivity you can adjust the amount of correction AutoTrackRaymarine applies to bring you back on the track.
+to 30 or 40 degrees should normally be fine. Setting Max Correction Angle to zero will cancel all corrections on the BTW. Then the ship will head straight
+for the next waypoint, without getting back to the original route segment.
+
+With Sensitivity you can adjust the amount of correction AutoTrackRaymarine applies to the BTW to bring you back on the defined route segment.
 Not enough action, increase to 100% or even higher. Unstable, rapid zigzagging, decrease to 70 or even 40%. Fast boats need lower values of Sensitivity.
-By tagging "Logging On" you can activate the logging of this plugin. Use this in case of abormal behavior or errors. The resulting opencpn.log file can be 
-used by the makers of the plugin to analyse an issue. But don't turn logging on when not needed, the logfile can get very big.
+
+By tagging "Logging On" you can activate the logging of this plugin in the opencpn.log file. Use this in case of abnormal behavior or errors. 
+The resulting opencpn.log file can be used by the makers of the plugin to analyse an issue. 
+But don't turn logging on when not needed, the logfile can get very big.
 
 == Background
 
