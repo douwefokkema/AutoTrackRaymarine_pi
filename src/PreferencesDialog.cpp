@@ -36,6 +36,7 @@ bool PreferencesDialog::Show( bool show )
         AutoTrackRaymarine_pi::preferences &p = m_pi.m_prefs;
         m_sMaxAngle1->SetValue(p.max_angle);
         m_sensitivity->SetValue(p.sensitivity);
+        m_checkBox1->SetValue(g_verbose);
     }
     return PreferencesDialogBase::Show(show);
 }
@@ -53,7 +54,7 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     AutoTrackRaymarine_pi::preferences &p = m_pi.m_prefs;
     p.max_angle = m_sMaxAngle1->GetValue();
     p.sensitivity = m_sensitivity->GetValue();
-    // Waypoint Arrival
+    g_verbose = m_checkBox1->GetValue();
     Hide();
 }
 

@@ -55,6 +55,9 @@
 
 #include "ocpn_plugin.h"
 
+#include "nmea0183.h"
+
+
 #ifdef __MSVC__
 //#include <string>
 #include "msvcdefs.h"
@@ -64,8 +67,9 @@
 //    The PlugIn Class Definition
 //----------------------------------
 
-//#define MY_API_VERSION_MAJOR 1
-//#define MY_API_VERSION_MINOR 18
+
+
+extern int g_verbose;
 
 class apDC;
 class ConsoleCanvas;
@@ -76,7 +80,17 @@ class ErrorDialog;
 #ifndef PI
 #define PI (3.1415926535897931160E0)
 #endif
-#define WPARRIVED 2;
+
+#define LOGLEVEL_VERBOSE 1
+#define IF_LOG_AT_LEVEL(x) if ((g_verbose & (x)) != 0)
+
+#define IF_LOG_AT(x, y)       \
+  do {                        \
+    IF_LOG_AT_LEVEL(x) { y; } \
+  } while (0)
+#define LOG_INFO wxLogMessage
+#define LOG_VERBOSE IF_LOG_AT_LEVEL(LOGLEVEL_VERBOSE) wxLogMessage
+
 
 class AutoTrackRaymarine_pi : public wxEvtHandler, public opencpn_plugin_118
 {
@@ -112,12 +126,16 @@ public:
   int Init(void);
   bool DeInit(void);
   DriverHandle m_handleN2k;
+  NMEA0183 m_NMEA0183;
+  double m_origin_to_dest;
+  wxString m_next_wp;
 
   int GetAPIVersionMajor();
   int GetAPIVersionMinor();
   int GetPlugInVersionMajor();
   int GetPlugInVersionMinor();
   int GetPlugInVersionPatch();
+  int GetPlugInVersionTweak();
   wxBitmap *GetPlugInBitmap();
   wxString GetCommonName();
   wxString GetShortDescription();
@@ -149,7 +167,6 @@ public:
   void ShowErrorDialog();
   void HideErrorDialog();
   void SetPilotSeen(bool seen);
-  void SetRouteActivated(bool active);
   void DisplayErrorText(wxString xx);
 
   static wxString StandardPath();
@@ -157,24 +174,30 @@ public:
   PlugIn_Position_Fix_Ex &LastFix() { return m_lastfix; }
 
   DriverHandle m_N2khandle;
-  int m_wp_arrived;
+  bool m_arrival;
+  uint16_t m_wp_loop, m_wp_loop_max;
+  double m_arrival_radius;
   double m_XTE, m_BTW, m_DTW;
   bool m_XTE_refreshed;
   bool m_heading_set;
-  double m_var;
+  double m_var, m_sog;
   bool m_initialized;
   bool m_route_active;
   double m_pilot_heading;         // target heading of pilot in auto mode
   double m_vessel_heading;        // current heading of vessel according to pilot
-  
+  double m_delayed_heading;       // delayed heading for simulation only
+  double m_heading_change;
   double m_XTE_P, m_XTE_I, m_XTE_D;   // proportional, integral and differential factors
   //enum PilotState { UNKNOWN, STANDB, TRACKING, AUTO, test} m_pilot_state;  does not function in some classes 
   uint16_t m_pilot_state; // 0 standby, 1 auto, 2 tracking
+  int m_context_menu_show_id;
 #define STANDBY 0
 #define AUTO 1
 #define TRACKING 2
 #define I_FACTOR 0.0075   // was 0.3, instable occillations
-#define D_FACTOR 2.   // was 5. 26-05-2025
+#define D_FACTOR 5.   // back to 5 13-06-2025
+
+  wxCriticalSection m_exclusive;
 
 public:
     void ResetXTE(); 
@@ -182,7 +205,7 @@ public:
     // these are stored to the config
     struct preferences {
         double max_angle;
-        double sensitivity;
+      double sensitivity;
     } m_prefs;
     
     PreferencesDialog *m_PreferencesDialog;
@@ -206,6 +229,7 @@ private:
     void SetPositionFixEx(PlugIn_Position_Fix_Ex &pfix);
     void SetPluginMessage(wxString &message_id, wxString &message_body);
     void SetActiveLegInfo(Plugin_Active_Leg_Info &leg_info);
+    void OnContextMenuItemCallback(int id);
     void Compute();
     void SendHSC(double course);
     int m_leftclick_tool_id;

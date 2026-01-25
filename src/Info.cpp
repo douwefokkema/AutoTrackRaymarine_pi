@@ -31,48 +31,48 @@
 #include "AutoTrackRaymarine_pi.h"
 
 void InfoDialog::UpdateInfo() {
-    if (m_pi->m_pilot_state == TRACKING)
-      TextStatus11->SetValue(_("Tracking"));
-    if (m_pi->m_pilot_state == AUTO)
-      TextStatus11->SetValue(_("Auto"));
-    if (m_pi->m_pilot_state == STANDBY)
-      TextStatus11->SetValue(_("Standby"));
-    wxString pilot_heading;
-    if (m_pi->m_pilot_heading == -1. || isnan(m_pi->m_pilot_heading)) {
-      pilot_heading = _("----");
-    }
-    else {
-      pilot_heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_pilot_heading);
-    }
-    TextStatus14->SetValue(pilot_heading);
-    wxString heading;
-    if (isnan(m_pi->m_vessel_heading)) {
-      heading = _("----");
-    }
-    else if (isnan(m_pi->m_var)) {
-        heading = _("no variation");
-        TextStatus12->SetForegroundColour(wxColour(255, 255, 255));
-        TextStatus12->SetBackgroundColour(wxColour(0, 0, 0));
-    }
-    else {
-      heading << wxString::Format(wxString("%4.1f", wxConvUTF8), m_pi->m_vessel_heading);
-      TextStatus12->SetForegroundColour(wxColour(0, 0, 0));
-      TextStatus12->SetBackgroundColour(wxColour(255, 255, 255));
-    }
-    TextStatus12->SetValue(heading);
-    wxString xte;
-    if (m_pi->m_XTE == 100000.) {
-      xte = _("----");
-    }
-    else {
-      xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE * 1852.);
-    }
-    TextStatus121->SetValue(xte);
+  if (m_pi->m_pilot_state == TRACKING) TextStatus11->SetValue(_("Tracking"));
+  if (m_pi->m_pilot_state == AUTO) {
+    TextStatus11->SetValue(_("Auto"));
+  }
+  if (m_pi->m_pilot_state == STANDBY) {
+    TextStatus11->SetValue(_("Standby"));
+  }
+  wxString pilot_heading;
+  if (m_pi->m_pilot_heading == -1. ||
+      isnan(m_pi->m_pilot_heading) || m_pi->m_pilot_state == STANDBY) {
+    pilot_heading = _("----");
+  } else {
+    pilot_heading << wxString::Format(wxString("%4.1f", wxConvUTF8),
+                                      m_pi->m_pilot_heading);
+  }
+  TextStatus14->SetValue(pilot_heading);
+  wxString heading;
+  if (isnan(m_pi->m_vessel_heading)) {
+    heading = _("----");
+  } else if (isnan(m_pi->m_var)) {
+    heading = _("no variation");
+    TextStatus12->SetForegroundColour(wxColour(255, 255, 255));
+    TextStatus12->SetBackgroundColour(wxColour(0, 0, 0));
+  } else {
+    heading << wxString::Format(wxString("%4.1f", wxConvUTF8),
+                                m_pi->m_vessel_heading);
+    TextStatus12->SetForegroundColour(wxColour(0, 0, 0));
+    TextStatus12->SetBackgroundColour(wxColour(255, 255, 255));
+  }
+  TextStatus12->SetValue(heading);
+  wxString xte;
+  if (m_pi->m_XTE == 100000.) {
+    xte = _("----");
+  } else {
+    xte << wxString::Format(wxString("%6.1f", wxConvUTF8), m_pi->m_XTE);
+  }
+  TextStatus121->SetValue(xte);
 }
 
 void InfoDialog::OnAuto(wxCommandEvent& event) {
     if (!m_pi->m_pilot_seen) {
-        //wxLogMessage(wxT("Pilot not seen"));
+        LOG_INFO(wxT("Pilot not seen"));
         m_pi->ShowErrorDialog();
         m_pi->DisplayErrorText("Pilot not seen");
     }

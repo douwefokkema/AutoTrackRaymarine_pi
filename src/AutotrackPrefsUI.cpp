@@ -35,11 +35,11 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer191->SetFlexibleDirection( wxBOTH );
 	fgSizer191->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText101 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Max Error Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Max Correction Angle"), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText101->Wrap( -1 );
 	fgSizer191->Add( m_staticText101, 0, wxALL, 5 );
 
-	m_sMaxAngle1 = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 90, 30 );
+	m_sMaxAngle1 = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 40, 30 );
 	fgSizer191->Add( m_sMaxAngle1, 0, wxALL, 5 );
 
 
@@ -50,15 +50,30 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer1911->SetFlexibleDirection( wxBOTH );
 	fgSizer1911->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText1011 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Sensitivity         "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1011 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Sensitivity                 "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1011->Wrap( -1 );
 	fgSizer1911->Add( m_staticText1011, 0, wxALL, 5 );
 
-	m_sensitivity = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 0, 199, 39 );
+	m_sensitivity = new wxSpinCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize( -1,-1 ), wxSP_ARROW_KEYS, 1, 120, 90 );
 	fgSizer1911->Add( m_sensitivity, 0, wxALL, 5 );
 
 
 	sbSizer5->Add( fgSizer1911, 1, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer19111;
+	fgSizer19111 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer19111->SetFlexibleDirection( wxBOTH );
+	fgSizer19111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText10111 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Logging On                "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText10111->Wrap( -1 );
+	fgSizer19111->Add( m_staticText10111, 0, wxALL, 5 );
+
+	m_checkBox1 = new wxCheckBox( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer19111->Add( m_checkBox1, 0, wxALL, 5 );
+
+
+	sbSizer5->Add( fgSizer19111, 1, wxEXPAND, 5 );
 
 
 	fgSizer162->Add( sbSizer5, 1, wxEXPAND, 5 );
