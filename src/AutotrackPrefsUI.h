@@ -19,8 +19,12 @@
 #include <wx/spinctrl.h>
 #include <wx/sizer.h>
 #include <wx/checkbox.h>
-#include <wx/statbox.h>
 #include <wx/button.h>
+#include <wx/bitmap.h>
+#include <wx/image.h>
+#include <wx/icon.h>
+#include <wx/textctrl.h>
+#include <wx/statbox.h>
 #include <wx/dialog.h>
 
 #include "wxWTranslateCatalog.h"
@@ -42,12 +46,21 @@ class PreferencesDialogBase : public wxDialog
 		wxSpinCtrl* m_sensitivity;
 		wxStaticText* m_staticText10111;
 		wxCheckBox* m_checkBox1;
+		wxStaticText* m_staticText1011131;
+		wxButton* m_button1;
+		wxStaticText* m_staticText101111;
+		wxTextCtrl* m_textCtrl1;
+		wxStaticText* m_staticText101112;
+		wxTextCtrl* m_textCtrl2;
+		wxStaticText* m_staticText101113;
+		wxTextCtrl* m_textCtrl3;
 		wxStdDialogButtonSizer* m_sdbSizer1;
 		wxButton* m_sdbSizer1OK;
 		wxButton* m_sdbSizer1Cancel;
 
 		// Virtual event handlers, override them in your derived class
 		virtual void OnOk( wxCommandEvent& event ) { event.Skip(); }
+        virtual void OnDefault(wxCommandEvent& event) { event.Skip(); }
 
 
 	public:

@@ -26,6 +26,7 @@
  */
 
 #include "PreferencesDialog.h"
+//#include "AutoTrackRaymarine_pi.h"
 
 
 bool PreferencesDialog::Show( bool show )
@@ -37,6 +38,9 @@ bool PreferencesDialog::Show( bool show )
         m_sMaxAngle1->SetValue(p.max_angle);
         m_sensitivity->SetValue(p.sensitivity);
         m_checkBox1->SetValue(g_verbose);
+        m_textCtrl1->SetValue(wxString::Format(wxT("%3.4f"), p.p_factor));
+        m_textCtrl2->SetValue(wxString::Format(wxT("%3.4f"), p.i_factor));
+        m_textCtrl3->SetValue(wxString::Format(wxT("%3.4f"), p.d_factor));
     }
     return PreferencesDialogBase::Show(show);
 }
@@ -55,7 +59,22 @@ void PreferencesDialog::OnOk( wxCommandEvent& event )
     p.max_angle = m_sMaxAngle1->GetValue();
     p.sensitivity = m_sensitivity->GetValue();
     g_verbose = m_checkBox1->GetValue();
+    wxString temp = m_textCtrl1->GetValue();  // Proportional
+    temp.ToDouble(&p.p_factor);
+    temp = m_textCtrl2->GetValue(); // Integral
+    temp.ToDouble(&p.i_factor);
+    temp = m_textCtrl3->GetValue();  // Differential
+    temp.ToDouble(&p.d_factor);
     Hide();
+}
+
+void PreferencesDialog::OnDefault(wxCommandEvent& event) {
+  wxString temp = P_FACTOR;
+  m_textCtrl1->SetValue(temp);
+  temp = I_FACTOR;
+  m_textCtrl2->SetValue(temp);
+  temp = D_FACTOR;
+  m_textCtrl3->SetValue(temp);
 }
 
 PreferencesDialog::~PreferencesDialog() {

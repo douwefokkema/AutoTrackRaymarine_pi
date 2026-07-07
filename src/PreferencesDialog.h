@@ -44,7 +44,7 @@ public:
 private:
     void OnCancel( wxCommandEvent& event );
     void OnOk( wxCommandEvent& event );
-
+    void OnDefault(wxCommandEvent& event);
 
     AutoTrackRaymarine_pi &m_pi;
 };

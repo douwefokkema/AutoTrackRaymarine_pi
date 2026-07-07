@@ -30,7 +30,6 @@
 #include "PreferencesDialog.h"
 #include "ErrorDialog.h"
 #include "icons.h"
-
 #include <wx/stdpaths.h>
 
 
@@ -141,6 +140,13 @@ int AutoTrackRaymarine_pi::Init(void)
     if (g_verbose > 1) g_verbose = 1;
     p.max_angle = pConf->Read("MaxAngle", 30.);
     p.sensitivity = pConf->Read("Sensitivity", 100.);
+    wxString temp;
+    pConf->Read(wxT("P_Factor"), &temp, P_FACTOR);
+    temp.ToDouble(&p.p_factor);
+    pConf->Read(wxT("I_Factor"), &temp , I_FACTOR);
+    temp.ToDouble(&p.i_factor);
+    pConf->Read(wxT("D_Factor"), &temp, D_FACTOR);
+    temp.ToDouble(&p.d_factor);
     ShowInfoDialog();
     m_XTE_refreshed = false;
     m_route_active = false;
@@ -307,9 +313,18 @@ bool AutoTrackRaymarine_pi::DeInit(void)
     }
 
     preferences& p = m_prefs;
-    pConf->Write("MaxAngle", p.max_angle);
-    pConf->Write("Sensitivity", p.sensitivity);
+    pConf->Write(wxT("MaxAngle"), p.max_angle);
+    pConf->Write(wxT("Sensitivity"), p.sensitivity);
+    pConf->Write(wxT("P_Factor"), p.p_factor);
+    pConf->Write(wxT("I_Factor"), p.i_factor);
+    pConf->Write(wxT("D_Factor"), p.d_factor);
     m_initialized = false;
+
+    if (m_PreferencesDialog) {
+      delete m_PreferencesDialog;
+      m_PreferencesDialog = NULL;
+    }
+
     return true;
 }
 
@@ -569,6 +584,9 @@ void AutoTrackRaymarine_pi::SetPositionFixEx(PlugIn_Position_Fix_Ex& pfix) {
   if (isnan(m_sog)) {
     m_sog = 6.;  // default value
   }
+  double lat = pfix.Lat;
+  double lon = pfix.Lon;
+  LOG_VERBOSE(wxString("lat= %f, lon= %f"), lat, lon);
 }
 
 void AutoTrackRaymarine_pi::SetActiveLegInfo(Plugin_Active_Leg_Info& leg_info) {
@@ -703,6 +721,10 @@ void AutoTrackRaymarine_pi::SetTracking()
 void AutoTrackRaymarine_pi::Compute() {
   wxCriticalSectionLocker lock(m_exclusive);
   double dist;
+  preferences& p = m_prefs;
+  double p_factor = m_prefs.p_factor;
+  double i_factor = m_prefs.i_factor;
+  double d_factor = m_prefs.d_factor;
   double DTW = m_DTW;
     double XTE_for_correction;
     if (isnan(m_BTW))
@@ -742,7 +764,7 @@ void AutoTrackRaymarine_pi::Compute() {
       LOG_VERBOSE(_("  m_max= %i, m_wp_loop= %i, factor=%f, m_XTE=%f, xte=%f"),
                    m_wp_loop_max, m_wp_loop, factor, m_XTE, xte);
       m_XTE_D = xte - m_XTE_P;  // difference, but lower at wp
-      differential = D_FACTOR * m_XTE_D;
+      differential = d_factor * m_XTE_D;
       if (m_wp_loop >= m_wp_loop_max - 1) {
         differential = 0.;
       }
@@ -751,7 +773,7 @@ void AutoTrackRaymarine_pi::Compute() {
       m_XTE_D = xte - m_XTE_P;
       if (m_XTE_D > .5) m_XTE_D = .5;
       if (m_XTE_D < -.5) m_XTE_D = -.5; // larger differences caused by arrivals or GPS errors
-      differential = D_FACTOR * m_XTE_D;
+      differential = d_factor * m_XTE_D;
       // integration of XTE, but prevent too much increase of m_XTE_I when XTE is large
       // don't integrate when in wp loop
       if (xte > -0.25 * dist && xte < 0.25 * dist) {
@@ -762,20 +784,20 @@ void AutoTrackRaymarine_pi::Compute() {
         m_XTE_I += 0.2 * xte;
       }
       // limit max size of m_XTE_I
-      if (m_XTE_I > 0.5 * dist / I_FACTOR) {  // in meters
-        m_XTE_I = 0.5 * dist / I_FACTOR;
+      if (m_XTE_I > 0.5 * dist / i_factor) {  // in meters
+        m_XTE_I = 0.5 * dist / i_factor;
       }
-      if (m_XTE_I < -0.5 * dist / I_FACTOR) {  // in meters
-        m_XTE_I = -0.5 * dist / I_FACTOR;
+      if (m_XTE_I < -0.5 * dist / i_factor) {  // in meters
+        m_XTE_I = -0.5 * dist / i_factor;
       }
     }
     m_XTE_P = xte;  // proportional used as previous xte next time
    
-    XTE_for_correction = xte + I_FACTOR * m_XTE_I + differential;
+    XTE_for_correction = p_factor * xte + i_factor * m_XTE_I + differential;
     XTE_for_correction *= m_prefs.sensitivity / 100.;
 
-    LOG_VERBOSE(wxT("XTE_for_cor= %f, xte= %f, I_FACTOR*m_XTE_I= %f, D_FACTOR*m_XTE_D= %f, DTW= %f"),
-                 XTE_for_correction, xte, I_FACTOR * m_XTE_I, differential, DTW);
+    LOG_VERBOSE(wxT("XTE_for_cor= %f, xte= %f, i_factor*m_XTE_I= %f, d_factor*m_XTE_D= %f, DTW= %f"),
+                 XTE_for_correction, xte, i_factor * m_XTE_I, differential, DTW);
     if (DTW < 0.) {
         XTE_for_correction = 0.;
     }

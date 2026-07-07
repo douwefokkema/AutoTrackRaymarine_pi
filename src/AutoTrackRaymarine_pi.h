@@ -194,18 +194,24 @@ public:
 #define STANDBY 0
 #define AUTO 1
 #define TRACKING 2
-#define I_FACTOR 0.0075   // was 0.3, instable occillations
-#define D_FACTOR 5.   // back to 5 13-06-2025
+  // default values for PID parameters
+#define P_FACTOR _("1.")
+#define I_FACTOR _("0.0075")
+  // was 0.3, instable occillations
+#define D_FACTOR _("5.")
+  // back to 5 13-06-2025
 
   wxCriticalSection m_exclusive;
 
 public:
     void ResetXTE(); 
-  
     // these are stored to the config
     struct preferences {
-        double max_angle;
+      double max_angle;
       double sensitivity;
+      double p_factor;  // proportional factor for PID
+      double d_factor;  // differential factor for PID
+      double i_factor;  // integration factor for PID
     } m_prefs;
     
     PreferencesDialog *m_PreferencesDialog;

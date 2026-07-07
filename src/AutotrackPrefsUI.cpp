@@ -35,7 +35,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer191->SetFlexibleDirection( wxBOTH );
 	fgSizer191->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText101 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Max Correction Angle"), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Max Correction Angle   "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText101->Wrap( -1 );
 	fgSizer191->Add( m_staticText101, 0, wxALL, 5 );
 
@@ -50,7 +50,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 	fgSizer1911->SetFlexibleDirection( wxBOTH );
 	fgSizer1911->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
 
-	m_staticText1011 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Sensitivity                 "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1011 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Sensitivity                     "), wxDefaultPosition, wxDefaultSize, 0 );
 	m_staticText1011->Wrap( -1 );
 	fgSizer1911->Add( m_staticText1011, 0, wxALL, 5 );
 
@@ -74,6 +74,66 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 
 	sbSizer5->Add( fgSizer19111, 1, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer1911131;
+	fgSizer1911131 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer1911131->SetFlexibleDirection( wxBOTH );
+	fgSizer1911131->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText1011131 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Don't change PID parameters unless you know what you do    "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText1011131->Wrap( -1 );
+	fgSizer1911131->Add( m_staticText1011131, 0, wxALL, 5 );
+
+	m_button1 = new wxButton( sbSizer5->GetStaticBox(), wxID_ANY, _("Default"), wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer1911131->Add( m_button1, 0, wxALL, 5 );
+
+
+	sbSizer5->Add( fgSizer1911131, 1, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer191111;
+	fgSizer191111 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer191111->SetFlexibleDirection( wxBOTH );
+	fgSizer191111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText101111 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Proportional              "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101111->Wrap( -1 );
+	fgSizer191111->Add( m_staticText101111, 0, wxALL, 5 );
+
+	m_textCtrl1 = new wxTextCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer191111->Add( m_textCtrl1, 0, wxALL, 5 );
+
+
+	sbSizer5->Add( fgSizer191111, 1, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer191112;
+	fgSizer191112 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer191112->SetFlexibleDirection( wxBOTH );
+	fgSizer191112->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText101112 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Integral                     "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101112->Wrap( -1 );
+	fgSizer191112->Add( m_staticText101112, 0, wxALL, 5 );
+
+	m_textCtrl2 = new wxTextCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer191112->Add( m_textCtrl2, 0, wxALL, 5 );
+
+
+	sbSizer5->Add( fgSizer191112, 1, wxEXPAND, 5 );
+
+	wxFlexGridSizer* fgSizer191113;
+	fgSizer191113 = new wxFlexGridSizer( 0, 2, 0, 0 );
+	fgSizer191113->SetFlexibleDirection( wxBOTH );
+	fgSizer191113->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+
+	m_staticText101113 = new wxStaticText( sbSizer5->GetStaticBox(), wxID_ANY, _("Differential               "), wxDefaultPosition, wxDefaultSize, 0 );
+	m_staticText101113->Wrap( -1 );
+	fgSizer191113->Add( m_staticText101113, 0, wxALL, 5 );
+
+	m_textCtrl3 = new wxTextCtrl( sbSizer5->GetStaticBox(), wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0 );
+	fgSizer191113->Add( m_textCtrl3, 0, wxALL, 5 );
+
+
+	sbSizer5->Add( fgSizer191113, 1, wxEXPAND, 5 );
 
 
 	fgSizer162->Add( sbSizer5, 1, wxEXPAND, 5 );
@@ -131,6 +191,7 @@ PreferencesDialogBase::PreferencesDialogBase( wxWindow* parent, wxWindowID id, c
 
 	// Connect Events
 	m_sdbSizer1OK->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( PreferencesDialogBase::OnOk ), NULL, this );
+    m_button1->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PreferencesDialogBase::OnDefault), NULL, this);
 }
 
 PreferencesDialogBase::~PreferencesDialogBase()
